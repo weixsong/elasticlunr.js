@@ -1028,11 +1028,7 @@ lunr.Index.prototype.idf = function (term) {
       idf = 1
 
   if (documentFrequency > 0) {
-<<<<<<< HEAD
-    idf = Math.log(1 + this.documentStore.length / documentFrequency)
-=======
     idf = 1 + Math.log(this.documentStore.length / documentFrequency)
->>>>>>> upstream/master
   }
 
   return this._idfCache[cacheKey] = idf
