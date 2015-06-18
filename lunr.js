@@ -22,8 +22,8 @@
  * Example:
  *
  *     var idx = lunr(function () {
- *       this.field('title', 10)
- *       this.field('tags', 100)
+ *       this.field('title', {boost: 10})
+ *       this.field('tags', {boost: 100})
  *       this.field('body')
  *       
  *       this.ref('cid')
@@ -647,25 +647,18 @@ lunr.SortedSet.prototype.forEach = function (fn, ctx) {
  */
 lunr.SortedSet.prototype.indexOf = function (elem) {
   var start = 0,
-      end = this.elements.length,
-      sectionLength = end - start,
-      pivot = start + Math.floor(sectionLength / 2),
-      pivotElem = this.elements[pivot]
+      end = this.elements.length - 1;
 
-  while (sectionLength > 1) {
-    if (pivotElem === elem) return pivot
+  while (end >= start) {
+    var pivot = start + Math.floor((end - start + 1) / 2);
+    var pivotElem = this.elements[pivot];
 
-    if (pivotElem < elem) start = pivot
-    if (pivotElem > elem) end = pivot
-
-    sectionLength = end - start
-    pivot = start + Math.floor(sectionLength / 2)
-    pivotElem = this.elements[pivot]
+    if (pivotElem === elem) return pivot;
+    if (pivotElem < elem) start = pivot + 1;
+    else end = pivot - 1;
   }
 
-  if (pivotElem === elem) return pivot
-
-  return -1
+  return -1;
 }
 
 /**
@@ -681,22 +674,19 @@ lunr.SortedSet.prototype.indexOf = function (elem) {
  */
 lunr.SortedSet.prototype.locationFor = function (elem) {
   var start = 0,
-      end = this.elements.length,
-      sectionLength = end - start,
-      pivot = start + Math.floor(sectionLength / 2),
-      pivotElem = this.elements[pivot]
+      end = this.elements.length - 1;
 
-  while (sectionLength > 1) {
-    if (pivotElem < elem) start = pivot
-    if (pivotElem > elem) end = pivot
+  while (end >= start) {
+    var pivot = start + Math.floor((end - start + 1) / 2);
+    var pivotElem = this.elements[pivot];
 
-    sectionLength = end - start
-    pivot = start + Math.floor(sectionLength / 2)
-    pivotElem = this.elements[pivot]
+    if (pivotElem === elem) return pivot;
+    if (pivotElem < elem) start = pivot + 1;
+    else end = pivot - 1;
   }
 
-  if (pivotElem > elem) return pivot
-  if (pivotElem < elem) return pivot + 1
+  if (pivotElem > elem) return pivot;
+  if (pivotElem < elem) return pivot + 1;
 }
 
 /**
@@ -800,7 +790,7 @@ lunr.Index = function () {
   this._fields = []
   this._ref = 'id'
   this.pipeline = new lunr.Pipeline
-  this.documentStore = new lunr.Store
+  this.documentStore = new lunr.DocumentStore
   this.tokenStore = new lunr.TokenStore
   this.corpusTokens = new lunr.SortedSet
   this.eventEmitter =  new lunr.EventEmitter
@@ -857,7 +847,7 @@ lunr.Index.load = function (serialisedData) {
   idx._fields = serialisedData.fields
   idx._ref = serialisedData.ref
 
-  idx.documentStore = lunr.Store.load(serialisedData.documentStore)
+  idx.documentStore = lunr.DocumentStore.load(serialisedData.documentStore)
   idx.tokenStore = lunr.TokenStore.load(serialisedData.tokenStore)
   idx.corpusTokens = lunr.SortedSet.load(serialisedData.corpusTokens)
   idx.pipeline = lunr.Pipeline.load(serialisedData.pipeline)
@@ -1038,7 +1028,7 @@ lunr.Index.prototype.idf = function (term) {
       idf = 1
 
   if (documentFrequency > 0) {
-    idf = 1 + Math.log(this.tokenStore.length / documentFrequency)
+    idf = Math.log(1 + this.documentStore.length / documentFrequency)
   }
 
   return this._idfCache[cacheKey] = idf
@@ -1082,7 +1072,8 @@ lunr.Index.prototype.search = function (query) {
 
   queryTokens
     .forEach(function (token, i, tokens) {
-      var tf = 1 / tokens.length * this._fields.length * fieldBoosts,
+      var tokenCount = tokens.filter(function (t) { return t === token; }).length;
+      var tf = tokenCount / tokens.length * this._fields.length * fieldBoosts,
           self = this
 
       var set = this.tokenStore.expand(token).reduce(function (memo, key) {
@@ -1206,101 +1197,101 @@ lunr.Index.prototype.use = function (plugin) {
   plugin.apply(this, args)
 }
 /*!
- * lunr.Store
+ * lunr.DocumentStore
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
- * lunr.Store is a simple key-value store used for storing sets of tokens for
+ * lunr.DocumentStore is a simple key-value document store used for storing sets of tokens for
  * documents stored in index.
  *
  * @constructor
  * @module
  */
-lunr.Store = function () {
-  this.store = {}
-  this.length = 0
-}
+lunr.DocumentStore = function () {
+  this.document_store = {};
+  this.length = 0;
+};
 
 /**
- * Loads a previously serialised store
+ * Loads a previously serialised document store
  *
- * @param {Object} serialisedData The serialised store to load.
+ * @param {Object} serialisedData The serialised document store to load.
  * @returns {lunr.Store}
  * @memberOf Store
  */
-lunr.Store.load = function (serialisedData) {
-  var store = new this
+lunr.DocumentStore.load = function (serialisedData) {
+  var doc_store = new this;
 
-  store.length = serialisedData.length
-  store.store = Object.keys(serialisedData.store).reduce(function (memo, key) {
-    memo[key] = lunr.SortedSet.load(serialisedData.store[key])
-    return memo
-  }, {})
+  doc_store.length = serialisedData.length;
+  doc_store.document_store = Object.keys(serialisedData.document_store).reduce(function (memo, key) {
+    memo[key] = lunr.SortedSet.load(serialisedData.document_store[key]);
+    return memo;
+  }, {});
 
-  return store
-}
+  return doc_store;
+};
 
 /**
- * Stores the given tokens in the store against the given id.
+ * Stores the given tokens in the document store against the given id.
  *
- * @param {Object} id The key used to store the tokens against.
- * @param {Object} tokens The tokens to store against the key.
+ * @param {Object} doc_id The, key used to store the sorted tokens.
+ * @param {Object} sorted_tokens, The sorted tokens to store against the key.
  * @memberOf Store
  */
-lunr.Store.prototype.set = function (id, tokens) {
-  if (!this.has(id)) this.length++
-  this.store[id] = tokens
-}
+lunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
+  if (!this.has(doc_id)) this.length++;
+  this.document_store[doc_id] = sorted_tokens;
+};
 
 /**
- * Retrieves the tokens from the store for a given key.
+ * Retrieves the tokens from the document store for a given key.
  *
- * @param {Object} id The key to lookup and retrieve from the store.
+ * @param {Object} doc_id, The key to lookup and retrieve from the document store.
  * @returns {Object}
  * @memberOf Store
  */
-lunr.Store.prototype.get = function (id) {
-  return this.store[id]
-}
+lunr.DocumentStore.prototype.get = function (doc_id) {
+  return this.document_store[doc_id];
+};
 
 /**
- * Checks whether the store contains a key.
+ * Checks whether the document store contains a key (doc_id).
  *
- * @param {Object} id The id to look up in the store.
+ * @param {Object} doc_id The id to look up in the document store.
  * @returns {Boolean}
  * @memberOf Store
  */
-lunr.Store.prototype.has = function (id) {
-  return id in this.store
-}
+lunr.DocumentStore.prototype.has = function (doc_id) {
+  return doc_id in this.document_store;
+};
 
 /**
- * Removes the value for a key in the store.
+ * Removes the value for a key in the document store.
  *
- * @param {Object} id The id to remove from the store.
+ * @param {Object} doc_id The id to remove from the document store.
  * @memberOf Store
  */
-lunr.Store.prototype.remove = function (id) {
-  if (!this.has(id)) return
+lunr.DocumentStore.prototype.remove = function (doc_id) {
+  if (!this.has(doc_id)) return;
 
-  delete this.store[id]
-  this.length--
-}
+  delete this.document_store[doc_id];
+  this.length--;
+};
 
 /**
- * Returns a representation of the store ready for serialisation.
+ * Returns a representation of the document store ready for serialisation.
  *
  * @returns {Object}
  * @memberOf Store
  */
-lunr.Store.prototype.toJSON = function () {
+lunr.DocumentStore.prototype.toJSON = function () {
   return {
-    store: this.store,
+    document_store: this.document_store,
     length: this.length
-  }
-}
-
+  };
+};
 /*!
  * lunr.stemmer
  * Copyright (C) 2015 Oliver Nightingale
@@ -1740,18 +1731,19 @@ lunr.TokenStore.load = function (serialisedData) {
  */
 lunr.TokenStore.prototype.add = function (token, doc, root) {
   var root = root || this.root,
-      key = token[0],
-      rest = token.slice(1)
+      key = '',
+      idx = 0;
 
-  if (!(key in root)) root[key] = {docs: {}}
+  while (idx <= token.length - 1) {
+    key = token[idx];
 
-  if (rest.length === 0) {
-    root[key].docs[doc.ref] = doc
-    this.length += 1
-    return
-  } else {
-    return this.add(rest, doc, root[key])
+    if (!(key in root)) root[key] = {docs: {}};
+    idx += 1;
+    root = root[key];
   }
+
+  root.docs[doc.ref] = doc;
+  this.length += 1;
 }
 
 /**
@@ -1855,21 +1847,24 @@ lunr.TokenStore.prototype.remove = function (token, ref) {
  * @returns {Array}
  * @memberOf TokenStore
  */
-lunr.TokenStore.prototype.expand = function (token, memo) {
-  var root = this.getNode(token),
-      docs = root.docs || {},
-      memo = memo || []
+lunr.TokenStore.prototype.expand = function (token, memo, root) {
+  if (root == void 0) {
+    root = this.getNode(token);
+  }
 
-  if (Object.keys(docs).length) memo.push(token)
+  var docs = root.docs || {},
+      memo = memo || [];
+
+  if (Object.keys(docs).length) memo.push(token);
 
   Object.keys(root)
     .forEach(function (key) {
-      if (key === 'docs') return
+      if (key === 'docs') return;
 
-      memo.concat(this.expand(token + key, memo))
-    }, this)
-
-  return memo
+      memo.concat(this.expand(token + key, memo, root[key]));
+    }, this);
+    
+  return memo;
 }
 
 /**

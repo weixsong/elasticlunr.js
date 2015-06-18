@@ -1,7 +1,7 @@
-module('lunr.Store')
+module('lunr.DocumentStore')
 
 test('adding document tokens to the document store', function () {
-  var docStore = new lunr.Store,
+  var docStore = new lunr.DocumentStore,
       tokens = ['eggs', 'ham']
 
   docStore.set(1, tokens)
@@ -9,7 +9,7 @@ test('adding document tokens to the document store', function () {
 })
 
 test('getting the number of items in the document store', function () {
-  var docStore = new lunr.Store
+  var docStore = new lunr.DocumentStore
 
   equal(docStore.length, 0)
   docStore.set(1, 'foo')
@@ -17,7 +17,7 @@ test('getting the number of items in the document store', function () {
 })
 
 test('checking whether the store contains a key', function () {
-  var store = new lunr.Store
+  var store = new lunr.DocumentStore
 
   ok(!store.has('foo'))
   store.set('foo', 1)
@@ -25,7 +25,7 @@ test('checking whether the store contains a key', function () {
 })
 
 test('removing an element from the store', function () {
-  var store = new lunr.Store
+  var store = new lunr.DocumentStore
 
   store.set('foo', 1)
   ok(store.has('foo'))
@@ -36,7 +36,7 @@ test('removing an element from the store', function () {
 })
 
 test('serialising', function () {
-  var store = new lunr.Store
+  var store = new lunr.DocumentStore
 
   deepEqual(store.toJSON(), { store: {}, length: 0 })
 
@@ -53,7 +53,7 @@ test('loading serialised data', function () {
     }
   }
 
-  var store = lunr.Store.load(serialisedData)
+  var store = lunr.DocumentStore.load(serialisedData)
 
   equal(store.length, 1)
   deepEqual(store.get(1), lunr.SortedSet.load(['eggs', 'ham']))

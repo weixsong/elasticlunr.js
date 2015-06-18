@@ -274,7 +274,7 @@ test('loading a serialised index', function () {
       { name: 'body', boost: 1 }
     ],
     ref: 'id',
-    documentStore: { store: {}, length: 0 },
+    documentStore: { document_store: {}, length: 0 },
     tokenStore: { root: {}, length: 0 },
     corpusTokens: [],
     pipeline: ['stopWordFilter', 'stemmer']
