@@ -31,7 +31,7 @@ test('dumping and loading an index', function () {
 })
 
 test('dumping and loading an index with a populated pipeline', function () {
-  var idx = lunr(function () {
+  var idx = elasticlunr(function () {
     this.field('title', { boost: 10 })
     this.field('body')
   })

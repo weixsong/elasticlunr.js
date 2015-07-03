@@ -1,13 +1,13 @@
-module('lunr')
+module('elasticlunr')
 
 test('returns a new instance of elasticlunr.Index', function () {
-  var index = lunr()
+  var index = elasticlunr()
 
   equal(index.constructor, elasticlunr.Index)
 })
 
 test('should set up the pipeline', function () {
-  var index = lunr(),
+  var index = elasticlunr(),
       stack = index.pipeline._stack
 
   equal(stack.length, 3)
@@ -19,7 +19,7 @@ test('should set up the pipeline', function () {
 test('passing a config fn which is called with the new index', function () {
   var configCtx, configArg
 
-  var index = lunr(function (idx) {
+  var index = elasticlunr(function (idx) {
     configCtx = this
     configArg = idx
 
