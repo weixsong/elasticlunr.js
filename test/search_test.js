@@ -1,6 +1,6 @@
 module('search', {
   setup: function () {
-    var idx = new lunr.Index
+    var idx = new elasticlunr.Index
     idx.field('body')
     idx.field('title', { boost: 10 })
 

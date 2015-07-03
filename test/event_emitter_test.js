@@ -1,7 +1,7 @@
-module('lunr.EventEmitter')
+module('elasticlunr.EventEmitter')
 
 test('adding an event listener', function () {
-  var emitter = new lunr.EventEmitter,
+  var emitter = new elasticlunr.EventEmitter,
       handler = function () {}
 
   emitter.addListener('test', handler)
@@ -11,7 +11,7 @@ test('adding an event listener', function () {
 })
 
 test('adding a listener to multiple events', function () {
-  var emitter = new lunr.EventEmitter,
+  var emitter = new elasticlunr.EventEmitter,
       handler = function () {}
 
   emitter.addListener('foo', 'bar', 'baz', handler)
@@ -26,7 +26,7 @@ test('adding a listener to multiple events', function () {
 })
 
 test('removing a single event listener', function () {
-  var emitter = new lunr.EventEmitter,
+  var emitter = new elasticlunr.EventEmitter,
       handler = function () {}
 
   emitter.addListener('test', handler)
@@ -40,7 +40,7 @@ test('removing a single event listener', function () {
 })
 
 test('removing a single event listener from many listeners', function () {
-  var emitter = new lunr.EventEmitter,
+  var emitter = new elasticlunr.EventEmitter,
       handler = function () {},
       otherHandler = function () {}
 
@@ -58,7 +58,7 @@ test('removing a single event listener from many listeners', function () {
 })
 
 test('emitting events', function () {
-  var emitter = new lunr.EventEmitter,
+  var emitter = new elasticlunr.EventEmitter,
       callbackCalled = false,
       callbackArguments = [],
       callback = function () {

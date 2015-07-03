@@ -1,5 +1,5 @@
 
-SRC = lib/lunr.js \
+SRC = lib/elasticlunr.js \
 	lib/utils.js \
 	lib/event_emitter.js \
 	lib/tokenizer.js \
@@ -26,21 +26,21 @@ NPM ?= /usr/local/bin/npm
 PHANTOMJS ?= ./node_modules/.bin/phantomjs
 UGLIFYJS ?= ./node_modules/.bin/uglifyjs
 
-all: node_modules lunr.js lunr.min.js docs bower.json package.json component.json example
+all: node_modules elasticlunr.js elasticlunr.min.js docs bower.json package.json component.json example
 
-lunr.js: $(SRC)
+elasticlunr.js: $(SRC)
 	cat build/wrapper_start $^ build/wrapper_end | \
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" > $@
 
-lunr.min.js: lunr.js
+elasticlunr.min.js: elasticlunr.js
 	${UGLIFYJS} --compress --mangle --comments < $< > $@
 
 %.json: build/%.json.template
 	cat $< | sed "s/@VERSION/${VERSION}/" > $@
 
-size: lunr.min.js
-	@gzip -c lunr.min.js | wc -c
+size: elasticlunr.min.js
+	@gzip -c elasticlunr.min.js | wc -c
 
 server:
 	${NODE} server.js ${SERVER_PORT}
@@ -49,17 +49,17 @@ test: node_modules
 	@./test/runner.sh ${TEST_PORT}
 
 docs: node_modules
-	${DOX} < lunr.js | ${DOX_TEMPLATE} -n lunr.js -r ${VERSION} > docs/index.html
+	${DOX} < elasticlunr.js | ${DOX_TEMPLATE} -n elasticlunr.js -r ${VERSION} > docs/index.html
 
 clean:
-	rm -f lunr{.min,}.js
+	rm -f elasticlunr{.min,}.js
 	rm *.json
 	rm example/example_index.json
 
 reset:
-	git checkout lunr.* *.json docs/index.html example/example_index.json
+	git checkout elasticlunr.* *.json docs/index.html example/example_index.json
 
-example: lunr.min.js
+example: elasticlunr.min.js
 	${NODE} example/index_builder.js
 
 node_modules: package.json

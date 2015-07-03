@@ -17,7 +17,7 @@ module('serialisation', {
 })
 
 test('dumping and loading an index', function () {
-  var idx = new lunr.Index
+  var idx = new elasticlunr.Index
 
   idx.field('title', { boost: 10 })
   idx.field('body')
@@ -25,7 +25,7 @@ test('dumping and loading an index', function () {
   this.corpus.forEach(function (doc) { idx.add(doc) })
 
   var dumpedIdx = JSON.stringify(idx),
-      clonedIdx = lunr.Index.load(JSON.parse(dumpedIdx))
+      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx))
 
   deepEqual(idx.search('green plant'), clonedIdx.search('green plant'))
 })
@@ -39,7 +39,7 @@ test('dumping and loading an index with a populated pipeline', function () {
   this.corpus.forEach(function (doc) { idx.add(doc) })
 
   var dumpedIdx = JSON.stringify(idx),
-      clonedIdx = lunr.Index.load(JSON.parse(dumpedIdx))
+      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx))
 
   deepEqual(idx.pipeline._stack, clonedIdx.pipeline._stack)
   deepEqual(idx.search('water'), clonedIdx.search('water'))

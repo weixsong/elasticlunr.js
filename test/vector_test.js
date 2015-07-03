@@ -1,7 +1,7 @@
-module("lunr.Vector")
+module("elasticlunr.Vector")
 
 test("calculating the magnitude of a vector", function () {
-  var vector = new lunr.Vector,
+  var vector = new elasticlunr.Vector,
       elements = [4,5,6]
 
   elements.forEach(function (el, i) { vector.insert(i, el) })
@@ -10,8 +10,8 @@ test("calculating the magnitude of a vector", function () {
 })
 
 test("calculating the dot product with another vector", function () {
-  var v1 = new lunr.Vector,
-      v2 = new lunr.Vector,
+  var v1 = new elasticlunr.Vector,
+      v2 = new elasticlunr.Vector,
       els1 = [1, 3, -5],
       els2 = [4, -2, -1]
 
@@ -23,8 +23,8 @@ test("calculating the dot product with another vector", function () {
 })
 
 test("calculating the similarity between two vectors", function () {
-  var v1 = new lunr.Vector,
-      v2 = new lunr.Vector,
+  var v1 = new elasticlunr.Vector,
+      v2 = new elasticlunr.Vector,
       els1 = [1, 3, -5],
       els2 = [4, -2, -1]
 
@@ -38,7 +38,7 @@ test("calculating the similarity between two vectors", function () {
 })
 
 test("inserting an element invalidates the magnitude cache", function () {
-  var vector = new lunr.Vector,
+  var vector = new elasticlunr.Vector,
       elements = [4,5,6]
 
   elements.forEach(function (el, i) { vector.insert(i, el) })
@@ -51,7 +51,7 @@ test("inserting an element invalidates the magnitude cache", function () {
 })
 
 test("inserted elements are kept in index order", function () {
-  var vector = new lunr.Vector,
+  var vector = new elasticlunr.Vector,
       elements = [6,5,4]
 
   vector.insert(2, 4)

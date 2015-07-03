@@ -1,9 +1,9 @@
 module('lunr')
 
-test('returns a new instance of lunr.Index', function () {
+test('returns a new instance of elasticlunr.Index', function () {
   var index = lunr()
 
-  equal(index.constructor, lunr.Index)
+  equal(index.constructor, elasticlunr.Index)
 })
 
 test('should set up the pipeline', function () {
@@ -11,9 +11,9 @@ test('should set up the pipeline', function () {
       stack = index.pipeline._stack
 
   equal(stack.length, 3)
-  equal(stack.indexOf(lunr.trimmer), 0)
-  equal(stack.indexOf(lunr.stopWordFilter), 1)
-  equal(stack.indexOf(lunr.stemmer), 2)
+  equal(stack.indexOf(elasticlunr.trimmer), 0)
+  equal(stack.indexOf(elasticlunr.stopWordFilter), 1)
+  equal(stack.indexOf(elasticlunr.stemmer), 2)
 })
 
 test('passing a config fn which is called with the new index', function () {

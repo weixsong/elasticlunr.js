@@ -1,8 +1,8 @@
-module('lunr.trimmer')
+module('elasticlunr.trimmer')
 
 test('latin characters', function () {
   var token = 'hello'
-  equal(lunr.trimmer(token), token)
+  equal(elasticlunr.trimmer(token), token)
 })
 
 test('removing leading and trailing punctuation', function () {
@@ -13,15 +13,15 @@ test('removing leading and trailing punctuation', function () {
       comma = 'first,',
       brackets = '[tag]'
 
-  deepEqual(lunr.trimmer(fullStop), 'hello')
-  deepEqual(lunr.trimmer(innerApostrophe), "it's")
-  deepEqual(lunr.trimmer(trailingApostrophe), "james")
-  deepEqual(lunr.trimmer(exclamationMark), 'stop')
-  deepEqual(lunr.trimmer(comma), 'first')
-  deepEqual(lunr.trimmer(brackets), 'tag')
+  deepEqual(elasticlunr.trimmer(fullStop), 'hello')
+  deepEqual(elasticlunr.trimmer(innerApostrophe), "it's")
+  deepEqual(elasticlunr.trimmer(trailingApostrophe), "james")
+  deepEqual(elasticlunr.trimmer(exclamationMark), 'stop')
+  deepEqual(elasticlunr.trimmer(comma), 'first')
+  deepEqual(elasticlunr.trimmer(brackets), 'tag')
 })
 
-test('should be registered with lunr.Pipeline', function () {
-  equal(lunr.trimmer.label, 'trimmer')
-  deepEqual(lunr.Pipeline.registeredFunctions['trimmer'], lunr.trimmer)
+test('should be registered with elasticlunr.Pipeline', function () {
+  equal(elasticlunr.trimmer.label, 'trimmer')
+  deepEqual(elasticlunr.Pipeline.registeredFunctions['trimmer'], elasticlunr.trimmer)
 })

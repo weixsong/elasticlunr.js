@@ -1,7 +1,7 @@
 {
   "name": "elastic-lunr",
   "repo": "weixsong/elastic-lunr.js",
-  "version": "0.1",
+  "version": "0.5.11",
   "description": "Full-text search for javascript.",
   "license": "MIT",
   "main": "elastic-lunr.js",

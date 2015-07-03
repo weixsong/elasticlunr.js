@@ -1,6 +1,7 @@
 /**
- * lunr - http://lunrjs.com - A bit like Solr, but much smaller and not as bright - 0.5.10
+ * elasticlunr - http://weixsong.github.io - A bit like Solr, but much smaller and not as bright - 0.5.11
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  * MIT Licensed
  * @license
  */
@@ -8,20 +9,20 @@
 (function(){
 
 /**
- * Convenience function for instantiating a new lunr index and configuring it
+ * Convenience function for instantiating a new elasticLunr index and configuring it
  * with the default pipeline functions and the passed config function.
  *
  * When using this convenience function a new index will be created with the
  * following functions already in the pipeline:
  *
- * lunr.StopWordFilter - filters out any stop words before they enter the
+ * elasticlunr.StopWordFilter - filters out any stop words before they enter the
  * index
  *
- * lunr.stemmer - stems the tokens before entering the index.
+ * elasticlunr.stemmer - stems the tokens before entering the index.
  *
  * Example:
  *
- *     var idx = lunr(function () {
+ *     var idx = elasticLunr(function () {
  *       this.field('title', {boost: 10})
  *       this.field('tags', {boost: 100})
  *       this.field('body')
@@ -35,37 +36,37 @@
  *     })
  *
  * @param {Function} config A function that will be called with the new instance
- * of the lunr.Index as both its context and first parameter. It can be used to
- * customize the instance of new lunr.Index.
+ * of the elasticlunr.Index as both its context and first parameter. It can be used to
+ * customize the instance of new elasticlunr.Index.
  * @namespace
  * @module
- * @returns {lunr.Index}
+ * @returns {elasticlunr.Index}
  *
  */
-var lunr = function (config) {
-  var idx = new lunr.Index
+var elasticlunr = function (config) {
+  var idx = new elasticlunr.Index;
 
   idx.pipeline.add(
-    lunr.trimmer,
-    lunr.stopWordFilter,
-    lunr.stemmer
-  )
+    elasticlunr.trimmer,
+    elasticlunr.stopWordFilter,
+    elasticlunr.stemmer
+  );
 
-  if (config) config.call(idx, idx)
+  if (config) config.call(idx, idx);
 
-  return idx
-}
+  return idx;
+};
 
-lunr.version = "0.5.10"
+elasticlunr.version = "0.5.11";
 /*!
- * lunr.utils
+ * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
  * A namespace containing utils for the rest of the lunr library
  */
-lunr.utils = {}
+elasticlunr.utils = {}
 
 /**
  * Print a warning message to the console.
@@ -73,7 +74,7 @@ lunr.utils = {}
  * @param {String} message The message to be printed.
  * @memberOf Utils
  */
-lunr.utils.warn = (function (global) {
+elasticlunr.utils.warn = (function (global) {
   return function (message) {
     if (global.console && console.warn) {
       console.warn(message)
@@ -82,16 +83,16 @@ lunr.utils.warn = (function (global) {
 })(this)
 
 /*!
- * lunr.EventEmitter
+ * elasticlunr.EventEmitter
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.EventEmitter is an event emitter for lunr. It manages adding and removing event handlers and triggering events and their handlers.
+ * elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.
  *
  * @constructor
  */
-lunr.EventEmitter = function () {
+elasticlunr.EventEmitter = function () {
   this.events = {}
 }
 
@@ -104,7 +105,7 @@ lunr.EventEmitter = function () {
  * @param {Function} fn The function to call when an event is fired.
  * @memberOf EventEmitter
  */
-lunr.EventEmitter.prototype.addListener = function () {
+elasticlunr.EventEmitter.prototype.addListener = function () {
   var args = Array.prototype.slice.call(arguments),
       fn = args.pop(),
       names = args
@@ -124,7 +125,7 @@ lunr.EventEmitter.prototype.addListener = function () {
  * @param {Function} fn The function to remove from an event.
  * @memberOf EventEmitter
  */
-lunr.EventEmitter.prototype.removeListener = function (name, fn) {
+elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
   if (!this.hasHandler(name)) return
 
   var fnIndex = this.events[name].indexOf(fn)
@@ -142,7 +143,7 @@ lunr.EventEmitter.prototype.removeListener = function (name, fn) {
  * @param {String} eventName The name of the event to emit.
  * @memberOf EventEmitter
  */
-lunr.EventEmitter.prototype.emit = function (name) {
+elasticlunr.EventEmitter.prototype.emit = function (name) {
   if (!this.hasHandler(name)) return
 
   var args = Array.prototype.slice.call(arguments, 1)
@@ -159,12 +160,12 @@ lunr.EventEmitter.prototype.emit = function (name) {
  * @private
  * @memberOf EventEmitter
  */
-lunr.EventEmitter.prototype.hasHandler = function (name) {
+elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
   return name in this.events
 }
 
 /*!
- * lunr.tokenizer
+ * elasticlunr.tokenizer
  * Copyright (C) 2015 Oliver Nightingale
  */
 
@@ -176,7 +177,7 @@ lunr.EventEmitter.prototype.hasHandler = function (name) {
  * @param {String} obj The string to convert into tokens
  * @returns {Array}
  */
-lunr.tokenizer = function (obj) {
+elasticlunr.tokenizer = function (obj) {
   if (!arguments.length || obj == null || obj == undefined) return []
   if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase() })
 
@@ -184,16 +185,16 @@ lunr.tokenizer = function (obj) {
 }
 
 /*!
- * lunr.Pipeline
+ * elasticlunr.Pipeline
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.Pipelines maintain an ordered list of functions to be applied to all
+ * elasticlunr.Pipelines maintain an ordered list of functions to be applied to all
  * tokens in documents entering the search index and queries being ran against
  * the index.
  *
- * An instance of lunr.Index created with the lunr shortcut will contain a
+ * An instance of elasticlunr.Index created with the lunr shortcut will contain a
  * pipeline with a stop word filter and an English language stemmer. Extra
  * functions can be added before or after either of these functions or these
  * default functions can be removed.
@@ -208,7 +209,7 @@ lunr.tokenizer = function (obj) {
  * this token.
  *
  * For serialisation of pipelines to work, all functions used in an instance of
- * a pipeline should be registered with lunr.Pipeline. Registered functions can
+ * a pipeline should be registered with elasticlunr.Pipeline. Registered functions can
  * then be loaded. If trying to load a serialised pipeline that uses functions
  * that are not registered an error will be thrown.
  *
@@ -217,11 +218,11 @@ lunr.tokenizer = function (obj) {
  *
  * @constructor
  */
-lunr.Pipeline = function () {
+elasticlunr.Pipeline = function () {
   this._stack = []
 }
 
-lunr.Pipeline.registeredFunctions = {}
+elasticlunr.Pipeline.registeredFunctions = {}
 
 /**
  * Register a function with the pipeline.
@@ -236,13 +237,13 @@ lunr.Pipeline.registeredFunctions = {}
  * @param {String} label The label to register this function with
  * @memberOf Pipeline
  */
-lunr.Pipeline.registerFunction = function (fn, label) {
+elasticlunr.Pipeline.registerFunction = function (fn, label) {
   if (label in this.registeredFunctions) {
-    lunr.utils.warn('Overwriting existing registered function: ' + label)
+    elasticlunr.utils.warn('Overwriting existing registered function: ' + label)
   }
 
   fn.label = label
-  lunr.Pipeline.registeredFunctions[fn.label] = fn
+  elasticlunr.Pipeline.registeredFunctions[fn.label] = fn
 }
 
 /**
@@ -252,30 +253,30 @@ lunr.Pipeline.registerFunction = function (fn, label) {
  * @private
  * @memberOf Pipeline
  */
-lunr.Pipeline.warnIfFunctionNotRegistered = function (fn) {
+elasticlunr.Pipeline.warnIfFunctionNotRegistered = function (fn) {
   var isRegistered = fn.label && (fn.label in this.registeredFunctions)
 
   if (!isRegistered) {
-    lunr.utils.warn('Function is not registered with pipeline. This may cause problems when serialising the index.\n', fn)
+    elasticlunr.utils.warn('Function is not registered with pipeline. This may cause problems when serialising the index.\n', fn)
   }
 }
 
 /**
  * Loads a previously serialised pipeline.
  *
- * All functions to be loaded must already be registered with lunr.Pipeline.
+ * All functions to be loaded must already be registered with elasticlunr.Pipeline.
  * If any function from the serialised data has not been registered then an
  * error will be thrown.
  *
  * @param {Object} serialised The serialised pipeline to load.
- * @returns {lunr.Pipeline}
+ * @returns {elasticlunr.Pipeline}
  * @memberOf Pipeline
  */
-lunr.Pipeline.load = function (serialised) {
-  var pipeline = new lunr.Pipeline
+elasticlunr.Pipeline.load = function (serialised) {
+  var pipeline = new elasticlunr.Pipeline
 
   serialised.forEach(function (fnName) {
-    var fn = lunr.Pipeline.registeredFunctions[fnName]
+    var fn = elasticlunr.Pipeline.registeredFunctions[fnName]
 
     if (fn) {
       pipeline.add(fn)
@@ -295,11 +296,11 @@ lunr.Pipeline.load = function (serialised) {
  * @param {Function} functions Any number of functions to add to the pipeline.
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.add = function () {
+elasticlunr.Pipeline.prototype.add = function () {
   var fns = Array.prototype.slice.call(arguments)
 
   fns.forEach(function (fn) {
-    lunr.Pipeline.warnIfFunctionNotRegistered(fn)
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
     this._stack.push(fn)
   }, this)
 }
@@ -314,8 +315,8 @@ lunr.Pipeline.prototype.add = function () {
  * @param {Function} newFn The new function to add to the pipeline.
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.after = function (existingFn, newFn) {
-  lunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+elasticlunr.Pipeline.prototype.after = function (existingFn, newFn) {
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
 
   var pos = this._stack.indexOf(existingFn)
   if (pos == -1) {
@@ -336,8 +337,8 @@ lunr.Pipeline.prototype.after = function (existingFn, newFn) {
  * @param {Function} newFn The new function to add to the pipeline.
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.before = function (existingFn, newFn) {
-  lunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
 
   var pos = this._stack.indexOf(existingFn)
   if (pos == -1) {
@@ -353,7 +354,7 @@ lunr.Pipeline.prototype.before = function (existingFn, newFn) {
  * @param {Function} fn The function to remove from the pipeline.
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.remove = function (fn) {
+elasticlunr.Pipeline.prototype.remove = function (fn) {
   var pos = this._stack.indexOf(fn)
   if (pos == -1) {
     return
@@ -370,7 +371,7 @@ lunr.Pipeline.prototype.remove = function (fn) {
  * @returns {Array}
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.run = function (tokens) {
+elasticlunr.Pipeline.prototype.run = function (tokens) {
   var out = [],
       tokenLength = tokens.length,
       stackLength = this._stack.length
@@ -394,7 +395,7 @@ lunr.Pipeline.prototype.run = function (tokens) {
  *
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.reset = function () {
+elasticlunr.Pipeline.prototype.reset = function () {
   this._stack = []
 }
 
@@ -406,42 +407,42 @@ lunr.Pipeline.prototype.reset = function () {
  * @returns {Array}
  * @memberOf Pipeline
  */
-lunr.Pipeline.prototype.toJSON = function () {
+elasticlunr.Pipeline.prototype.toJSON = function () {
   return this._stack.map(function (fn) {
-    lunr.Pipeline.warnIfFunctionNotRegistered(fn)
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
 
     return fn.label
   })
 }
 /*!
- * lunr.Vector
+ * elasticlunr.Vector
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.Vectors implement vector related operations for
+ * elasticlunr.Vectors implement vector related operations for
  * a series of elements.
  *
  * @constructor
  */
-lunr.Vector = function () {
+elasticlunr.Vector = function () {
   this._magnitude = null
   this.list = undefined
   this.length = 0
 }
 
 /**
- * lunr.Vector.Node is a simple struct for each node
- * in a lunr.Vector.
+ * elasticlunr.Vector.Node is a simple struct for each node
+ * in a elasticlunr.Vector.
  *
  * @private
  * @param {Number} The index of the node in the vector.
  * @param {Object} The data at this node in the vector.
- * @param {lunr.Vector.Node} The node directly after this node in the vector.
+ * @param {elasticlunr.Vector.Node} The node directly after this node in the vector.
  * @constructor
  * @memberOf Vector
  */
-lunr.Vector.Node = function (idx, val, next) {
+elasticlunr.Vector.Node = function (idx, val, next) {
   this.idx = idx
   this.val = val
   this.next = next
@@ -454,17 +455,17 @@ lunr.Vector.Node = function (idx, val, next) {
  * @param {Object} The object to insert in the vector.
  * @memberOf Vector.
  */
-lunr.Vector.prototype.insert = function (idx, val) {
+elasticlunr.Vector.prototype.insert = function (idx, val) {
   this._magnitude = undefined;
   var list = this.list
 
   if (!list) {
-    this.list = new lunr.Vector.Node (idx, val, list)
+    this.list = new elasticlunr.Vector.Node (idx, val, list)
     return this.length++
   }
 
   if (idx < list.idx) {
-    this.list = new lunr.Vector.Node (idx, val, list)
+    this.list = new elasticlunr.Vector.Node (idx, val, list)
     return this.length++
   }
 
@@ -473,14 +474,14 @@ lunr.Vector.prototype.insert = function (idx, val) {
 
   while (next != undefined) {
     if (idx < next.idx) {
-      prev.next = new lunr.Vector.Node (idx, val, next)
+      prev.next = new elasticlunr.Vector.Node (idx, val, next)
       return this.length++
     }
 
     prev = next, next = next.next
   }
 
-  prev.next = new lunr.Vector.Node (idx, val, next)
+  prev.next = new elasticlunr.Vector.Node (idx, val, next)
   return this.length++
 }
 
@@ -490,7 +491,7 @@ lunr.Vector.prototype.insert = function (idx, val) {
  * @returns {Number}
  * @memberOf Vector
  */
-lunr.Vector.prototype.magnitude = function () {
+elasticlunr.Vector.prototype.magnitude = function () {
   if (this._magnitude) return this._magnitude
   var node = this.list,
       sumOfSquares = 0,
@@ -508,11 +509,11 @@ lunr.Vector.prototype.magnitude = function () {
 /**
  * Calculates the dot product of this vector and another vector.
  *
- * @param {lunr.Vector} otherVector The vector to compute the dot product with.
+ * @param {elasticlunr.Vector} otherVector The vector to compute the dot product with.
  * @returns {Number}
  * @memberOf Vector
  */
-lunr.Vector.prototype.dot = function (otherVector) {
+elasticlunr.Vector.prototype.dot = function (otherVector) {
   var node = this.list,
       otherNode = otherVector.list,
       dotProduct = 0
@@ -536,26 +537,26 @@ lunr.Vector.prototype.dot = function (otherVector) {
  * Calculates the cosine similarity between this vector and another
  * vector.
  *
- * @param {lunr.Vector} otherVector The other vector to calculate the
+ * @param {elasticlunr.Vector} otherVector The other vector to calculate the
  * similarity with.
  * @returns {Number}
  * @memberOf Vector
  */
-lunr.Vector.prototype.similarity = function (otherVector) {
+elasticlunr.Vector.prototype.similarity = function (otherVector) {
   return this.dot(otherVector) / (this.magnitude() * otherVector.magnitude())
 }
 /*!
- * lunr.SortedSet
+ * elasticlunr.SortedSet
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.SortedSets are used to maintain an array of uniq values in a sorted
+ * elasticlunr.SortedSets are used to maintain an array of uniq values in a sorted
  * order.
  *
  * @constructor
  */
-lunr.SortedSet = function () {
+elasticlunr.SortedSet = function () {
   this.length = 0
   this.elements = []
 }
@@ -564,10 +565,10 @@ lunr.SortedSet = function () {
  * Loads a previously serialised sorted set.
  *
  * @param {Array} serialisedData The serialised set to load.
- * @returns {lunr.SortedSet}
+ * @returns {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
-lunr.SortedSet.load = function (serialisedData) {
+elasticlunr.SortedSet.load = function (serialisedData) {
   var set = new this
 
   set.elements = serialisedData
@@ -583,7 +584,7 @@ lunr.SortedSet.load = function (serialisedData) {
  * @param {Object} The objects to add to this set.
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.add = function () {
+elasticlunr.SortedSet.prototype.add = function () {
   var i, element
 
   for (i = 0; i < arguments.length; i++) {
@@ -601,7 +602,7 @@ lunr.SortedSet.prototype.add = function () {
  * @returns {Array}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.toArray = function () {
+elasticlunr.SortedSet.prototype.toArray = function () {
   return this.elements.slice()
 }
 
@@ -618,7 +619,7 @@ lunr.SortedSet.prototype.toArray = function () {
  * @returns {Array}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.map = function (fn, ctx) {
+elasticlunr.SortedSet.prototype.map = function (fn, ctx) {
   return this.elements.map(fn, ctx)
 }
 
@@ -633,7 +634,7 @@ lunr.SortedSet.prototype.map = function (fn, ctx) {
  * @memberOf SortedSet
  * for the function fn.
  */
-lunr.SortedSet.prototype.forEach = function (fn, ctx) {
+elasticlunr.SortedSet.prototype.forEach = function (fn, ctx) {
   return this.elements.forEach(fn, ctx)
 }
 
@@ -645,7 +646,7 @@ lunr.SortedSet.prototype.forEach = function (fn, ctx) {
  * @returns {Number}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.indexOf = function (elem) {
+elasticlunr.SortedSet.prototype.indexOf = function (elem) {
   var start = 0,
       end = this.elements.length - 1;
 
@@ -672,7 +673,7 @@ lunr.SortedSet.prototype.indexOf = function (elem) {
  * @returns {Number}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.locationFor = function (elem) {
+elasticlunr.SortedSet.prototype.locationFor = function (elem) {
   var start = 0,
       end = this.elements.length - 1;
 
@@ -690,15 +691,15 @@ lunr.SortedSet.prototype.locationFor = function (elem) {
 }
 
 /**
- * Creates a new lunr.SortedSet that contains the elements in the intersection
+ * Creates a new elasticlunr.SortedSet that contains the elements in the intersection
  * of this set and the passed set.
  *
- * @param {lunr.SortedSet} otherSet The set to intersect with this set.
- * @returns {lunr.SortedSet}
+ * @param {elasticlunr.SortedSet} otherSet The set to intersect with this set.
+ * @returns {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.intersect = function (otherSet) {
-  var intersectSet = new lunr.SortedSet,
+elasticlunr.SortedSet.prototype.intersect = function (otherSet) {
+  var intersectSet = new elasticlunr.SortedSet,
       i = 0, j = 0,
       a_len = this.length, b_len = otherSet.length,
       a = this.elements, b = otherSet.elements
@@ -729,11 +730,11 @@ lunr.SortedSet.prototype.intersect = function (otherSet) {
 /**
  * Makes a copy of this set
  *
- * @returns {lunr.SortedSet}
+ * @returns {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.clone = function () {
-  var clone = new lunr.SortedSet
+elasticlunr.SortedSet.prototype.clone = function () {
+  var clone = new elasticlunr.SortedSet
 
   clone.elements = this.toArray()
   clone.length = clone.elements.length
@@ -742,14 +743,14 @@ lunr.SortedSet.prototype.clone = function () {
 }
 
 /**
- * Creates a new lunr.SortedSet that contains the elements in the union
+ * Creates a new elasticlunr.SortedSet that contains the elements in the union
  * of this set and the passed set.
  *
- * @param {lunr.SortedSet} otherSet The set to union with this set.
- * @returns {lunr.SortedSet}
+ * @param {elasticlunr.SortedSet} otherSet The set to union with this set.
+ * @returns {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.union = function (otherSet) {
+elasticlunr.SortedSet.prototype.union = function (otherSet) {
   var longSet, shortSet, unionSet
 
   if (this.length >= otherSet.length) {
@@ -771,30 +772,30 @@ lunr.SortedSet.prototype.union = function (otherSet) {
  * @returns {Array}
  * @memberOf SortedSet
  */
-lunr.SortedSet.prototype.toJSON = function () {
+elasticlunr.SortedSet.prototype.toJSON = function () {
   return this.toArray()
 }
 /*!
- * lunr.Index
+ * elasticlunr.Index
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
  */
 
 /**
- * lunr.Index is object that manages a search index.  It contains the indexes
+ * elasticlunr.Index is object that manages a search index.  It contains the indexes
  * and stores all the tokens and document lookups.  It also provides the main
  * user facing API for the library.
  *
  * @constructor
  */
-lunr.Index = function () {
+elasticlunr.Index = function () {
   this._fields = [];
   this._ref = 'id';
-  this.pipeline = new lunr.Pipeline;
-  this.documentStore = new lunr.DocumentStore;
-  this.invertedIndex = new lunr.InvertedIndex;
-  this.corpusTokens = new lunr.SortedSet;
-  this.eventEmitter =  new lunr.EventEmitter;
+  this.pipeline = new elasticlunr.Pipeline;
+  this.documentStore = new elasticlunr.DocumentStore;
+  this.invertedIndex = new elasticlunr.InvertedIndex;
+  this.corpusTokens = new elasticlunr.SortedSet;
+  this.eventEmitter =  new elasticlunr.EventEmitter;
 
   this._idfCache = {};
 
@@ -812,7 +813,7 @@ lunr.Index = function () {
  * @param {Function} fn The serialised set to load.
  * @memberOf Index
  */
-lunr.Index.prototype.on = function () {
+elasticlunr.Index.prototype.on = function () {
   var args = Array.prototype.slice.call(arguments);
   return this.eventEmitter.addListener.apply(this.eventEmitter, args);
 };
@@ -824,7 +825,7 @@ lunr.Index.prototype.on = function () {
  * @param {Function} fn The serialised set to load.
  * @memberOf Index
  */
-lunr.Index.prototype.off = function (name, fn) {
+elasticlunr.Index.prototype.off = function (name, fn) {
   return this.eventEmitter.removeListener(name, fn);
 };
 
@@ -832,16 +833,16 @@ lunr.Index.prototype.off = function (name, fn) {
  * Loads a previously serialised index.
  *
  * Issues a warning if the index being imported was serialised
- * by a different version of lunr.
+ * by a different version of elasticlunr.
  *
  * @param {Object} serialisedData The serialised set to load.
- * @returns {lunr.Index}
+ * @returns {elasticlunr.Index}
  * @memberOf Index
  */
-lunr.Index.load = function (serialisedData) {
-  if (serialisedData.version !== lunr.version) {
-    lunr.utils.warn('version mismatch: current ' 
-                    + lunr.version + ' importing ' + serialisedData.version);
+elasticlunr.Index.load = function (serialisedData) {
+  if (serialisedData.version !== elasticlunr.version) {
+    elasticlunr.utils.warn('version mismatch: current ' 
+                    + elasticlunr.version + ' importing ' + serialisedData.version);
   }
 
   var idx = new this;
@@ -849,10 +850,10 @@ lunr.Index.load = function (serialisedData) {
   idx._fields = serialisedData.fields;
   idx._ref = serialisedData.ref;
 
-  idx.documentStore = lunr.DocumentStore.load(serialisedData.documentStore);
-  idx.invertedIndex = lunr.InvertedIndex.load(serialisedData.invertedIndex);
-  idx.corpusTokens = lunr.SortedSet.load(serialisedData.corpusTokens);
-  idx.pipeline = lunr.Pipeline.load(serialisedData.pipeline);
+  idx.documentStore = elasticlunr.DocumentStore.load(serialisedData.documentStore);
+  idx.invertedIndex = elasticlunr.InvertedIndex.load(serialisedData.invertedIndex);
+  idx.corpusTokens = elasticlunr.SortedSet.load(serialisedData.corpusTokens);
+  idx.pipeline = elasticlunr.Pipeline.load(serialisedData.pipeline);
 
   return idx;
 };
@@ -872,10 +873,10 @@ lunr.Index.load = function (serialisedData) {
  * should be indexed
  * @param {Number} boost An optional boost that can be applied to terms in this
  * field.
- * @returns {lunr.Index}
+ * @returns {elasticlunr.Index}
  * @memberOf Index
  */
-lunr.Index.prototype.field = function (fieldName, opts) {
+elasticlunr.Index.prototype.field = function (fieldName, opts) {
   var opts = opts || {},
       field = { name: fieldName, boost: opts.boost || 1 };
 
@@ -893,10 +894,10 @@ lunr.Index.prototype.field = function (fieldName, opts) {
  * @param {String} refName The property to use to uniquely identify the
  * documents in the index.
  * @param {Boolean} emitEvent Whether to emit add events, defaults to true
- * @returns {lunr.Index}
+ * @returns {elasticlunr.Index}
  * @memberOf Index
  */
-lunr.Index.prototype.ref = function (refName) {
+elasticlunr.Index.prototype.ref = function (refName) {
   this._ref = refName;
   return this;
 };
@@ -916,21 +917,21 @@ lunr.Index.prototype.ref = function (refName) {
  * @param {Boolean} emitEvent Whether or not to emit events, default true.
  * @memberOf Index
  */
-lunr.Index.prototype.add = function (doc, emitEvent) {
+elasticlunr.Index.prototype.add = function (doc, emitEvent) {
   var docTokens = {},
-      allDocumentTokens = new lunr.SortedSet,
+      allDocumentTokens = new elasticlunr.SortedSet,
       docRef = doc[this._ref],
       emitEvent = emitEvent === undefined ? true : emitEvent;
 
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(lunr.tokenizer(doc[field.name]));
+    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field.name]));
 
     docTokens[field.name] = fieldTokens;
-    lunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens);
+    elasticlunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens);
   }, this);
 
   this.documentStore.set(docRef, allDocumentTokens);
-  lunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray());
+  elasticlunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray());
 
   for (var i = 0; i < allDocumentTokens.length; i++) {
     var token = allDocumentTokens.elements[i];
@@ -965,7 +966,7 @@ lunr.Index.prototype.add = function (doc, emitEvent) {
  * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
  * @memberOf Index
  */
-lunr.Index.prototype.remove = function (doc, emitEvent) {
+elasticlunr.Index.prototype.remove = function (doc, emitEvent) {
   var docRef = doc[this._ref],
       emitEvent = emitEvent === undefined ? true : emitEvent;
 
@@ -1002,7 +1003,7 @@ lunr.Index.prototype.remove = function (doc, emitEvent) {
  * @see Index.prototype.add
  * @memberOf Index
  */
-lunr.Index.prototype.update = function (doc, emitEvent) {
+elasticlunr.Index.prototype.update = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
   this.remove(doc, false);
@@ -1019,7 +1020,7 @@ lunr.Index.prototype.update = function (doc, emitEvent) {
  * @private
  * @memberOf Index
  */
-lunr.Index.prototype.idf = function (term) {
+elasticlunr.Index.prototype.idf = function (term) {
   var cacheKey = "@" + term;
   if (Object.prototype.hasOwnProperty.call(this._idfCache, cacheKey)) return this._idfCache[cacheKey];
 
@@ -1057,9 +1058,9 @@ lunr.Index.prototype.idf = function (term) {
  * @see Index.prototype.documentVector
  * @memberOf Index
  */
-lunr.Index.prototype.search = function (query) {
-  var queryTokens = this.pipeline.run(lunr.tokenizer(query)),
-      queryVector = new lunr.Vector,
+elasticlunr.Index.prototype.search = function (query) {
+  var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query)),
+      queryVector = new elasticlunr.Vector,
       documentSets = [],
       fieldBoosts = this._fields.reduce(function (memo, f) { return memo + f.boost }, 0)
 
@@ -1079,7 +1080,7 @@ lunr.Index.prototype.search = function (query) {
         var pos = self.corpusTokens.indexOf(key),
             idf = self.idf(key),
             similarityBoost = 1,
-            set = new lunr.SortedSet;
+            set = new elasticlunr.SortedSet;
 
         // if the expanded key is not an exact match to the token then
         // penalise the score for this key by how different the key is
@@ -1098,7 +1099,7 @@ lunr.Index.prototype.search = function (query) {
         Object.keys(self.invertedIndex.getDocs(key)).forEach(function (ref) { set.add(ref) })
 
         return memo.union(set);
-      }, new lunr.SortedSet);
+      }, new elasticlunr.SortedSet);
 
       documentSets.push(set);
     }, this)
@@ -1126,14 +1127,14 @@ lunr.Index.prototype.search = function (query) {
  * token the element will be 0.
  *
  * @param {Object} documentRef The ref to find the document with.
- * @returns {lunr.Vector}
+ * @returns {elasticlunr.Vector}
  * @private
  * @memberOf Index
  */
-lunr.Index.prototype.documentVector = function (documentRef) {
+elasticlunr.Index.prototype.documentVector = function (documentRef) {
   var documentTokens = this.documentStore.get(documentRef),
       documentTokensLength = documentTokens.length,
-      documentVector = new lunr.Vector;
+      documentVector = new elasticlunr.Vector;
 
   for (var i = 0; i < documentTokensLength; i++) {
     var token = documentTokens.elements[i],
@@ -1152,9 +1153,9 @@ lunr.Index.prototype.documentVector = function (documentRef) {
  * @returns {Object}
  * @memberOf Index
  */
-lunr.Index.prototype.toJSON = function () {
+elasticlunr.Index.prototype.toJSON = function () {
   return {
-    version: lunr.version,
+    version: elasticlunr.version,
     fields: this._fields,
     ref: this._ref,
     documentStore: this.documentStore.toJSON(),
@@ -1190,25 +1191,25 @@ lunr.Index.prototype.toJSON = function () {
  * @param {Function} plugin The plugin to apply.
  * @memberOf Index
  */
-lunr.Index.prototype.use = function (plugin) {
+elasticlunr.Index.prototype.use = function (plugin) {
   var args = Array.prototype.slice.call(arguments, 1)
   args.unshift(this)
   plugin.apply(this, args)
 }
 /*!
- * lunr.DocumentStore
+ * elasticlunr.DocumentStore
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
  */
 
 /**
- * lunr.DocumentStore is a simple key-value document store used for storing sets of tokens for
+ * elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for
  * documents stored in index.
  *
  * @constructor
  * @module
  */
-lunr.DocumentStore = function () {
+elasticlunr.DocumentStore = function () {
   this.document_store = {};
   this.length = 0;
 };
@@ -1217,15 +1218,15 @@ lunr.DocumentStore = function () {
  * Loads a previously serialised document store
  *
  * @param {Object} serialisedData The serialised document store to load.
- * @returns {lunr.Store}
+ * @returns {elasticlunr.Store}
  * @memberOf Store
  */
-lunr.DocumentStore.load = function (serialisedData) {
+elasticlunr.DocumentStore.load = function (serialisedData) {
   var doc_store = new this;
 
   doc_store.length = serialisedData.length;
   for (var key in serialisedData.document_store) {
-    doc_store.document_store[key] = lunr.SortedSet.load(serialisedData.document_store[key]);
+    doc_store.document_store[key] = elasticlunr.SortedSet.load(serialisedData.document_store[key]);
   }
 
   return doc_store;
@@ -1238,7 +1239,7 @@ lunr.DocumentStore.load = function (serialisedData) {
  * @param {Object} sorted_tokens, The sorted tokens to store against the key.
  * @memberOf Store
  */
-lunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
+elasticlunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
   if (!this.has(doc_id)) this.length++;
   this.document_store[doc_id] = sorted_tokens;
 };
@@ -1250,7 +1251,7 @@ lunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
  * @returns {Object}
  * @memberOf Store
  */
-lunr.DocumentStore.prototype.get = function (doc_id) {
+elasticlunr.DocumentStore.prototype.get = function (doc_id) {
   return this.document_store[doc_id];
 };
 
@@ -1261,7 +1262,7 @@ lunr.DocumentStore.prototype.get = function (doc_id) {
  * @returns {Boolean}
  * @memberOf Store
  */
-lunr.DocumentStore.prototype.has = function (doc_id) {
+elasticlunr.DocumentStore.prototype.has = function (doc_id) {
   return doc_id in this.document_store;
 };
 
@@ -1271,7 +1272,7 @@ lunr.DocumentStore.prototype.has = function (doc_id) {
  * @param {Object} doc_id The id to remove from the document store.
  * @memberOf Store
  */
-lunr.DocumentStore.prototype.remove = function (doc_id) {
+elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
   if (!this.has(doc_id)) return;
 
   delete this.document_store[doc_id];
@@ -1284,28 +1285,28 @@ lunr.DocumentStore.prototype.remove = function (doc_id) {
  * @returns {Object}
  * @memberOf Store
  */
-lunr.DocumentStore.prototype.toJSON = function () {
+elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {
     document_store: this.document_store,
     length: this.length
   };
 };
 /*!
- * lunr.stemmer
+ * elasticlunr.stemmer
  * Copyright (C) 2015 Oliver Nightingale
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
 /**
- * lunr.stemmer is an english language stemmer, this is a JavaScript
+ * elasticlunr.stemmer is an english language stemmer, this is a JavaScript
  * implementation of the PorterStemmer taken from http://tartarus.org/~martin
  *
  * @module
  * @param {String} str The string to stem
  * @returns {String}
- * @see lunr.Pipeline
+ * @see elasticlunr.Pipeline
  */
-lunr.stemmer = (function(){
+elasticlunr.stemmer = (function(){
   var step2list = {
       "ational" : "ate",
       "tional" : "tion",
@@ -1507,14 +1508,14 @@ lunr.stemmer = (function(){
   return porterStemmer;
 })();
 
-lunr.Pipeline.registerFunction(lunr.stemmer, 'stemmer')
+elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer')
 /*!
- * lunr.stopWordFilter
+ * elasticlunr.stopWordFilter
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.stopWordFilter is an English language stop word list filter, any words
+ * elasticlunr.stopWordFilter is an English language stop word list filter, any words
  * contained in the list will not be passed through the filter.
  *
  * This is intended to be used in the Pipeline. If the token does not pass the
@@ -1523,15 +1524,15 @@ lunr.Pipeline.registerFunction(lunr.stemmer, 'stemmer')
  * @module
  * @param {String} token The token to pass through the filter
  * @returns {String}
- * @see lunr.Pipeline
+ * @see elasticlunr.Pipeline
  */
-lunr.stopWordFilter = function (token) {
-  if (lunr.stopWordFilter.stopWords.indexOf(token) === -1) return token
+elasticlunr.stopWordFilter = function (token) {
+  if (elasticlunr.stopWordFilter.stopWords.indexOf(token) === -1) return token
 }
 
-lunr.stopWordFilter.stopWords = new lunr.SortedSet
-lunr.stopWordFilter.stopWords.length = 119
-lunr.stopWordFilter.stopWords.elements = [
+elasticlunr.stopWordFilter.stopWords = new elasticlunr.SortedSet
+elasticlunr.stopWordFilter.stopWords.length = 119
+elasticlunr.stopWordFilter.stopWords.elements = [
   "",
   "a",
   "able",
@@ -1654,14 +1655,14 @@ lunr.stopWordFilter.stopWords.elements = [
   "your"
 ]
 
-lunr.Pipeline.registerFunction(lunr.stopWordFilter, 'stopWordFilter')
+elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter')
 /*!
- * lunr.trimmer
+ * elasticlunr.trimmer
  * Copyright (C) 2015 Oliver Nightingale
  */
 
 /**
- * lunr.trimmer is a pipeline function for trimming non word
+ * elasticlunr.trimmer is a pipeline function for trimming non word
  * characters from the begining and end of tokens before they
  * enter the index.
  *
@@ -1672,29 +1673,29 @@ lunr.Pipeline.registerFunction(lunr.stopWordFilter, 'stopWordFilter')
  * @module
  * @param {String} token The token to pass through the filter
  * @returns {String}
- * @see lunr.Pipeline
+ * @see elasticlunr.Pipeline
  */
-lunr.trimmer = function (token) {
+elasticlunr.trimmer = function (token) {
   return token
     .replace(/^\W+/, '')
     .replace(/\W+$/, '')
 }
 
-lunr.Pipeline.registerFunction(lunr.trimmer, 'trimmer')
+elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer')
 /*!
- * lunr.InvertedIndex
+ * elasticlunr.InvertedIndex
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
 /**
- * lunr.InvertedIndex is used for efficient storing and lookup of the inverted index
+ * elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index
  * of token to document ref.
  *
  * @constructor
  */
-lunr.InvertedIndex = function () {
+elasticlunr.InvertedIndex = function () {
   this.root = { docs: {}, df: 0 };
   this.length = 0;
 };
@@ -1703,10 +1704,10 @@ lunr.InvertedIndex = function () {
  * Loads a previously serialised inverted index.
  *
  * @param {Object} serialisedData The serialised inverted index to load.
- * @returns {lunr.InvertedIndex}
+ * @returns {elasticlunr.InvertedIndex}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.load = function (serialisedData) {
+elasticlunr.InvertedIndex.load = function (serialisedData) {
   var idx = new this;
 
   idx.root = serialisedData.root;
@@ -1724,11 +1725,11 @@ lunr.InvertedIndex.load = function (serialisedData) {
  * @param {String} token The token to store the tokenInfo under
  * @param {Object} tokenInfo The tokenInfo to store against the token
  * @param {Object} root An optional node at which to start looking for the
- * correct place to enter the doc, by default the root of this lunr.InvertedIndex
+ * correct place to enter the doc, by default the root of this elasticlunr.InvertedIndex
  * is used.
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
+elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
   var root = root || this.root,
       idx = 0;
 
@@ -1752,7 +1753,7 @@ lunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
 };
 
 /**
- * Checks whether this key is contained within this lunr.InvertedIndex.
+ * Checks whether this key is contained within this elasticlunr.InvertedIndex.
  *
  * By default this function starts at the root of the current inverted index, however
  * it can start at any node of inverted index if required.
@@ -1761,7 +1762,7 @@ lunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
  * @param {Object} root An optional node at which to start
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.hasToken = function (token) {
+elasticlunr.InvertedIndex.prototype.hasToken = function (token) {
   if (!token) return false;
 
   var node = this.root;
@@ -1786,7 +1787,7 @@ lunr.InvertedIndex.prototype.hasToken = function (token) {
  * @see InvertedIndex.prototype.get
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.getNode = function (token) {
+elasticlunr.InvertedIndex.prototype.getNode = function (token) {
   if (!token) return {};
 
   var node = this.root;
@@ -1810,7 +1811,7 @@ lunr.InvertedIndex.prototype.getNode = function (token) {
  * @returns {Object}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.getDocs = function (token, root) {
+elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
   return this.getNode(token, root).docs || {};
 };
 
@@ -1825,7 +1826,7 @@ lunr.InvertedIndex.prototype.getDocs = function (token, root) {
  * @returns {Object}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
+elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
   var node = this.getNode(token, root);
   if (node.df) {
     return node.df;
@@ -1845,7 +1846,7 @@ lunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
  * @returns {Object}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.removeToken = function (token, ref) {
+elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
   if (!token) return;
   var node = this.root;
 
@@ -1868,7 +1869,7 @@ lunr.InvertedIndex.prototype.removeToken = function (token, ref) {
  * @returns {Array}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
+elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
   if (root == void 0) {
     root = this.getNode(token);
   }
@@ -1892,7 +1893,7 @@ lunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
  * @returns {Object}
  * @memberOf InvertedIndex
  */
-lunr.InvertedIndex.prototype.toJSON = function () {
+elasticlunr.InvertedIndex.prototype.toJSON = function () {
   return {
     root: this.root,
     length: this.length
@@ -1917,7 +1918,7 @@ lunr.InvertedIndex.prototype.toJSON = function () {
       module.exports = factory()
     } else {
       // Browser globals (root is window)
-      root.lunr = factory()
+      root.elasticlunr = factory()
     }
   }(this, function () {
     /**
@@ -1925,6 +1926,6 @@ lunr.InvertedIndex.prototype.toJSON = function () {
      * This example returns an object, but the module
      * can return a function as the exported value.
      */
-    return lunr
+    return elasticlunr
   }))
 })()

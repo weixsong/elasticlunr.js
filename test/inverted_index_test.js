@@ -1,7 +1,7 @@
-module('lunr.InvertedIndex')
+module('elasticlunr.InvertedIndex')
 
 test('adding a token to the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 },
       token = 'foo'
 
@@ -12,7 +12,7 @@ test('adding a token to the store', function () {
 })
 
 test('adding another document to the token', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
       doc2 = { ref: 456, tf: 1 },
       token = 'foo'
@@ -25,7 +25,7 @@ test('adding another document to the token', function () {
 })
 
 test('checking if a token exists in the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 },
       token = 'foo'
 
@@ -35,7 +35,7 @@ test('checking if a token exists in the store', function () {
 })
 
 test('checking if a token does not exist in the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 },
       token = 'foo'
 
@@ -45,7 +45,7 @@ test('checking if a token does not exist in the store', function () {
 })
 
 test('retrieving items from the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 },
       token = 'foo'
 
@@ -58,13 +58,13 @@ test('retrieving items from the store', function () {
 })
 
 test('retrieving items that do not exist in the store', function () {
-  var store = new lunr.InvertedIndex
+  var store = new elasticlunr.InvertedIndex
 
   deepEqual(store.getDocs('foo'), {})
 })
 
 test('counting items in the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
       doc2 = { ref: 456, tf: 1 },
       doc3 = { ref: 789, tf: 1 }
@@ -79,7 +79,7 @@ test('counting items in the store', function () {
 })
 
 test('removing a document from the token store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 }
 
   deepEqual(store.getDocs('foo'), {})
@@ -94,7 +94,7 @@ test('removing a document from the token store', function () {
 })
 
 test('removing a document that is not in the store', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
       doc2 = { ref: 567, tf: 1 }
 
@@ -106,14 +106,14 @@ test('removing a document that is not in the store', function () {
 })
 
 test('removing a document from a key that does not exist', function () {
-  var store = new lunr.InvertedIndex
+  var store = new elasticlunr.InvertedIndex
 
   store.removeToken('foo', 123)
   ok(!store.hasToken('foo'))
 })
 
 test('expand a token into all descendent tokens', function () {
-  var store = new lunr.InvertedIndex,
+  var store = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 }
 
   store.addToken('hell', doc)
@@ -128,7 +128,7 @@ test('expand a token into all descendent tokens', function () {
 })
 
 test('serialisation', function () {
-  var store = new lunr.InvertedIndex;
+  var store = new elasticlunr.InvertedIndex;
 
   deepEqual(store.toJSON(), { root: { docs: {}, df: 0 }, length: 0 });
 
@@ -178,7 +178,7 @@ test('loading a serialised story', function () {
       length: 1
   };
 
-  var store = lunr.InvertedIndex.load(serialisedData),
+  var store = elasticlunr.InvertedIndex.load(serialisedData),
       documents = store.getDocs('foo');
 
   equal(store.length, 1)

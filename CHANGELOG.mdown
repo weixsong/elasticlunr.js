@@ -1,5 +1,10 @@
 # Changelog
 
+## git clone --bare
+
+I want to add some other features to this lunr.js, and because if I forked the repo and then work on the forked repo, there will be some issues, so I'd to break the connection of my fork with original repo.
+The original repo is a great package and give good performance, based on this cornerstone, I could add some other features.
+
 ## 0.5.10
 
 * Fix bug in IDF calculation, thanks to [weixsong](https://github.com/weixsong) for discovering the issue.

@@ -1,4 +1,4 @@
-var lunr = require('./../lunr.js'),
+var lunr = require('./../elasticlunr.js'),
     fs = require('fs')
 
 var idx = lunr(function () {

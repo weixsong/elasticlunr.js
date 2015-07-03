@@ -1,7 +1,7 @@
 module('store node')
 
 test("get all children", function() {
-  var node = new lunr.StoreNode,
+  var node = new elasticlunr.StoreNode,
       childNode = node.at('a'),
       otherChildNode = node.at('a'),
       grandChildNode = childNode.at('a')
