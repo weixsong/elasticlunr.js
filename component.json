@@ -1,9 +1,9 @@
 {
-  "name": "lunr",
-  "repo": "olivernn/lunr.js",
-  "version": "0.5.10",
-  "description": "Simple full-text search in your browser.",
+  "name": "elastic-lunr",
+  "repo": "weixsong/elastic-lunr.js",
+  "version": "0.1",
+  "description": "Full-text search for javascript.",
   "license": "MIT",
-  "main": "lunr.js",
-  "scripts": ["lunr.js"]
+  "main": "elastic-lunr.js",
+  "scripts": ["elastic-lunr.js"]
 }

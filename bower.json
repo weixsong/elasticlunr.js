@@ -1,7 +1,7 @@
 {
-  "name": "lunr.js",
-  "version": "0.5.10",
-  "main": "lunr.js",
+  "name": "elastic-lunr.js",
+  "version": "0.1",
+  "main": "elastic-lunr.js",
   "ignore": [
     "tests/",
     "perf/",

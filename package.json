@@ -1,16 +1,16 @@
 {
-  "name": "lunr",
-  "description": "Simple full-text search in your browser.",
-  "version": "0.5.10",
-  "author": "Oliver Nightingale",
-  "keywords": ["search"],
-  "homepage": "http://lunrjs.com",
-  "bugs": "http://github.com/olivernn/lunr.js/issues",
-  "main": "lunr.js",
+  "name": "elastic-lunr",
+  "description": "Full-text search for javascript",
+  "version": "0.1",
+  "author": "wei song",
+  "keywords": ["search", "full-text", "javascript", "retrieval"],
+  "homepage": "https://github.com/weixsong/elastic-lunr.js",
+  "bugs": "https://github.com/weixsong/elastic-lunr.js/issues",
+  "main": "elastic-lunr.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/olivernn/lunr.js.git"
+    "url": "https://github.com/weixsong/elastic-lunr.js"
   },
   "devDependencies": {
     "dox": "0.4.4",
