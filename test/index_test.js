@@ -1,11 +1,11 @@
-module('lunr.Index')
+module('lunr.Index');
 
 test("defining what fields to index", function () {
-  var idx = new lunr.Index
-  idx.field('foo')
+  var idx = new lunr.Index;
+  idx.field('foo');
 
-  deepEqual(idx._fields[0], {name: 'foo', boost: 1})
-})
+  deepEqual(idx._fields[0], {name: 'foo', boost: 1});
+});
 
 test("giving a particular field a weighting", function () {
   var idx = new lunr.Index
@@ -45,7 +45,7 @@ test('adding a document with an empty field', function () {
   idx.field('body')
 
   idx.add(doc)
-  ok(!isNaN(idx.tokenStore.get('test')[1].tf))
+  ok(!isNaN(idx.invertedIndex.getDocs('test')[1].tf))
 })
 
 test('triggering add events', function () {
@@ -167,13 +167,13 @@ test('updating a document', function () {
   idx.field('body')
   idx.add(doc)
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  ok(idx.invertedIndex.hasToken('foo'))
 
   doc.body = 'bar'
   idx.update(doc)
 
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('bar'))
+  ok(idx.invertedIndex.hasToken('bar'))
 })
 
 test('emitting update events', function () {
@@ -187,7 +187,7 @@ test('emitting update events', function () {
   idx.field('body')
   idx.add(doc)
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  ok(idx.invertedIndex.hasToken('foo'))
 
   idx.on('update', function (doc, index) {
     updateCallbackCalled = true
@@ -223,7 +223,7 @@ test('silencing update events', function () {
   idx.field('body')
   idx.add(doc)
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  ok(idx.invertedIndex.hasToken('foo'))
 
   idx.on('update', function (doc, index) {
     callbackCalled = true
@@ -238,12 +238,12 @@ test('silencing update events', function () {
 test('serialising', function () {
   var idx = new lunr.Index,
       mockDocumentStore = { toJSON: function () { return 'documentStore' }},
-      mockTokenStore = { toJSON: function () { return 'tokenStore' }},
+      mockInvertedIndex = { toJSON: function () { return 'invertedIndex' }},
       mockCorpusTokens = { toJSON: function () { return 'corpusTokens' }},
       mockPipeline = { toJSON: function () { return 'pipeline' }}
 
   idx.documentStore = mockDocumentStore
-  idx.tokenStore = mockTokenStore
+  idx.invertedIndex = mockInvertedIndex
   idx.corpusTokens = mockCorpusTokens
   idx.pipeline = mockPipeline
 
@@ -260,7 +260,7 @@ test('serialising', function () {
     ],
     ref: 'id',
     documentStore: 'documentStore',
-    tokenStore: 'tokenStore',
+    invertedIndex: 'invertedIndex',
     corpusTokens: 'corpusTokens',
     pipeline: 'pipeline'
   })
@@ -275,7 +275,7 @@ test('loading a serialised index', function () {
     ],
     ref: 'id',
     documentStore: { document_store: {}, length: 0 },
-    tokenStore: { root: {}, length: 0 },
+    invertedIndex: { root: {}, length: 0 },
     corpusTokens: [],
     pipeline: ['stopWordFilter', 'stemmer']
   }

@@ -777,6 +777,7 @@ lunr.SortedSet.prototype.toJSON = function () {
 /*!
  * lunr.Index
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
@@ -787,20 +788,20 @@ lunr.SortedSet.prototype.toJSON = function () {
  * @constructor
  */
 lunr.Index = function () {
-  this._fields = []
-  this._ref = 'id'
-  this.pipeline = new lunr.Pipeline
-  this.documentStore = new lunr.DocumentStore
-  this.tokenStore = new lunr.TokenStore
-  this.corpusTokens = new lunr.SortedSet
-  this.eventEmitter =  new lunr.EventEmitter
+  this._fields = [];
+  this._ref = 'id';
+  this.pipeline = new lunr.Pipeline;
+  this.documentStore = new lunr.DocumentStore;
+  this.invertedIndex = new lunr.InvertedIndex;
+  this.corpusTokens = new lunr.SortedSet;
+  this.eventEmitter =  new lunr.EventEmitter;
 
-  this._idfCache = {}
+  this._idfCache = {};
 
   this.on('add', 'remove', 'update', (function () {
-    this._idfCache = {}
-  }).bind(this))
-}
+    this._idfCache = {};
+  }).bind(this));
+};
 
 /**
  * Bind a handler to events being emitted by the index.
@@ -812,9 +813,9 @@ lunr.Index = function () {
  * @memberOf Index
  */
 lunr.Index.prototype.on = function () {
-  var args = Array.prototype.slice.call(arguments)
-  return this.eventEmitter.addListener.apply(this.eventEmitter, args)
-}
+  var args = Array.prototype.slice.call(arguments);
+  return this.eventEmitter.addListener.apply(this.eventEmitter, args);
+};
 
 /**
  * Removes a handler from an event being emitted by the index.
@@ -824,8 +825,8 @@ lunr.Index.prototype.on = function () {
  * @memberOf Index
  */
 lunr.Index.prototype.off = function (name, fn) {
-  return this.eventEmitter.removeListener(name, fn)
-}
+  return this.eventEmitter.removeListener(name, fn);
+};
 
 /**
  * Loads a previously serialised index.
@@ -839,21 +840,22 @@ lunr.Index.prototype.off = function (name, fn) {
  */
 lunr.Index.load = function (serialisedData) {
   if (serialisedData.version !== lunr.version) {
-    lunr.utils.warn('version mismatch: current ' + lunr.version + ' importing ' + serialisedData.version)
+    lunr.utils.warn('version mismatch: current ' 
+                    + lunr.version + ' importing ' + serialisedData.version);
   }
 
-  var idx = new this
+  var idx = new this;
 
-  idx._fields = serialisedData.fields
-  idx._ref = serialisedData.ref
+  idx._fields = serialisedData.fields;
+  idx._ref = serialisedData.ref;
 
-  idx.documentStore = lunr.DocumentStore.load(serialisedData.documentStore)
-  idx.tokenStore = lunr.TokenStore.load(serialisedData.tokenStore)
-  idx.corpusTokens = lunr.SortedSet.load(serialisedData.corpusTokens)
-  idx.pipeline = lunr.Pipeline.load(serialisedData.pipeline)
+  idx.documentStore = lunr.DocumentStore.load(serialisedData.documentStore);
+  idx.invertedIndex = lunr.InvertedIndex.load(serialisedData.invertedIndex);
+  idx.corpusTokens = lunr.SortedSet.load(serialisedData.corpusTokens);
+  idx.pipeline = lunr.Pipeline.load(serialisedData.pipeline);
 
-  return idx
-}
+  return idx;
+};
 
 /**
  * Adds a field to the list of fields that will be searchable within documents
@@ -875,11 +877,11 @@ lunr.Index.load = function (serialisedData) {
  */
 lunr.Index.prototype.field = function (fieldName, opts) {
   var opts = opts || {},
-      field = { name: fieldName, boost: opts.boost || 1 }
+      field = { name: fieldName, boost: opts.boost || 1 };
 
-  this._fields.push(field)
-  return this
-}
+  this._fields.push(field);
+  return this;
+};
 
 /**
  * Sets the property used to uniquely identify documents added to the index,
@@ -895,9 +897,9 @@ lunr.Index.prototype.field = function (fieldName, opts) {
  * @memberOf Index
  */
 lunr.Index.prototype.ref = function (refName) {
-  this._ref = refName
-  return this
-}
+  this._ref = refName;
+  return this;
+};
 
 /**
  * Add a document to the index.
@@ -918,35 +920,32 @@ lunr.Index.prototype.add = function (doc, emitEvent) {
   var docTokens = {},
       allDocumentTokens = new lunr.SortedSet,
       docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent
+      emitEvent = emitEvent === undefined ? true : emitEvent;
 
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(lunr.tokenizer(doc[field.name]))
+    var fieldTokens = this.pipeline.run(lunr.tokenizer(doc[field.name]));
 
-    docTokens[field.name] = fieldTokens
-    lunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens)
-  }, this)
+    docTokens[field.name] = fieldTokens;
+    lunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens);
+  }, this);
 
-  this.documentStore.set(docRef, allDocumentTokens)
-  lunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray())
+  this.documentStore.set(docRef, allDocumentTokens);
+  lunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray());
 
   for (var i = 0; i < allDocumentTokens.length; i++) {
-    var token = allDocumentTokens.elements[i]
-    var tf = this._fields.reduce(function (memo, field) {
-      var fieldLength = docTokens[field.name].length
+    var token = allDocumentTokens.elements[i];
+    var tf = this._fields.reduce( function (memo, field) {
+      var fieldLength = docTokens[field.name].length;
+      if (!fieldLength) return memo;
+      var tokenCount = docTokens[field.name].filter(function (t) { return t === token }).length;
+      return memo + (tokenCount / fieldLength * field.boost);
+    }, 0);
 
-      if (!fieldLength) return memo
-
-      var tokenCount = docTokens[field.name].filter(function (t) { return t === token }).length
-
-      return memo + (tokenCount / fieldLength * field.boost)
-    }, 0)
-
-    this.tokenStore.add(token, { ref: docRef, tf: tf })
+    this.invertedIndex.addToken(token, { ref: docRef, tf: tf });
   };
 
-  if (emitEvent) this.eventEmitter.emit('add', doc, this)
-}
+  if (emitEvent) this.eventEmitter.emit('add', doc, this);
+};
 
 /**
  * Removes a document from the index.
@@ -968,19 +967,19 @@ lunr.Index.prototype.add = function (doc, emitEvent) {
  */
 lunr.Index.prototype.remove = function (doc, emitEvent) {
   var docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent
+      emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  if (!this.documentStore.has(docRef)) return
+  if (!this.documentStore.has(docRef)) return;
 
-  var docTokens = this.documentStore.get(docRef)
+  var docTokens = this.documentStore.get(docRef);
 
-  this.documentStore.remove(docRef)
+  this.documentStore.remove(docRef);
 
   docTokens.forEach(function (token) {
-    this.tokenStore.remove(token, docRef)
-  }, this)
+    this.invertedIndex.removeToken(token, docRef);
+  }, this);
 
-  if (emitEvent) this.eventEmitter.emit('remove', doc, this)
+  if (emitEvent) this.eventEmitter.emit('remove', doc, this);
 }
 
 /**
@@ -1004,13 +1003,13 @@ lunr.Index.prototype.remove = function (doc, emitEvent) {
  * @memberOf Index
  */
 lunr.Index.prototype.update = function (doc, emitEvent) {
-  var emitEvent = emitEvent === undefined ? true : emitEvent
+  var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.remove(doc, false)
-  this.add(doc, false)
+  this.remove(doc, false);
+  this.add(doc, false);
 
-  if (emitEvent) this.eventEmitter.emit('update', doc, this)
-}
+  if (emitEvent) this.eventEmitter.emit('update', doc, this);
+};
 
 /**
  * Calculates the inverse document frequency for a token within the index.
@@ -1021,18 +1020,18 @@ lunr.Index.prototype.update = function (doc, emitEvent) {
  * @memberOf Index
  */
 lunr.Index.prototype.idf = function (term) {
-  var cacheKey = "@" + term
-  if (Object.prototype.hasOwnProperty.call(this._idfCache, cacheKey)) return this._idfCache[cacheKey]
+  var cacheKey = "@" + term;
+  if (Object.prototype.hasOwnProperty.call(this._idfCache, cacheKey)) return this._idfCache[cacheKey];
 
-  var documentFrequency = this.tokenStore.count(term),
-      idf = 1
+  var documentFrequency = this.invertedIndex.getDocFreq(term),
+      idf = 1;
 
   if (documentFrequency > 0) {
-    idf = 1 + Math.log(this.documentStore.length / documentFrequency)
+    idf = 1 + Math.log(this.documentStore.length / documentFrequency);
   }
 
-  return this._idfCache[cacheKey] = idf
-}
+  return this._idfCache[cacheKey] = idf;
+};
 
 /**
  * Searches the index using the passed query.
@@ -1065,10 +1064,10 @@ lunr.Index.prototype.search = function (query) {
       fieldBoosts = this._fields.reduce(function (memo, f) { return memo + f.boost }, 0)
 
   var hasSomeToken = queryTokens.some(function (token) {
-    return this.tokenStore.has(token)
-  }, this)
+    return this.invertedIndex.hasToken(token);
+  }, this);
 
-  if (!hasSomeToken) return []
+  if (!hasSomeToken) return [];
 
   queryTokens
     .forEach(function (token, i, tokens) {
@@ -1076,32 +1075,32 @@ lunr.Index.prototype.search = function (query) {
       var tf = tokenCount / tokens.length * this._fields.length * fieldBoosts,
           self = this
 
-      var set = this.tokenStore.expand(token).reduce(function (memo, key) {
+      var set = this.invertedIndex.expandToken(token).reduce(function (memo, key) {
         var pos = self.corpusTokens.indexOf(key),
             idf = self.idf(key),
             similarityBoost = 1,
-            set = new lunr.SortedSet
+            set = new lunr.SortedSet;
 
         // if the expanded key is not an exact match to the token then
         // penalise the score for this key by how different the key is
         // to the token.
         if (key !== token) {
-          var diff = Math.max(3, key.length - token.length)
-          similarityBoost = 1 / Math.log(diff)
+          var diff = Math.max(3, key.length - token.length);
+          similarityBoost = 1 / Math.log(diff);
         }
 
         // calculate the query tf-idf score for this token
         // applying an similarityBoost to ensure exact matches
         // these rank higher than expanded terms
-        if (pos > -1) queryVector.insert(pos, tf * idf * similarityBoost)
+        if (pos > -1) queryVector.insert(pos, tf * idf * similarityBoost);
 
         // add all the documents that have this key into a set
-        Object.keys(self.tokenStore.get(key)).forEach(function (ref) { set.add(ref) })
+        Object.keys(self.invertedIndex.getDocs(key)).forEach(function (ref) { set.add(ref) })
 
-        return memo.union(set)
-      }, new lunr.SortedSet)
+        return memo.union(set);
+      }, new lunr.SortedSet);
 
-      documentSets.push(set)
+      documentSets.push(set);
     }, this)
 
   var documentSet = documentSets.reduce(function (memo, set) {
@@ -1134,18 +1133,18 @@ lunr.Index.prototype.search = function (query) {
 lunr.Index.prototype.documentVector = function (documentRef) {
   var documentTokens = this.documentStore.get(documentRef),
       documentTokensLength = documentTokens.length,
-      documentVector = new lunr.Vector
+      documentVector = new lunr.Vector;
 
   for (var i = 0; i < documentTokensLength; i++) {
     var token = documentTokens.elements[i],
-        tf = this.tokenStore.get(token)[documentRef].tf,
-        idf = this.idf(token)
+        tf = this.invertedIndex.getDocs(token)[documentRef].tf,
+        idf = this.idf(token);
 
-    documentVector.insert(this.corpusTokens.indexOf(token), tf * idf)
+    documentVector.insert(this.corpusTokens.indexOf(token), tf * idf);
   };
 
-  return documentVector
-}
+  return documentVector;
+};
 
 /**
  * Returns a representation of the index ready for serialisation.
@@ -1159,11 +1158,11 @@ lunr.Index.prototype.toJSON = function () {
     fields: this._fields,
     ref: this._ref,
     documentStore: this.documentStore.toJSON(),
-    tokenStore: this.tokenStore.toJSON(),
+    invertedIndex: this.invertedIndex.toJSON(),
     corpusTokens: this.corpusTokens.toJSON(),
     pipeline: this.pipeline.toJSON()
-  }
-}
+  };
+};
 
 /**
  * Applies a plugin to the current index.
@@ -1225,10 +1224,9 @@ lunr.DocumentStore.load = function (serialisedData) {
   var doc_store = new this;
 
   doc_store.length = serialisedData.length;
-  doc_store.document_store = Object.keys(serialisedData.document_store).reduce(function (memo, key) {
-    memo[key] = lunr.SortedSet.load(serialisedData.document_store[key]);
-    return memo;
-  }, {});
+  for (var key in serialisedData.document_store) {
+    doc_store.document_store[key] = lunr.SortedSet.load(serialisedData.document_store[key]);
+  }
 
   return doc_store;
 };
@@ -1684,170 +1682,193 @@ lunr.trimmer = function (token) {
 
 lunr.Pipeline.registerFunction(lunr.trimmer, 'trimmer')
 /*!
- * lunr.stemmer
+ * lunr.InvertedIndex
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
 /**
- * lunr.TokenStore is used for efficient storing and lookup of the reverse
- * index of token to document ref.
+ * lunr.InvertedIndex is used for efficient storing and lookup of the inverted index
+ * of token to document ref.
  *
  * @constructor
  */
-lunr.TokenStore = function () {
-  this.root = { docs: {} }
-  this.length = 0
-}
+lunr.InvertedIndex = function () {
+  this.root = { docs: {}, df: 0 };
+  this.length = 0;
+};
 
 /**
- * Loads a previously serialised token store
+ * Loads a previously serialised inverted index.
  *
- * @param {Object} serialisedData The serialised token store to load.
- * @returns {lunr.TokenStore}
- * @memberOf TokenStore
+ * @param {Object} serialisedData The serialised inverted index to load.
+ * @returns {lunr.InvertedIndex}
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.load = function (serialisedData) {
-  var store = new this
+lunr.InvertedIndex.load = function (serialisedData) {
+  var idx = new this;
 
-  store.root = serialisedData.root
-  store.length = serialisedData.length
+  idx.root = serialisedData.root;
+  idx.length = serialisedData.length;
 
-  return store
-}
+  return idx;
+};
 
 /**
- * Adds a new token doc pair to the store.
+ * Adds a new token tokenInfo pair to the inverted index.
  *
- * By default this function starts at the root of the current store, however
- * it can start at any node of any token store if required.
+ * By default this function starts at the root of the current inverted index, however
+ * it can start at any node of the inverted index if required.
  *
- * @param {String} token The token to store the doc under
- * @param {Object} doc The doc to store against the token
+ * @param {String} token The token to store the tokenInfo under
+ * @param {Object} tokenInfo The tokenInfo to store against the token
  * @param {Object} root An optional node at which to start looking for the
- * correct place to enter the doc, by default the root of this lunr.TokenStore
+ * correct place to enter the doc, by default the root of this lunr.InvertedIndex
  * is used.
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.add = function (token, doc, root) {
+lunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
   var root = root || this.root,
-      key = '',
       idx = 0;
 
   while (idx <= token.length - 1) {
-    key = token[idx];
+    var key = token[idx];
 
-    if (!(key in root)) root[key] = {docs: {}};
+    if (!(key in root)) root[key] = {docs: {}, df: 0};
     idx += 1;
     root = root[key];
   }
 
-  root.docs[doc.ref] = doc;
-  this.length += 1;
-}
+  if (!root.docs[tokenInfo.ref]) {
+    // if this doc not exist, then add this doc
+    root.docs[tokenInfo.ref] = tokenInfo;
+    root.df += 1;
+    this.length += 1;
+  } else {
+    // if this doc already exist, then update tokenInfo
+    root.docs[tokenInfo.ref] = tokenInfo;
+  }
+};
 
 /**
- * Checks whether this key is contained within this lunr.TokenStore.
+ * Checks whether this key is contained within this lunr.InvertedIndex.
  *
- * By default this function starts at the root of the current store, however
- * it can start at any node of any token store if required.
+ * By default this function starts at the root of the current inverted index, however
+ * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to check for
  * @param {Object} root An optional node at which to start
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.has = function (token) {
-  if (!token) return false
+lunr.InvertedIndex.prototype.hasToken = function (token) {
+  if (!token) return false;
 
-  var node = this.root
+  var node = this.root;
 
   for (var i = 0; i < token.length; i++) {
-    if (!node[token[i]]) return false
-
-    node = node[token[i]]
+    if (!node[token[i]]) return false;
+    node = node[token[i]];
   }
 
-  return true
-}
+  return true;
+};
 
 /**
- * Retrieve a node from the token store for a given token.
+ * Retrieve a node from the inverted index for a given token.
  *
  * By default this function starts at the root of the current store, however
- * it can start at any node of any token store if required.
+ * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the node for.
  * @param {Object} root An optional node at which to start.
  * @returns {Object}
- * @see TokenStore.prototype.get
- * @memberOf TokenStore
+ * @see InvertedIndex.prototype.get
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.getNode = function (token) {
-  if (!token) return {}
+lunr.InvertedIndex.prototype.getNode = function (token) {
+  if (!token) return {};
 
-  var node = this.root
+  var node = this.root;
 
   for (var i = 0; i < token.length; i++) {
-    if (!node[token[i]]) return {}
-
-    node = node[token[i]]
+    if (!node[token[i]]) return {};
+    node = node[token[i]];
   }
 
-  return node
-}
+  return node;
+};
 
 /**
  * Retrieve the documents for a node for the given token.
  *
  * By default this function starts at the root of the current store, however
- * it can start at any node of any token store if required.
+ * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the documents for.
  * @param {Object} root An optional node at which to start.
  * @returns {Object}
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.get = function (token, root) {
-  return this.getNode(token, root).docs || {}
-}
-
-lunr.TokenStore.prototype.count = function (token, root) {
-  return Object.keys(this.get(token, root)).length
-}
+lunr.InvertedIndex.prototype.getDocs = function (token, root) {
+  return this.getNode(token, root).docs || {};
+};
 
 /**
- * Remove the document identified by ref from the token in the store.
+ * Retrieve the document frequency of given token.
  *
  * By default this function starts at the root of the current store, however
- * it can start at any node of any token store if required.
+ * it can start at any node of inverted index if required.
+ *
+ * @param {String} token The token to get the documents for.
+ * @param {Object} root An optional node at which to start.
+ * @returns {Object}
+ * @memberOf InvertedIndex
+ */
+lunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
+  var node = this.getNode(token, root);
+  if (node.df) {
+    return node.df;
+  }
+  return 0;
+};
+
+/**
+ * Remove the document identified by ref from the token in the inverted index.
+ *
+ * By default this function starts at the root of the current store, however
+ * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the documents for.
  * @param {String} ref The ref of the document to remove from this token.
  * @param {Object} root An optional node at which to start.
  * @returns {Object}
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.remove = function (token, ref) {
-  if (!token) return
-  var node = this.root
+lunr.InvertedIndex.prototype.removeToken = function (token, ref) {
+  if (!token) return;
+  var node = this.root;
 
   for (var i = 0; i < token.length; i++) {
-    if (!(token[i] in node)) return
-    node = node[token[i]]
+    if (!(token[i] in node)) return;
+    node = node[token[i]];
   }
 
-  delete node.docs[ref]
-}
+  if (ref in node.docs) {
+    delete node.docs[ref];
+    node.df -= 1;
+  }
+};
 
 /**
  * Find all the possible suffixes of the passed token using tokens
- * currently in the store.
+ * currently in the inverted index.
  *
  * @param {String} token The token to expand.
  * @returns {Array}
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.expand = function (token, memo, root) {
+lunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
   if (root == void 0) {
     root = this.getNode(token);
   }
@@ -1855,30 +1876,28 @@ lunr.TokenStore.prototype.expand = function (token, memo, root) {
   var docs = root.docs || {},
       memo = memo || [];
 
-  if (Object.keys(docs).length) memo.push(token);
+  if (root.df > 0) memo.push(token);
 
-  Object.keys(root)
-    .forEach(function (key) {
-      if (key === 'docs') return;
+  for (var key in root) {
+    if (key === 'docs') continue;
+    memo.concat(this.expandToken(token + key, memo, root[key]));
+  }
 
-      memo.concat(this.expand(token + key, memo, root[key]));
-    }, this);
-    
   return memo;
 }
 
 /**
- * Returns a representation of the token store ready for serialisation.
+ * Returns a representation of the inverted index ready for serialisation.
  *
  * @returns {Object}
- * @memberOf TokenStore
+ * @memberOf InvertedIndex
  */
-lunr.TokenStore.prototype.toJSON = function () {
+lunr.InvertedIndex.prototype.toJSON = function () {
   return {
     root: this.root,
     length: this.length
-  }
-}
+  };
+};
 
 
   /**
