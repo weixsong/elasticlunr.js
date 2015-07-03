@@ -1,16 +1,16 @@
 {
-  "name": "lunr",
-  "description": "Simple full-text search in your browser.",
+  "name": "elasticlunr",
+  "description": "Full-text search engine in Javascript for browser search and offline search.",
   "version": "@VERSION",
-  "author": "Oliver Nightingale",
+  "author": "Wei Song",
   "keywords": ["search"],
-  "homepage": "http://lunrjs.com",
-  "bugs": "http://github.com/olivernn/lunr.js/issues",
-  "main": "lunr.js",
+  "homepage": "http://weixsong.github.io",
+  "bugs": "https://github.com/weixsong/elastic-lunr.js/issues",
+  "main": "elasticlunr.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/olivernn/lunr.js.git"
+    "url": "https://github.com/weixsong/elastic-lunr.js"
   },
   "devDependencies": {
     "dox": "0.4.4",

@@ -1,8 +1,7 @@
 {
-  "name": "elastic-lunr.js",
+  "name": "elasticlunr.js",
   "version": "0.5.11",
-  "description": "Full-text search for javascript.",
-  "main": "elastic-lunr.js",
+  "main": "elasticlunr.js",
   "ignore": [
     "tests/",
     "perf/",
