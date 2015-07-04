@@ -1717,7 +1717,8 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
 };
 
 /**
- * Adds a new token tokenInfo pair to the inverted index.
+ * Adds a token tokenInfo pair to the inverted index.
+ * If the token already exist, then update the tokenInfo.
  *
  * By default this function starts at the root of the current inverted index, however
  * it can start at any node of the inverted index if required.
@@ -1778,6 +1779,7 @@ elasticlunr.InvertedIndex.prototype.hasToken = function (token) {
 
 /**
  * Retrieve a node from the inverted index for a given token.
+ * If token not found, return null.
  *
  * By default this function starts at the root of the current store, however
  * it can start at any node of inverted index if required.
@@ -1803,6 +1805,7 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
 
 /**
  * Retrieve the documents for a node for the given token.
+ * If token not found, return null.
  *
  * By default this function starts at the root of the current store, however
  * it can start at any node of inverted index if required.
@@ -1818,6 +1821,7 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
 
 /**
  * Retrieve the document frequency of given token.
+ * If token not found, return 0.
  *
  * By default this function starts at the root of the current store, however
  * it can start at any node of inverted index if required.
@@ -1829,6 +1833,7 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
  */
 elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
   var node = this.getNode(token, root);
+
   if (node.df) {
     return node.df;
   }
@@ -1844,7 +1849,6 @@ elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
  * @param {String} token The token to get the documents for.
  * @param {String} ref The ref of the document to remove from this token.
  * @param {Object} root An optional node at which to start.
- * @return {Object}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
@@ -1863,8 +1867,8 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
 };
 
 /**
- * Find all the possible suffixes of the passed token using tokens
- * currently in the inverted index.
+ * Find all the possible suffixes of the passed token using tokens currently in the inverted index.
+ * If token not found, return empty Array.
  *
  * @param {String} token The token to expand.
  * @return {Array}

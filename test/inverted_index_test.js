@@ -1,140 +1,197 @@
-module('elasticlunr.InvertedIndex')
+module('elasticlunr.InvertedIndex');
 
-test('adding a token to the store', function () {
-  var store = new elasticlunr.InvertedIndex,
+test('create empty inverted index', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex;
+
+  deepEqual(invertedIndex.root, { docs: {}, df: 0 });
+  equal(invertedIndex.length, 0);
+  equal(invertedIndex.root.df, 0);
+});
+
+test('adding a token to the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
       doc = { ref: 123, tf: 1 },
-      token = 'foo'
+      token = 'foo';
 
-  store.addToken(token, doc)
+  invertedIndex.addToken(token, doc);
 
-  ok(store.root['f']['o']['o']['docs'][123] === doc)
-  equal(store.length, 1)
-})
+  ok(invertedIndex.root['f']['o']['o']['docs'][123] === doc);
+  equal(invertedIndex.getDocFreq('foo'), 1);
+  equal(invertedIndex.length, 1);
+});
 
 test('adding another document to the token', function () {
-  var store = new elasticlunr.InvertedIndex,
+  var invertedIndex = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
       doc2 = { ref: 456, tf: 1 },
-      token = 'foo'
+      token = 'foo';
 
-  store.addToken(token, doc1)
-  store.addToken(token, doc2)
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
 
-  ok(store.root['f']['o']['o']['docs'][123] === doc1)
-  ok(store.root['f']['o']['o']['docs'][456] === doc2)
-})
+  ok(invertedIndex.root['f']['o']['o']['docs'][123] === doc1);
+  ok(invertedIndex.root['f']['o']['o']['docs'][456] === doc2);
+  equal(invertedIndex.getDocFreq('foo'), 2);
+});
 
-test('checking if a token exists in the store', function () {
-  var store = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1 },
-      token = 'foo'
-
-  store.addToken(token, doc)
-
-  ok(store.hasToken(token))
-})
-
-test('checking if a token does not exist in the store', function () {
-  var store = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1 },
-      token = 'foo'
-
-  ok(!store.hasToken('bar'))
-  store.addToken(token, doc)
-  ok(!store.hasToken('bar'))
-})
-
-test('retrieving items from the store', function () {
-  var store = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1 },
-      token = 'foo'
-
-  store.addToken(token, doc)
-  deepEqual(store.getDocs(token), {
-    '123': doc
-  })
-
-  deepEqual(store.getDocs(''), {})
-})
-
-test('retrieving items that do not exist in the store', function () {
-  var store = new elasticlunr.InvertedIndex
-
-  deepEqual(store.getDocs('foo'), {})
-})
-
-test('counting items in the store', function () {
-  var store = new elasticlunr.InvertedIndex,
+test('test df of none-existing token', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
       doc2 = { ref: 456, tf: 1 },
-      doc3 = { ref: 789, tf: 1 }
+      token = 'foo';
 
-  store.addToken('foo', doc1)
-  store.addToken('foo', doc2)
-  store.addToken('bar', doc3)
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
 
-  equal(store.getDocFreq('foo'), 2)
-  equal(store.getDocFreq('bar'), 1)
-  equal(store.getDocFreq('baz'), 0)
-})
+  equal(invertedIndex.getDocFreq('foo'), 2);
+  equal(invertedIndex.getDocFreq('fox'), 0);
+});
 
-test('removing a document from the token store', function () {
-  var store = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1 }
-
-  deepEqual(store.getDocs('foo'), {})
-
-  store.addToken('foo', doc)
-  deepEqual(store.getDocs('foo'), {
-    '123': doc
-  })
-
-  store.removeToken('foo', 123)
-  deepEqual(store.getDocs('foo'), {})
-})
-
-test('removing a document that is not in the store', function () {
-  var store = new elasticlunr.InvertedIndex,
+test('adding existing doc', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 1 },
-      doc2 = { ref: 567, tf: 1 }
+      doc2 = { ref: 456, tf: 1 },
+      token = 'foo';
 
-  store.addToken('foo', doc1)
-  store.addToken('bar', doc2)
-  store.removeToken('foo', 456);
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
+  invertedIndex.addToken(token, { ref: 456, tf: 100 });
 
-  deepEqual(store.getDocs('foo'), { 123: doc1 })
-})
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], { ref: 456, tf: 100 });
+
+  equal(invertedIndex.getDocFreq('foo'), 2);
+});
+
+test('checking if a token exists in the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc);
+
+  ok(invertedIndex.hasToken(token));
+});
+
+test('checking if a token does not exist in the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 },
+      token = 'foo';
+
+  ok(!invertedIndex.hasToken('bar'));
+  invertedIndex.addToken(token, doc);
+  ok(!invertedIndex.hasToken('bar'));
+});
+
+test('retrieving items from the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc);
+  deepEqual(invertedIndex.getDocs(token), {
+    '123': doc
+  });
+
+  deepEqual(invertedIndex.getDocs(''), {});
+});
+
+test('retrieving items that do not exist in the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex;
+
+  deepEqual(invertedIndex.getDocs('foo'), {});
+  deepEqual(invertedIndex.getDocs('fox'), {});
+});
+
+test('test df of items in the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 1 },
+      doc2 = { ref: 456, tf: 1 },
+      doc3 = { ref: 789, tf: 1 };
+
+  invertedIndex.addToken('foo', doc1);
+  invertedIndex.addToken('foo', doc2);
+  invertedIndex.addToken('bar', doc3);
+
+  equal(invertedIndex.getDocFreq('foo'), 2);
+  equal(invertedIndex.getDocFreq('bar'), 1);
+  equal(invertedIndex.getDocFreq('baz'), 0);
+});
+
+test('removing a document from the token invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 };
+
+  deepEqual(invertedIndex.getDocs('foo'), {});
+
+  invertedIndex.addToken('foo', doc);
+  deepEqual(invertedIndex.getDocs('foo'), {
+    '123': doc
+  });
+
+  invertedIndex.removeToken('foo', 123);
+  deepEqual(invertedIndex.getDocs('foo'), {});
+  equal(invertedIndex.getDocFreq('foo'), 0);
+});
+
+test('removing a document that is not in the invertedIndex', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 1 },
+      doc2 = { ref: 567, tf: 1 };
+
+  invertedIndex.addToken('foo', doc1);
+  invertedIndex.addToken('bar', doc2);
+  invertedIndex.removeToken('foo', 456);
+
+  deepEqual(invertedIndex.getDocs('foo'), { 123: doc1 });
+  equal(invertedIndex.getDocFreq('foo'), 1);
+});
 
 test('removing a document from a key that does not exist', function () {
-  var store = new elasticlunr.InvertedIndex
+  var invertedIndex = new elasticlunr.InvertedIndex;
 
-  store.removeToken('foo', 123)
-  ok(!store.hasToken('foo'))
-})
+  invertedIndex.removeToken('foo', 123);
+  ok(!invertedIndex.hasToken('foo'));
+  equal(invertedIndex.getDocFreq('foo'), 0);
+});
 
 test('expand a token into all descendent tokens', function () {
-  var store = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1 }
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 };
 
-  store.addToken('hell', doc)
-  store.addToken('hello', doc)
-  store.addToken('help', doc)
-  store.addToken('held', doc)
-  store.addToken('foo', doc)
-  store.addToken('bar', doc)
+  invertedIndex.addToken('hell', doc);
+  invertedIndex.addToken('hello', doc);
+  invertedIndex.addToken('help', doc);
+  invertedIndex.addToken('held', doc);
+  invertedIndex.addToken('foo', doc);
+  invertedIndex.addToken('bar', doc);
 
-  var tokens = store.expandToken('hel')
-  deepEqual(tokens, ['hell', 'hello', 'help', 'held'])
-})
+  var tokens = invertedIndex.expandToken('hel');
+  deepEqual(tokens, ['hell', 'hello', 'help', 'held']);
+});
+
+test('expand a non existing token', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1 };
+
+  invertedIndex.addToken('hell', doc);
+  invertedIndex.addToken('hello', doc);
+  invertedIndex.addToken('help', doc);
+  invertedIndex.addToken('held', doc);
+  invertedIndex.addToken('foo', doc);
+  invertedIndex.addToken('bar', doc);
+
+  var tokens = invertedIndex.expandToken('wax');
+  deepEqual(tokens, []);
+});
 
 test('serialisation', function () {
-  var store = new elasticlunr.InvertedIndex;
+  var invertedIndex = new elasticlunr.InvertedIndex;
 
-  deepEqual(store.toJSON(), { root: { docs: {}, df: 0 }, length: 0 });
+  deepEqual(invertedIndex.toJSON(), { root: { docs: {}, df: 0 }, length: 0 });
 
-  store.addToken('foo', { ref: 123, tf: 1 });
+  invertedIndex.addToken('foo', { ref: 123, tf: 1 });
 
-  deepEqual(store.toJSON(),
+  deepEqual(invertedIndex.toJSON(),
     {
       root: {
         docs: {},
@@ -178,9 +235,9 @@ test('loading a serialised story', function () {
       length: 1
   };
 
-  var store = elasticlunr.InvertedIndex.load(serialisedData),
-      documents = store.getDocs('foo');
+  var invertedIndex = elasticlunr.InvertedIndex.load(serialisedData),
+      documents = invertedIndex.getDocs('foo');
 
-  equal(store.length, 1)
+  equal(invertedIndex.length, 1)
   deepEqual(documents, { 123: { ref: 123, tf: 1 }});
-})
+});

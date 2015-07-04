@@ -194,7 +194,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds a new token tokenInfo pair to the inverted index.</p><p>By default this function starts at the root of the current inverted index, however<br />it can start at any node of the inverted index if required.</p> </div>
+          <div class="description"><p>Adds a token tokenInfo pair to the inverted index.<br />If the token already exist, then update the tokenInfo.</p><p>By default this function starts at the root of the current inverted index, however<br />it can start at any node of the inverted index if required.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root) {
   var root = root || this.root,
       idx = 0;
@@ -296,7 +296,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Retrieve a node from the inverted index for a given token.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
+          <div class="description"><p>Retrieve a node from the inverted index for a given token.<br />If token not found, return null.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getNode = function (token) {
   if (!token) return {};
 
@@ -342,7 +342,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Retrieve the documents for a node for the given token.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
+          <div class="description"><p>Retrieve the documents for a node for the given token.<br />If token not found, return null.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
   return this.getNode(token, root).docs || {};
 };</code></pre>
@@ -379,9 +379,10 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Retrieve the document frequency of given token.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
+          <div class="description"><p>Retrieve the document frequency of given token.<br />If token not found, return 0.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
   var node = this.getNode(token, root);
+
   if (node.df) {
     return node.df;
   }
@@ -417,11 +418,6 @@
                 <td>root</td>
                 <td>Object</td>
                 <td><p>An optional node at which to start.</p></td>
-              </tr>
-              <tr>
-                <td>return</td>
-                <td>Object</td>
-                <td></td>
               </tr>
             </tbody>
           </table>
@@ -468,7 +464,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Find all the possible suffixes of the passed token using tokens<br />currently in the inverted index.</p> </div>
+          <div class="description"><p>Find all the possible suffixes of the passed token using tokens currently in the inverted index.<br />If token not found, return empty Array.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
   if (root == void 0) {
     root = this.getNode(token);
