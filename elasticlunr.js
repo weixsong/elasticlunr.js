@@ -42,7 +42,7 @@
  * customize the instance of new elasticlunr.Index.
  * @namespace
  * @module
- * @returns {elasticlunr.Index}
+ * @return {elasticlunr.Index}
  *
  */
 var elasticlunr = function (config) {
@@ -177,7 +177,7 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
  *
  * @module
  * @param {String} obj The string to convert into tokens
- * @returns {Array}
+ * @return {Array}
  */
 elasticlunr.tokenizer = function (obj) {
   if (!arguments.length || obj == null || obj == undefined) return []
@@ -271,7 +271,7 @@ elasticlunr.Pipeline.warnIfFunctionNotRegistered = function (fn) {
  * error will be thrown.
  *
  * @param {Object} serialised The serialised pipeline to load.
- * @returns {elasticlunr.Pipeline}
+ * @return {elasticlunr.Pipeline}
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.load = function (serialised) {
@@ -370,7 +370,7 @@ elasticlunr.Pipeline.prototype.remove = function (fn) {
  * passed tokens.
  *
  * @param {Array} tokens The tokens to run through the pipeline.
- * @returns {Array}
+ * @return {Array}
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.run = function (tokens) {
@@ -406,7 +406,7 @@ elasticlunr.Pipeline.prototype.reset = function () {
  *
  * Logs a warning if the function has not been registered.
  *
- * @returns {Array}
+ * @return {Array}
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.toJSON = function () {
@@ -490,7 +490,7 @@ elasticlunr.Vector.prototype.insert = function (idx, val) {
 /**
  * Calculates the magnitude of this vector.
  *
- * @returns {Number}
+ * @return {Number}
  * @memberOf Vector
  */
 elasticlunr.Vector.prototype.magnitude = function () {
@@ -512,7 +512,7 @@ elasticlunr.Vector.prototype.magnitude = function () {
  * Calculates the dot product of this vector and another vector.
  *
  * @param {elasticlunr.Vector} otherVector The vector to compute the dot product with.
- * @returns {Number}
+ * @return {Number}
  * @memberOf Vector
  */
 elasticlunr.Vector.prototype.dot = function (otherVector) {
@@ -541,7 +541,7 @@ elasticlunr.Vector.prototype.dot = function (otherVector) {
  *
  * @param {elasticlunr.Vector} otherVector The other vector to calculate the
  * similarity with.
- * @returns {Number}
+ * @return {Number}
  * @memberOf Vector
  */
 elasticlunr.Vector.prototype.similarity = function (otherVector) {
@@ -567,7 +567,7 @@ elasticlunr.SortedSet = function () {
  * Loads a previously serialised sorted set.
  *
  * @param {Array} serialisedData The serialised set to load.
- * @returns {elasticlunr.SortedSet}
+ * @return {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.load = function (serialisedData) {
@@ -601,7 +601,7 @@ elasticlunr.SortedSet.prototype.add = function () {
 /**
  * Converts this sorted set into an array.
  *
- * @returns {Array}
+ * @return {Array}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.toArray = function () {
@@ -618,7 +618,7 @@ elasticlunr.SortedSet.prototype.toArray = function () {
  * set.
  * @param {Object} ctx An optional object that can be used as the context
  * for the function fn.
- * @returns {Array}
+ * @return {Array}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.map = function (fn, ctx) {
@@ -645,7 +645,7 @@ elasticlunr.SortedSet.prototype.forEach = function (fn, ctx) {
  * sorted set, or -1 if it is not present.
  *
  * @param {Object} elem The object to locate in the sorted set.
- * @returns {Number}
+ * @return {Number}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.indexOf = function (elem) {
@@ -672,7 +672,7 @@ elasticlunr.SortedSet.prototype.indexOf = function (elem) {
  * in the sorted set.
  *
  * @param {Object} elem The elem to find the position for in the set
- * @returns {Number}
+ * @return {Number}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.locationFor = function (elem) {
@@ -697,7 +697,7 @@ elasticlunr.SortedSet.prototype.locationFor = function (elem) {
  * of this set and the passed set.
  *
  * @param {elasticlunr.SortedSet} otherSet The set to intersect with this set.
- * @returns {elasticlunr.SortedSet}
+ * @return {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.intersect = function (otherSet) {
@@ -732,7 +732,7 @@ elasticlunr.SortedSet.prototype.intersect = function (otherSet) {
 /**
  * Makes a copy of this set
  *
- * @returns {elasticlunr.SortedSet}
+ * @return {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.clone = function () {
@@ -749,7 +749,7 @@ elasticlunr.SortedSet.prototype.clone = function () {
  * of this set and the passed set.
  *
  * @param {elasticlunr.SortedSet} otherSet The set to union with this set.
- * @returns {elasticlunr.SortedSet}
+ * @return {elasticlunr.SortedSet}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.union = function (otherSet) {
@@ -771,7 +771,7 @@ elasticlunr.SortedSet.prototype.union = function (otherSet) {
 /**
  * Returns a representation of the sorted set ready for serialisation.
  *
- * @returns {Array}
+ * @return {Array}
  * @memberOf SortedSet
  */
 elasticlunr.SortedSet.prototype.toJSON = function () {
@@ -838,7 +838,7 @@ elasticlunr.Index.prototype.off = function (name, fn) {
  * by a different version of elasticlunr.
  *
  * @param {Object} serialisedData The serialised set to load.
- * @returns {elasticlunr.Index}
+ * @return {elasticlunr.Index}
  * @memberOf Index
  */
 elasticlunr.Index.load = function (serialisedData) {
@@ -875,7 +875,7 @@ elasticlunr.Index.load = function (serialisedData) {
  * should be indexed
  * @param {Number} boost An optional boost that can be applied to terms in this
  * field.
- * @returns {elasticlunr.Index}
+ * @return {elasticlunr.Index}
  * @memberOf Index
  */
 elasticlunr.Index.prototype.field = function (fieldName, opts) {
@@ -896,7 +896,7 @@ elasticlunr.Index.prototype.field = function (fieldName, opts) {
  * @param {String} refName The property to use to uniquely identify the
  * documents in the index.
  * @param {Boolean} emitEvent Whether to emit add events, defaults to true
- * @returns {elasticlunr.Index}
+ * @return {elasticlunr.Index}
  * @memberOf Index
  */
 elasticlunr.Index.prototype.ref = function (refName) {
@@ -1055,7 +1055,7 @@ elasticlunr.Index.prototype.idf = function (term) {
  * for this document against the query.
  *
  * @param {String} query The query to search the index with.
- * @returns {Object}
+ * @return {Object}
  * @see Index.prototype.idf
  * @see Index.prototype.documentVector
  * @memberOf Index
@@ -1129,7 +1129,7 @@ elasticlunr.Index.prototype.search = function (query) {
  * token the element will be 0.
  *
  * @param {Object} documentRef The ref to find the document with.
- * @returns {elasticlunr.Vector}
+ * @return {elasticlunr.Vector}
  * @private
  * @memberOf Index
  */
@@ -1152,7 +1152,7 @@ elasticlunr.Index.prototype.documentVector = function (documentRef) {
 /**
  * Returns a representation of the index ready for serialisation.
  *
- * @returns {Object}
+ * @return {Object}
  * @memberOf Index
  */
 elasticlunr.Index.prototype.toJSON = function () {
@@ -1220,7 +1220,7 @@ elasticlunr.DocumentStore = function () {
  * Loads a previously serialised document store
  *
  * @param {Object} serialisedData The serialised document store to load.
- * @returns {elasticlunr.Store}
+ * @return {elasticlunr.Store}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.load = function (serialisedData) {
@@ -1250,7 +1250,7 @@ elasticlunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
  * Retrieves the tokens from the document store for a given key.
  *
  * @param {Object} doc_id, The key to lookup and retrieve from the document store.
- * @returns {Object}
+ * @return {Object}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.get = function (doc_id) {
@@ -1261,7 +1261,7 @@ elasticlunr.DocumentStore.prototype.get = function (doc_id) {
  * Checks whether the document store contains a key (doc_id).
  *
  * @param {Object} doc_id The id to look up in the document store.
- * @returns {Boolean}
+ * @return {Boolean}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.has = function (doc_id) {
@@ -1284,7 +1284,7 @@ elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
 /**
  * Returns a representation of the document store ready for serialisation.
  *
- * @returns {Object}
+ * @return {Object}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.toJSON = function () {
@@ -1305,7 +1305,7 @@ elasticlunr.DocumentStore.prototype.toJSON = function () {
  *
  * @module
  * @param {String} str The string to stem
- * @returns {String}
+ * @return {String}
  * @see elasticlunr.Pipeline
  */
 elasticlunr.stemmer = (function(){
@@ -1525,7 +1525,7 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer')
  *
  * @module
  * @param {String} token The token to pass through the filter
- * @returns {String}
+ * @return {String}
  * @see elasticlunr.Pipeline
  */
 elasticlunr.stopWordFilter = function (token) {
@@ -1674,7 +1674,7 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilte
  *
  * @module
  * @param {String} token The token to pass through the filter
- * @returns {String}
+ * @return {String}
  * @see elasticlunr.Pipeline
  */
 elasticlunr.trimmer = function (token) {
@@ -1692,8 +1692,7 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer')
  */
 
 /**
- * elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index
- * of token to document ref.
+ * elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index of token to document ref.
  *
  * @constructor
  */
@@ -1706,8 +1705,7 @@ elasticlunr.InvertedIndex = function () {
  * Loads a previously serialised inverted index.
  *
  * @param {Object} serialisedData The serialised inverted index to load.
- * @returns {elasticlunr.InvertedIndex}
- * @memberOf InvertedIndex
+ * @return {elasticlunr.InvertedIndex}
  */
 elasticlunr.InvertedIndex.load = function (serialisedData) {
   var idx = new this;
@@ -1762,6 +1760,7 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
  *
  * @param {String} token The token to check for
  * @param {Object} root An optional node at which to start
+ * @return {Boolean}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.hasToken = function (token) {
@@ -1785,7 +1784,7 @@ elasticlunr.InvertedIndex.prototype.hasToken = function (token) {
  *
  * @param {String} token The token to get the node for.
  * @param {Object} root An optional node at which to start.
- * @returns {Object}
+ * @return {Object}
  * @see InvertedIndex.prototype.get
  * @memberOf InvertedIndex
  */
@@ -1810,7 +1809,7 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
  *
  * @param {String} token The token to get the documents for.
  * @param {Object} root An optional node at which to start.
- * @returns {Object}
+ * @return {Object}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
@@ -1825,7 +1824,7 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
  *
  * @param {String} token The token to get the documents for.
  * @param {Object} root An optional node at which to start.
- * @returns {Object}
+ * @return {Object}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
@@ -1845,7 +1844,7 @@ elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
  * @param {String} token The token to get the documents for.
  * @param {String} ref The ref of the document to remove from this token.
  * @param {Object} root An optional node at which to start.
- * @returns {Object}
+ * @return {Object}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
@@ -1868,7 +1867,7 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
  * currently in the inverted index.
  *
  * @param {String} token The token to expand.
- * @returns {Array}
+ * @return {Array}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
@@ -1892,7 +1891,7 @@ elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
 /**
  * Returns a representation of the inverted index ready for serialisation.
  *
- * @returns {Object}
+ * @return {Object}
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.toJSON = function () {

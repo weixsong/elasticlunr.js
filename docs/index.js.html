@@ -225,6 +225,11 @@
                 <td>Object</td>
                 <td><p>The serialised set to load.</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>elasticlunr.Index</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Loads a previously serialised index.</p><p>Issues a warning if the index being imported was serialised<br />by a different version of elasticlunr.</p> </div>
@@ -272,6 +277,11 @@
                 <td>Number</td>
                 <td><p>An optional boost that can be applied to terms in this field.</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>elasticlunr.Index</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Adds a field to the list of fields that will be searchable within documents<br />in the index.</p><p>An optional boost param can be passed to affect how much tokens in this field<br />rank in search results, by default the boost value is 1.</p><p>Fields should be added before any documents are added to the index, fields<br />that are added after documents are added to the index will only apply to new<br />documents added to the index.</p> </div>
@@ -307,6 +317,11 @@
                 <td>emitEvent</td>
                 <td>Boolean</td>
                 <td><p>Whether to emit add events, defaults to true</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>elasticlunr.Index</td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -476,6 +491,11 @@
                 <td>query</td>
                 <td>String</td>
                 <td><p>The query to search the index with.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
               </tr>
             </tbody>
           </table>

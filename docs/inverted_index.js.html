@@ -119,7 +119,7 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.InvertedIndex()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index<br />of token to document ref.</p> </div>
+          <div class="description"><p>elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index of token to document ref.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex = function () {
   this.root = { docs: {}, df: 0 };
   this.length = 0;
@@ -144,6 +144,11 @@
                 <td>serialisedData</td>
                 <td>Object</td>
                 <td><p>The serialised inverted index to load.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>elasticlunr.InvertedIndex</td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -238,6 +243,11 @@
                 <td>Object</td>
                 <td><p>An optional node at which to start</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>Boolean</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Checks whether this key is contained within this elasticlunr.InvertedIndex.</p><p>By default this function starts at the root of the current inverted index, however<br />it can start at any node of inverted index if required.</p> </div>
@@ -278,6 +288,11 @@
                 <td>root</td>
                 <td>Object</td>
                 <td><p>An optional node at which to start.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -320,6 +335,11 @@
                 <td>Object</td>
                 <td><p>An optional node at which to start.</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Retrieve the documents for a node for the given token.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
@@ -351,6 +371,11 @@
                 <td>root</td>
                 <td>Object</td>
                 <td><p>An optional node at which to start.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -393,6 +418,11 @@
                 <td>Object</td>
                 <td><p>An optional node at which to start.</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Remove the document identified by ref from the token in the inverted index.</p><p>By default this function starts at the root of the current store, however<br />it can start at any node of inverted index if required.</p> </div>
@@ -430,6 +460,11 @@
                 <td>token</td>
                 <td>String</td>
                 <td><p>The token to expand.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Array</td>
+                <td></td>
               </tr>
             </tbody>
           </table>

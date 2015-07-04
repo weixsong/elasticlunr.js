@@ -115,6 +115,11 @@
                 <td>Function</td>
                 <td><p>A function that will be called with the new instance of the elasticlunr.Index as both its context and first parameter. It can be used to<br />customize the instance of new elasticlunr.Index.</p></td>
               </tr>
+              <tr>
+                <td>return</td>
+                <td>elasticlunr.Index</td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
           <div class="description"><p>Convenience function for instantiating a new elasticLunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><p>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</p><p>elasticlunr.stemmer - stems the tokens before entering the index.</p><p>Example:</p><pre><code>var idx = elasticLunr(function () {
