@@ -52,7 +52,8 @@ docs: node_modules
 	${DOX} < elasticlunr.js | ${DOX_TEMPLATE} -n elasticlunr.js -r ${VERSION} > docs/index.html
 
 clean:
-	rm -f elasticlunr{.min,}.js
+	rm -f elasticlunr.js
+	rm -f elasticlunr.min.js
 	rm *.json
 	rm example/example_index.json
 
