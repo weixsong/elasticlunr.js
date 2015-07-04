@@ -1,7 +1,7 @@
 {
   "name": "elasticlunr",
   "repo": "weixsong/elasticlunr.js",
-  "version": "0.5.11",
+  "version": "0.6.1",
   "description": "Full-text search engine in Javascript for browser search and offline search.",
   "license": "MIT",
   "main": "elasticlunr.js",
