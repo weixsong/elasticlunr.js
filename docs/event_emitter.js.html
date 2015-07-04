@@ -71,10 +71,10 @@
       <div class="row">
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
-            <li class="active"><a href="index.html">Main</a></li>
+            <li><a href="index.html">Main</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
-            <li><a href="event_emitter.js.html">event_emitter.js</a></li>
+            <li class="active"><a href="event_emitter.js.html">event_emitter.js</a></li>
             <li><a href="index.js.html">index.js</a></li>
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li><a href="pipeline.js.html">pipeline.js</a></li>
@@ -88,37 +88,140 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
+              <li><a href="#EventEmitter"><i class="alert alert-success"></i><span>EventEmitter</span></a>
+              </li>
+              <li><a href="#addListener"><i class="alert alert-info"></i><span>addListener</span></a>
+              </li>
+              <li><a href="#removeListener"><i class="alert alert-info"></i><span>removeListener</span></a>
+              </li>
+              <li><a href="#emit"><i class="alert alert-info"></i><span>emit</span></a>
+              </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="Main"><h1>Lunr.js</h1>
-<p><a href="https://gitter.im/olivernn/lunr.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/olivernn/lunr.js"></a></p><p><a href="https://travis-ci.org/olivernn/lunr.js"><img src="https://travis-ci.org/olivernn/lunr.js.png?branch=master" alt="Build Status"></a></p><p>A bit like Solr, but much smaller and not as bright.</p><h2>Example</h2>
-<p>A very simple search index can be created using the following:</p><pre><code class="lang-javascript">var idx = lunr(function () {
-    this.field(&#39;title&#39;, { boost: 10 })
-    this.field(&#39;body&#39;)
-})
-</code></pre>
-<p>Adding documents to be indexed is as simple as:</p><pre><code class="lang-javascript">var doc = {
-    &quot;title&quot;: &quot;Twelfth-Night&quot;,
-    &quot;body&quot;: &quot;If music be the food of love, play on: Give me excess of it…&quot;,
-    &quot;author&quot;: &quot;William Shakespeare&quot;,
-    &quot;id&quot;: 1
-}
-idx.add(doc)
-</code></pre>
-<p>Then searching is as simple:</p><pre><code class="lang-javascript">idx.search(&quot;love&quot;)
-</code></pre>
-<p>This returns a list of matching documents with a score of how closely they match the search query:</p><pre><code class="lang-javascript">[{
-    &quot;ref&quot;: 1,
-    &quot;score&quot;: 0.87533
-}]
-</code></pre>
-<p><a href="http://lunrjs.com/docs">API documentation</a> is available, as well as a <a href="http://lunrjs.com/example/">full working example</a>.</p><h2>Description</h2>
-<p>Lunr.js is a small, full-text search library for use in the browser.  It indexes JSON documents and provides a simple search interface for retrieving documents that best match text queries.</p><h2>Why</h2>
-<p>For web applications with all their data already sitting in the client, it makes sense to be able to search that data on the client too.  It saves adding extra, compacted services on the server.  A local search index will be quicker, there is no network overhead, and will remain available and useable even without a network connection.</p><h2>Installation</h2>
-<p>Simply include the lunr.js source file in the page that you want to use it.  Lunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Lunr to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
-<p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
+          <section id="EventEmitter">
+            <h1>EventEmitter</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.EventEmitter()</span>
+            </p>
+          </section>
+          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.EventEmitter = function () {
+  this.events = {}
+}</code></pre>
+          <section id="addListener">
+            <h1>addListener</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.EventEmitter.prototype.addListener()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>[eventName]</td>
+                <td>String</td>
+                <td><p>The name(s) of events to bind this function to.</p></td>
+              </tr>
+              <tr>
+                <td>fn</td>
+                <td>Function</td>
+                <td><p>The function to call when an event is fired.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Binds a handler function to a specific event(s).</p><p>Can bind a single function to many different events in one call.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.addListener = function () {
+  var args = Array.prototype.slice.call(arguments),
+      fn = args.pop(),
+      names = args
+
+  if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;)
+
+  names.forEach(function (name) {
+    if (!this.hasHandler(name)) this.events[name] = []
+    this.events[name].push(fn)
+  }, this)
+}</code></pre>
+          <section id="removeListener">
+            <h1>removeListener</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.EventEmitter.prototype.removeListener()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>eventName</td>
+                <td>String</td>
+                <td><p>The name of the event to remove this function from.</p></td>
+              </tr>
+              <tr>
+                <td>fn</td>
+                <td>Function</td>
+                <td><p>The function to remove from an event.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Removes a handler function from a specific event.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
+  if (!this.hasHandler(name)) return
+
+  var fnIndex = this.events[name].indexOf(fn)
+  this.events[name].splice(fnIndex, 1)
+
+  if (!this.events[name].length) delete this.events[name]
+}</code></pre>
+          <section id="emit">
+            <h1>emit</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.EventEmitter.prototype.emit()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>eventName</td>
+                <td>String</td>
+                <td><p>The name of the event to emit.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Calls all functions bound to the given event.</p><p>Additional data can be passed to the event handler as arguments to <code>emit</code><br />after the event name.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.emit = function (name) {
+  if (!this.hasHandler(name)) return
+
+  var args = Array.prototype.slice.call(arguments, 1)
+
+  this.events[name].forEach(function (fn) {
+    fn.apply(undefined, args)
+  })
+}</code></pre>
         </div>
       </div>
     </div>

@@ -19,8 +19,7 @@ VERSION = $(shell cat VERSION)
 SERVER_PORT ?= 3000
 TEST_PORT ?= 32423
 
-DOX ?= ./node_modules/.bin/dox
-DOX_TEMPLATE ?= ./node_modules/.bin/dox-template
+DOXX ?= ./node_modules/.bin/doxx
 NODE ?= /usr/local/bin/node
 NPM ?= /usr/local/bin/npm
 PHANTOMJS ?= ./node_modules/.bin/phantomjs
@@ -32,12 +31,14 @@ elasticlunr.js: $(SRC)
 	cat build/wrapper_start $^ build/wrapper_end | \
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" > $@
+	cp $@ ./release/
 
 elasticlunr.min.js: $(SRC)
 	cat build/wrapper_start $^ build/wrapper_end | \
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" | \
 	${UGLIFYJS} --compress --mangle --comments > $@
+	cp $@ ./release/
 
 %.json: build/%.json.template
 	cat $< | sed "s/@VERSION/${VERSION}/" > $@
@@ -52,13 +53,15 @@ test: node_modules
 	@./test/runner.sh ${TEST_PORT}
 
 docs: node_modules
-	${DOX} < elasticlunr.js | ${DOX_TEMPLATE} -n elasticlunr.js -r ${VERSION} > docs/index.html
+	${DOXX} --source lib --target docs
 
 clean:
 	rm -f elasticlunr.js
 	rm -f elasticlunr.min.js
 	rm -f *.json
 	rm -f example/example_index.json
+	rm -rf node_modules
+	rm -rf docs/*
 
 reset:
 	git checkout elasticlunr.* *.json docs/index.html example/example_index.json

@@ -71,7 +71,7 @@
       <div class="row">
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
-            <li class="active"><a href="index.html">Main</a></li>
+            <li><a href="index.html">Main</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -80,7 +80,7 @@
             <li><a href="pipeline.js.html">pipeline.js</a></li>
             <li><a href="sorted_set.js.html">sorted_set.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
-            <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
+            <li class="active"><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
             <li><a href="trimmer.js.html">trimmer.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
@@ -88,37 +88,166 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
+              <li><a href="#stopWordFilter"><i class="alert alert-info"></i><span>stopWordFilter</span></a>
+              </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="Main"><h1>Lunr.js</h1>
-<p><a href="https://gitter.im/olivernn/lunr.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/olivernn/lunr.js"></a></p><p><a href="https://travis-ci.org/olivernn/lunr.js"><img src="https://travis-ci.org/olivernn/lunr.js.png?branch=master" alt="Build Status"></a></p><p>A bit like Solr, but much smaller and not as bright.</p><h2>Example</h2>
-<p>A very simple search index can be created using the following:</p><pre><code class="lang-javascript">var idx = lunr(function () {
-    this.field(&#39;title&#39;, { boost: 10 })
-    this.field(&#39;body&#39;)
-})
-</code></pre>
-<p>Adding documents to be indexed is as simple as:</p><pre><code class="lang-javascript">var doc = {
-    &quot;title&quot;: &quot;Twelfth-Night&quot;,
-    &quot;body&quot;: &quot;If music be the food of love, play on: Give me excess of it…&quot;,
-    &quot;author&quot;: &quot;William Shakespeare&quot;,
-    &quot;id&quot;: 1
+          <section id="stopWordFilter">
+            <h1>stopWordFilter</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.stopWordFilter()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>token</td>
+                <td>String</td>
+                <td><p>The token to pass through the filter</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>elasticlunr.stopWordFilter is an English language stop word list filter, any words<br />contained in the list will not be passed through the filter.</p><p>This is intended to be used in the Pipeline. If the token does not pass the<br />filter then undefined will be returned.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.stopWordFilter = function (token) {
+  if (elasticlunr.stopWordFilter.stopWords.indexOf(token) === -1) return token
 }
-idx.add(doc)
-</code></pre>
-<p>Then searching is as simple:</p><pre><code class="lang-javascript">idx.search(&quot;love&quot;)
-</code></pre>
-<p>This returns a list of matching documents with a score of how closely they match the search query:</p><pre><code class="lang-javascript">[{
-    &quot;ref&quot;: 1,
-    &quot;score&quot;: 0.87533
-}]
-</code></pre>
-<p><a href="http://lunrjs.com/docs">API documentation</a> is available, as well as a <a href="http://lunrjs.com/example/">full working example</a>.</p><h2>Description</h2>
-<p>Lunr.js is a small, full-text search library for use in the browser.  It indexes JSON documents and provides a simple search interface for retrieving documents that best match text queries.</p><h2>Why</h2>
-<p>For web applications with all their data already sitting in the client, it makes sense to be able to search that data on the client too.  It saves adding extra, compacted services on the server.  A local search index will be quicker, there is no network overhead, and will remain available and useable even without a network connection.</p><h2>Installation</h2>
-<p>Simply include the lunr.js source file in the page that you want to use it.  Lunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Lunr to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
-<p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
+
+elasticlunr.stopWordFilter.stopWords = new elasticlunr.SortedSet
+elasticlunr.stopWordFilter.stopWords.length = 119
+elasticlunr.stopWordFilter.stopWords.elements = [
+  &quot;&quot;,
+  &quot;a&quot;,
+  &quot;able&quot;,
+  &quot;about&quot;,
+  &quot;across&quot;,
+  &quot;after&quot;,
+  &quot;all&quot;,
+  &quot;almost&quot;,
+  &quot;also&quot;,
+  &quot;am&quot;,
+  &quot;among&quot;,
+  &quot;an&quot;,
+  &quot;and&quot;,
+  &quot;any&quot;,
+  &quot;are&quot;,
+  &quot;as&quot;,
+  &quot;at&quot;,
+  &quot;be&quot;,
+  &quot;because&quot;,
+  &quot;been&quot;,
+  &quot;but&quot;,
+  &quot;by&quot;,
+  &quot;can&quot;,
+  &quot;cannot&quot;,
+  &quot;could&quot;,
+  &quot;dear&quot;,
+  &quot;did&quot;,
+  &quot;do&quot;,
+  &quot;does&quot;,
+  &quot;either&quot;,
+  &quot;else&quot;,
+  &quot;ever&quot;,
+  &quot;every&quot;,
+  &quot;for&quot;,
+  &quot;from&quot;,
+  &quot;get&quot;,
+  &quot;got&quot;,
+  &quot;had&quot;,
+  &quot;has&quot;,
+  &quot;have&quot;,
+  &quot;he&quot;,
+  &quot;her&quot;,
+  &quot;hers&quot;,
+  &quot;him&quot;,
+  &quot;his&quot;,
+  &quot;how&quot;,
+  &quot;however&quot;,
+  &quot;i&quot;,
+  &quot;if&quot;,
+  &quot;in&quot;,
+  &quot;into&quot;,
+  &quot;is&quot;,
+  &quot;it&quot;,
+  &quot;its&quot;,
+  &quot;just&quot;,
+  &quot;least&quot;,
+  &quot;let&quot;,
+  &quot;like&quot;,
+  &quot;likely&quot;,
+  &quot;may&quot;,
+  &quot;me&quot;,
+  &quot;might&quot;,
+  &quot;most&quot;,
+  &quot;must&quot;,
+  &quot;my&quot;,
+  &quot;neither&quot;,
+  &quot;no&quot;,
+  &quot;nor&quot;,
+  &quot;not&quot;,
+  &quot;of&quot;,
+  &quot;off&quot;,
+  &quot;often&quot;,
+  &quot;on&quot;,
+  &quot;only&quot;,
+  &quot;or&quot;,
+  &quot;other&quot;,
+  &quot;our&quot;,
+  &quot;own&quot;,
+  &quot;rather&quot;,
+  &quot;said&quot;,
+  &quot;say&quot;,
+  &quot;says&quot;,
+  &quot;she&quot;,
+  &quot;should&quot;,
+  &quot;since&quot;,
+  &quot;so&quot;,
+  &quot;some&quot;,
+  &quot;than&quot;,
+  &quot;that&quot;,
+  &quot;the&quot;,
+  &quot;their&quot;,
+  &quot;them&quot;,
+  &quot;then&quot;,
+  &quot;there&quot;,
+  &quot;these&quot;,
+  &quot;they&quot;,
+  &quot;this&quot;,
+  &quot;tis&quot;,
+  &quot;to&quot;,
+  &quot;too&quot;,
+  &quot;twas&quot;,
+  &quot;us&quot;,
+  &quot;wants&quot;,
+  &quot;was&quot;,
+  &quot;we&quot;,
+  &quot;were&quot;,
+  &quot;what&quot;,
+  &quot;when&quot;,
+  &quot;where&quot;,
+  &quot;which&quot;,
+  &quot;while&quot;,
+  &quot;who&quot;,
+  &quot;whom&quot;,
+  &quot;why&quot;,
+  &quot;will&quot;,
+  &quot;with&quot;,
+  &quot;would&quot;,
+  &quot;yet&quot;,
+  &quot;you&quot;,
+  &quot;your&quot;
+]
+
+elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter')</code></pre>
         </div>
       </div>
     </div>

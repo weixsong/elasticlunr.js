@@ -71,7 +71,7 @@
       <div class="row">
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
-            <li class="active"><a href="index.html">Main</a></li>
+            <li><a href="index.html">Main</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -79,7 +79,7 @@
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li><a href="pipeline.js.html">pipeline.js</a></li>
             <li><a href="sorted_set.js.html">sorted_set.js</a></li>
-            <li><a href="stemmer.js.html">stemmer.js</a></li>
+            <li class="active"><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
             <li><a href="trimmer.js.html">trimmer.js</a></li>
@@ -88,37 +88,239 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
+              <li><a href="#stemmer"><i class="alert alert-success"></i><span>stemmer</span></a>
+              </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="Main"><h1>Lunr.js</h1>
-<p><a href="https://gitter.im/olivernn/lunr.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/olivernn/lunr.js"></a></p><p><a href="https://travis-ci.org/olivernn/lunr.js"><img src="https://travis-ci.org/olivernn/lunr.js.png?branch=master" alt="Build Status"></a></p><p>A bit like Solr, but much smaller and not as bright.</p><h2>Example</h2>
-<p>A very simple search index can be created using the following:</p><pre><code class="lang-javascript">var idx = lunr(function () {
-    this.field(&#39;title&#39;, { boost: 10 })
-    this.field(&#39;body&#39;)
-})
-</code></pre>
-<p>Adding documents to be indexed is as simple as:</p><pre><code class="lang-javascript">var doc = {
-    &quot;title&quot;: &quot;Twelfth-Night&quot;,
-    &quot;body&quot;: &quot;If music be the food of love, play on: Give me excess of it…&quot;,
-    &quot;author&quot;: &quot;William Shakespeare&quot;,
-    &quot;id&quot;: 1
-}
-idx.add(doc)
-</code></pre>
-<p>Then searching is as simple:</p><pre><code class="lang-javascript">idx.search(&quot;love&quot;)
-</code></pre>
-<p>This returns a list of matching documents with a score of how closely they match the search query:</p><pre><code class="lang-javascript">[{
-    &quot;ref&quot;: 1,
-    &quot;score&quot;: 0.87533
-}]
-</code></pre>
-<p><a href="http://lunrjs.com/docs">API documentation</a> is available, as well as a <a href="http://lunrjs.com/example/">full working example</a>.</p><h2>Description</h2>
-<p>Lunr.js is a small, full-text search library for use in the browser.  It indexes JSON documents and provides a simple search interface for retrieving documents that best match text queries.</p><h2>Why</h2>
-<p>For web applications with all their data already sitting in the client, it makes sense to be able to search that data on the client too.  It saves adding extra, compacted services on the server.  A local search index will be quicker, there is no network overhead, and will remain available and useable even without a network connection.</p><h2>Installation</h2>
-<p>Simply include the lunr.js source file in the page that you want to use it.  Lunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Lunr to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
-<p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
+          <section id="stemmer">
+            <h1>stemmer</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>elasticlunr.stemmer</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>str</td>
+                <td>String</td>
+                <td><p>The string to stem</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>elasticlunr.stemmer is an english language stemmer, this is a JavaScript<br />implementation of the PorterStemmer taken from <a href="http://tartarus.org/~martin">http://tartarus.org/~martin</a></p> </div>
+          <pre><code class="language-javascript">elasticlunr.stemmer = (function(){
+  var step2list = {
+      &quot;ational&quot; : &quot;ate&quot;,
+      &quot;tional&quot; : &quot;tion&quot;,
+      &quot;enci&quot; : &quot;ence&quot;,
+      &quot;anci&quot; : &quot;ance&quot;,
+      &quot;izer&quot; : &quot;ize&quot;,
+      &quot;bli&quot; : &quot;ble&quot;,
+      &quot;alli&quot; : &quot;al&quot;,
+      &quot;entli&quot; : &quot;ent&quot;,
+      &quot;eli&quot; : &quot;e&quot;,
+      &quot;ousli&quot; : &quot;ous&quot;,
+      &quot;ization&quot; : &quot;ize&quot;,
+      &quot;ation&quot; : &quot;ate&quot;,
+      &quot;ator&quot; : &quot;ate&quot;,
+      &quot;alism&quot; : &quot;al&quot;,
+      &quot;iveness&quot; : &quot;ive&quot;,
+      &quot;fulness&quot; : &quot;ful&quot;,
+      &quot;ousness&quot; : &quot;ous&quot;,
+      &quot;aliti&quot; : &quot;al&quot;,
+      &quot;iviti&quot; : &quot;ive&quot;,
+      &quot;biliti&quot; : &quot;ble&quot;,
+      &quot;logi&quot; : &quot;log&quot;
+    },
+
+    step3list = {
+      &quot;icate&quot; : &quot;ic&quot;,
+      &quot;ative&quot; : &quot;&quot;,
+      &quot;alize&quot; : &quot;al&quot;,
+      &quot;iciti&quot; : &quot;ic&quot;,
+      &quot;ical&quot; : &quot;ic&quot;,
+      &quot;ful&quot; : &quot;&quot;,
+      &quot;ness&quot; : &quot;&quot;
+    },
+
+    c = &quot;[^aeiou]&quot;,          // consonant
+    v = &quot;[aeiouy]&quot;,          // vowel
+    C = c + &quot;[^aeiouy]*&quot;,    // consonant sequence
+    V = v + &quot;[aeiou]*&quot;,      // vowel sequence
+
+    mgr0 = &quot;^(&quot; + C + &quot;)?&quot; + V + C,               // [C]VC... is m&gt;0
+    meq1 = &quot;^(&quot; + C + &quot;)?&quot; + V + C + &quot;(&quot; + V + &quot;)?$&quot;,  // [C]VC[V] is m=1
+    mgr1 = &quot;^(&quot; + C + &quot;)?&quot; + V + C + V + C,       // [C]VCVC... is m&gt;1
+    s_v = &quot;^(&quot; + C + &quot;)?&quot; + v;                   // vowel in stem
+
+  var re_mgr0 = new RegExp(mgr0);
+  var re_mgr1 = new RegExp(mgr1);
+  var re_meq1 = new RegExp(meq1);
+  var re_s_v = new RegExp(s_v);
+
+  var re_1a = /^(.+?)(ss|i)es$/;
+  var re2_1a = /^(.+?)([^s])s$/;
+  var re_1b = /^(.+?)eed$/;
+  var re2_1b = /^(.+?)(ed|ing)$/;
+  var re_1b_2 = /.$/;
+  var re2_1b_2 = /(at|bl|iz)$/;
+  var re3_1b_2 = new RegExp(&quot;([^aeiouylsz])\\1$&quot;);
+  var re4_1b_2 = new RegExp(&quot;^&quot; + C + v + &quot;[^aeiouwxy]$&quot;);
+
+  var re_1c = /^(.+?[^aeiou])y$/;
+  var re_2 = /^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$/;
+
+  var re_3 = /^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$/;
+
+  var re_4 = /^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize)$/;
+  var re2_4 = /^(.+?)(s|t)(ion)$/;
+
+  var re_5 = /^(.+?)e$/;
+  var re_5_1 = /ll$/;
+  var re3_5 = new RegExp(&quot;^&quot; + C + v + &quot;[^aeiouwxy]$&quot;);
+
+  var porterStemmer = function porterStemmer(w) {
+    var   stem,
+      suffix,
+      firstch,
+      re,
+      re2,
+      re3,
+      re4;
+
+    if (w.length &lt; 3) { return w; }
+
+    firstch = w.substr(0,1);
+    if (firstch == &quot;y&quot;) {
+      w = firstch.toUpperCase() + w.substr(1);
+    }
+
+    // Step 1a
+    re = re_1a
+    re2 = re2_1a;
+
+    if (re.test(w)) { w = w.replace(re,&quot;$1$2&quot;); }
+    else if (re2.test(w)) { w = w.replace(re2,&quot;$1$2&quot;); }
+
+    // Step 1b
+    re = re_1b;
+    re2 = re2_1b;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      re = re_mgr0;
+      if (re.test(fp[1])) {
+        re = re_1b_2;
+        w = w.replace(re,&quot;&quot;);
+      }
+    } else if (re2.test(w)) {
+      var fp = re2.exec(w);
+      stem = fp[1];
+      re2 = re_s_v;
+      if (re2.test(stem)) {
+        w = stem;
+        re2 = re2_1b_2;
+        re3 = re3_1b_2;
+        re4 = re4_1b_2;
+        if (re2.test(w)) {  w = w + &quot;e&quot;; }
+        else if (re3.test(w)) { re = re_1b_2; w = w.replace(re,&quot;&quot;); }
+        else if (re4.test(w)) { w = w + &quot;e&quot;; }
+      }
+    }
+
+    // Step 1c - replace suffix y or Y by i if preceded by a non-vowel which is not the first letter of the word (so cry -&gt; cri, by -&gt; by, say -&gt; say)
+    re = re_1c;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      stem = fp[1];
+      w = stem + &quot;i&quot;;
+    }
+
+    // Step 2
+    re = re_2;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      stem = fp[1];
+      suffix = fp[2];
+      re = re_mgr0;
+      if (re.test(stem)) {
+        w = stem + step2list[suffix];
+      }
+    }
+
+    // Step 3
+    re = re_3;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      stem = fp[1];
+      suffix = fp[2];
+      re = re_mgr0;
+      if (re.test(stem)) {
+        w = stem + step3list[suffix];
+      }
+    }
+
+    // Step 4
+    re = re_4;
+    re2 = re2_4;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      stem = fp[1];
+      re = re_mgr1;
+      if (re.test(stem)) {
+        w = stem;
+      }
+    } else if (re2.test(w)) {
+      var fp = re2.exec(w);
+      stem = fp[1] + fp[2];
+      re2 = re_mgr1;
+      if (re2.test(stem)) {
+        w = stem;
+      }
+    }
+
+    // Step 5
+    re = re_5;
+    if (re.test(w)) {
+      var fp = re.exec(w);
+      stem = fp[1];
+      re = re_mgr1;
+      re2 = re_meq1;
+      re3 = re3_5;
+      if (re.test(stem) || (re2.test(stem) &amp;&amp; !(re3.test(stem)))) {
+        w = stem;
+      }
+    }
+
+    re = re_5_1;
+    re2 = re_mgr1;
+    if (re.test(w) &amp;&amp; re2.test(w)) {
+      re = re_1b_2;
+      w = w.replace(re,&quot;&quot;);
+    }
+
+    // and turn initial Y back to y
+
+    if (firstch == &quot;y&quot;) {
+      w = firstch.toLowerCase() + w.substr(1);
+    }
+
+    return w;
+  };
+
+  return porterStemmer;
+})();
+
+elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer')</code></pre>
         </div>
       </div>
     </div>
