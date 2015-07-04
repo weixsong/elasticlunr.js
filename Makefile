@@ -33,8 +33,11 @@ elasticlunr.js: $(SRC)
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" > $@
 
-elasticlunr.min.js: elasticlunr.js
-	${UGLIFYJS} --compress --mangle --comments < $< > $@
+elasticlunr.min.js: $(SRC)
+	cat build/wrapper_start $^ build/wrapper_end | \
+	sed "s/@YEAR/${YEAR}/" | \
+	sed "s/@VERSION/${VERSION}/" | \
+	${UGLIFYJS} --compress --mangle --comments > $@
 
 %.json: build/%.json.template
 	cat $< | sed "s/@VERSION/${VERSION}/" > $@
@@ -54,8 +57,8 @@ docs: node_modules
 clean:
 	rm -f elasticlunr.js
 	rm -f elasticlunr.min.js
-	rm *.json
-	rm example/example_index.json
+	rm -f *.json
+	rm -f example/example_index.json
 
 reset:
 	git checkout elasticlunr.* *.json docs/index.html example/example_index.json
