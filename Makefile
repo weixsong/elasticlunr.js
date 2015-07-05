@@ -60,8 +60,10 @@ clean:
 	rm -f elasticlunr.min.js
 	rm -f *.json
 	rm -f example/example_index.json
-	rm -rf node_modules
 	rm -rf docs/*
+
+clean_modules:
+	rm -rf node_modules
 
 reset:
 	git checkout elasticlunr.* *.json docs/index.html example/example_index.json
