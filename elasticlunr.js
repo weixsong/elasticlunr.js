@@ -1717,14 +1717,14 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
 };
 
 /**
- * Adds a token tokenInfo pair to the inverted index.
+ * Adds a {token: tokenInfo} pair to the inverted index.
  * If the token already exist, then update the tokenInfo.
  *
  * By default this function starts at the root of the current inverted index, however
  * it can start at any node of the inverted index if required.
  *
- * @param {String} token The token to store the tokenInfo under
- * @param {Object} tokenInfo The tokenInfo to store against the token
+ * @param {String} token 
+ * @param {Object} tokenInfo format: { ref: 1, tf: 2 }
  * @param {Object} root An optional node at which to start looking for the
  * correct place to enter the doc, by default the root of this elasticlunr.InvertedIndex
  * is used.
@@ -1754,13 +1754,10 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
 };
 
 /**
- * Checks whether this key is contained within this elasticlunr.InvertedIndex.
+ * Checks whether this key is in this elasticlunr.InvertedIndex.
+ * 
  *
- * By default this function starts at the root of the current inverted index, however
- * it can start at any node of inverted index if required.
- *
- * @param {String} token The token to check for
- * @param {Object} root An optional node at which to start
+ * @param {String} token The token to check
  * @return {Boolean}
  * @memberOf InvertedIndex
  */
@@ -1779,24 +1776,21 @@ elasticlunr.InvertedIndex.prototype.hasToken = function (token) {
 
 /**
  * Retrieve a node from the inverted index for a given token.
- * If token not found, return null.
- *
- * By default this function starts at the root of the current store, however
- * it can start at any node of inverted index if required.
+ * If token not found in this InvertedIndex, return null.
+ * 
  *
  * @param {String} token The token to get the node for.
- * @param {Object} root An optional node at which to start.
  * @return {Object}
  * @see InvertedIndex.prototype.get
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.getNode = function (token) {
-  if (!token) return {};
+  if (!token) return null;
 
   var node = this.root;
 
   for (var i = 0; i < token.length; i++) {
-    if (!node[token[i]]) return {};
+    if (!node[token[i]]) return null;
     node = node[token[i]];
   }
 
@@ -1805,50 +1799,47 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
 
 /**
  * Retrieve the documents for a node for the given token.
- * If token not found, return null.
+ * If token not found, return {}.
  *
- * By default this function starts at the root of the current store, however
- * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the documents for.
- * @param {Object} root An optional node at which to start.
  * @return {Object}
  * @memberOf InvertedIndex
  */
-elasticlunr.InvertedIndex.prototype.getDocs = function (token, root) {
-  return this.getNode(token, root).docs || {};
+elasticlunr.InvertedIndex.prototype.getDocs = function (token) {
+  var node = this.getNode(token);
+  if (node == null) {
+    return {};
+  }
+
+  return node.docs;
 };
 
 /**
  * Retrieve the document frequency of given token.
  * If token not found, return 0.
  *
- * By default this function starts at the root of the current store, however
- * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the documents for.
- * @param {Object} root An optional node at which to start.
  * @return {Object}
  * @memberOf InvertedIndex
  */
-elasticlunr.InvertedIndex.prototype.getDocFreq = function (token, root) {
-  var node = this.getNode(token, root);
+elasticlunr.InvertedIndex.prototype.getDocFreq = function (token) {
+  var node = this.getNode(token);
 
-  if (node.df) {
-    return node.df;
+  if (node == null) {
+    return 0;
   }
-  return 0;
+
+  return node.df;
 };
 
 /**
  * Remove the document identified by ref from the token in the inverted index.
  *
- * By default this function starts at the root of the current store, however
- * it can start at any node of inverted index if required.
  *
  * @param {String} token The token to get the documents for.
  * @param {String} ref The ref of the document to remove from this token.
- * @param {Object} root An optional node at which to start.
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
@@ -1875,22 +1866,24 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
+  if (token == null || token == '') return [];
   if (root == void 0) {
     root = this.getNode(token);
+    if (root == null) return [];
   }
 
-  var docs = root.docs || {},
-      memo = memo || [];
+  var memo = memo || [];
 
   if (root.df > 0) memo.push(token);
 
   for (var key in root) {
     if (key === 'docs') continue;
+    if (key === 'df') continue;
     memo.concat(this.expandToken(token + key, memo, root[key]));
   }
 
   return memo;
-}
+};
 
 /**
  * Returns a representation of the inverted index ready for serialisation.

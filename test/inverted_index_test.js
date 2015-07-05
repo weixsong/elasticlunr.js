@@ -181,6 +181,7 @@ test('expand a non existing token', function () {
   invertedIndex.addToken('bar', doc);
 
   var tokens = invertedIndex.expandToken('wax');
+  console.log(tokens)
   deepEqual(tokens, []);
 });
 
