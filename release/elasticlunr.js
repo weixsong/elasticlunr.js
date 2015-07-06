@@ -1212,7 +1212,7 @@ elasticlunr.Index.prototype.use = function (plugin) {
  * @module
  */
 elasticlunr.DocumentStore = function () {
-  this.document_store = {};
+  this.docs = {};
   this.length = 0;
 };
 
@@ -1221,40 +1221,36 @@ elasticlunr.DocumentStore = function () {
  *
  * @param {Object} serialisedData The serialised document store to load.
  * @return {elasticlunr.Store}
- * @memberOf Store
  */
 elasticlunr.DocumentStore.load = function (serialisedData) {
-  var doc_store = new this;
+  var store = new this;
 
-  doc_store.length = serialisedData.length;
-  for (var key in serialisedData.document_store) {
-    doc_store.document_store[key] = elasticlunr.SortedSet.load(serialisedData.document_store[key]);
-  }
+  store.length = serialisedData.length;
+  store.docs = serialisedData.docs;
 
-  return doc_store;
+  return store;
 };
 
 /**
- * Stores the given tokens in the document store against the given id.
+ * Stores the given doc in the document store against the given id.
  *
- * @param {Object} doc_id The, key used to store the sorted tokens.
- * @param {Object} sorted_tokens, The sorted tokens to store against the key.
- * @memberOf Store
+ * @param {Object} doc_id The key used to store the JSON format doc.
+ * @param {Object} doc The JSON format doc.
  */
-elasticlunr.DocumentStore.prototype.set = function (doc_id, sorted_tokens) {
+elasticlunr.DocumentStore.prototype.set = function (doc_id, doc) {
   if (!this.has(doc_id)) this.length++;
-  this.document_store[doc_id] = sorted_tokens;
+  this.docs[doc_id] = doc;
 };
 
 /**
- * Retrieves the tokens from the document store for a given key.
+ * Retrieves the JSON doc from the document store for a given key.
  *
  * @param {Object} doc_id, The key to lookup and retrieve from the document store.
  * @return {Object}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.get = function (doc_id) {
-  return this.document_store[doc_id];
+  return this.docs[doc_id];
 };
 
 /**
@@ -1265,7 +1261,7 @@ elasticlunr.DocumentStore.prototype.get = function (doc_id) {
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.has = function (doc_id) {
-  return doc_id in this.document_store;
+  return doc_id in this.docs;
 };
 
 /**
@@ -1277,7 +1273,7 @@ elasticlunr.DocumentStore.prototype.has = function (doc_id) {
 elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
   if (!this.has(doc_id)) return;
 
-  delete this.document_store[doc_id];
+  delete this.docs[doc_id];
   this.length--;
 };
 
@@ -1289,7 +1285,7 @@ elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
  */
 elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {
-    document_store: this.document_store,
+    docs: this.docs,
     length: this.length
   };
 };

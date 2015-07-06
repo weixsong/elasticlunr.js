@@ -1,60 +1,60 @@
-module('elasticlunr.DocumentStore')
+module('elasticlunr.DocumentStore');
 
 test('adding document tokens to the document store', function () {
   var docStore = new elasticlunr.DocumentStore,
-      tokens = ['eggs', 'ham']
+      doc = {title: 'eggs bread'};
 
-  docStore.set(1, tokens)
-  deepEqual(docStore.get(1), tokens)
-})
+  docStore.addDoc(1, doc);
+  deepEqual(docStore.getDoc(1), doc);
+});
 
-test('getting the number of items in the document store', function () {
-  var docStore = new elasticlunr.DocumentStore
+test('getting the number of docs in the document store', function () {
+  var docStore = new elasticlunr.DocumentStore;
 
-  equal(docStore.length, 0)
-  docStore.set(1, 'foo')
-  equal(docStore.length, 1)
-})
+  equal(docStore.length, 0);
+  docStore.addDoc(1, {title: 'eggs bread'});
+  equal(docStore.length, 1);
+});
 
 test('checking whether the store contains a key', function () {
-  var store = new elasticlunr.DocumentStore
+  var store = new elasticlunr.DocumentStore;
 
-  ok(!store.has('foo'))
-  store.set('foo', 1)
-  ok(store.has('foo'))
-})
+  ok(!store.hasDoc('foo'));
+  store.addDoc('foo', {title: 'eggs bread'});
+  ok(store.hasDoc('foo'));
+});
 
-test('removing an element from the store', function () {
-  var store = new elasticlunr.DocumentStore
+test('removing an doc from the store', function () {
+  var store = new elasticlunr.DocumentStore;
 
-  store.set('foo', 1)
-  ok(store.has('foo'))
-  equal(store.length, 1)
-  store.remove('foo')
-  ok(!store.has('foo'))
-  equal(store.length, 0)
-})
+  store.addDoc('foo', {title: 'eggs bread'});
+  ok(store.hasDoc('foo'));
+  equal(store.length, 1);
+  store.removeDoc('foo');
+  ok(!store.hasDoc('foo'));
+  equal(store.length, 0);
+});
 
 test('serialising', function () {
-  var store = new elasticlunr.DocumentStore
+  var store = new elasticlunr.DocumentStore;
 
-  deepEqual(store.toJSON(), { store: {}, length: 0 })
+  deepEqual(store.toJSON(), { docs: {}, length: 0 });
 
-  store.set(1, ['eggs', 'ham'])
+  store.addDoc('foo', {title: 'eggs bread'});
 
-  deepEqual(store.toJSON(), { store: { 1: ['eggs', 'ham'] }, length: 1 })
-})
+  deepEqual(store.toJSON(), { docs: { 1: {title: 'eggs bread'} }, length: 1 });
+});
 
 test('loading serialised data', function () {
   var serialisedData = {
     length: 1,
-    store: {
-      1: ['eggs', 'ham']
+    docs: {
+      1: {title: 'eggs bread'}
     }
-  }
+  };
 
-  var store = elasticlunr.DocumentStore.load(serialisedData)
+  var store = elasticlunr.DocumentStore.load(serialisedData);
 
-  equal(store.length, 1)
-  deepEqual(store.get(1), elasticlunr.SortedSet.load(['eggs', 'ham']))
-})
+  equal(store.length, 1);
+  deepEqual(store.getDoc(1), {title: 'eggs bread'});
+});
