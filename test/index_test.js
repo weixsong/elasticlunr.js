@@ -4,7 +4,7 @@ test("defining what fields to index", function () {
   var idx = new elasticlunr.Index;
   idx.field('foo');
 
-  deepEqual(idx._fields[0], {name: 'foo', boost: 1});
+  deepEqual(idx._fields[0], {name: 'foo'});
 });
 
 test("giving a particular field a weighting", function () {

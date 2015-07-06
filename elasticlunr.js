@@ -25,11 +25,12 @@
  * Example:
  *
  *     var idx = elasticLunr(function () {
- *       this.field('title', {boost: 10})
- *       this.field('tags', {boost: 100})
+ *       this.field('id')
+ *       this.field('title')
+ *       this.field('tags')
  *       this.field('body')
  *       
- *       this.ref('cid')
+ *       //this.ref('cid') // default ref is 'id'
  *       
  *       this.pipeline.add(function () {
  *         // some custom pipeline function
@@ -795,8 +796,7 @@ elasticlunr.Index = function () {
   this._ref = 'id';
   this.pipeline = new elasticlunr.Pipeline;
   this.documentStore = new elasticlunr.DocumentStore;
-  this.invertedIndex = new elasticlunr.InvertedIndex;
-  this.corpusTokens = new elasticlunr.SortedSet;
+  this.index = {};
   this.eventEmitter =  new elasticlunr.EventEmitter;
 
   this._idfCache = {};
@@ -851,38 +851,32 @@ elasticlunr.Index.load = function (serialisedData) {
 
   idx._fields = serialisedData.fields;
   idx._ref = serialisedData.ref;
-
   idx.documentStore = elasticlunr.DocumentStore.load(serialisedData.documentStore);
-  idx.invertedIndex = elasticlunr.InvertedIndex.load(serialisedData.invertedIndex);
-  idx.corpusTokens = elasticlunr.SortedSet.load(serialisedData.corpusTokens);
   idx.pipeline = elasticlunr.Pipeline.load(serialisedData.pipeline);
+  idx.index = {};
+  for (var field in serialisedData.index) {
+    idx.index[field] = elasticlunr.InvertedIndex.load(serialisedData.index[field]);
+  }
 
   return idx;
 };
 
 /**
- * Adds a field to the list of fields that will be searchable within documents
- * in the index.
- *
- * An optional boost param can be passed to affect how much tokens in this field
- * rank in search results, by default the boost value is 1.
+ * Adds a field to the list of fields that will be searchable within documents in the index.
+ * 
+ * Remember that inner index is build based on field, which means each field has one inverted index.
  *
  * Fields should be added before any documents are added to the index, fields
  * that are added after documents are added to the index will only apply to new
  * documents added to the index.
  *
- * @param {String} fieldName The name of the field within the document that
- * should be indexed
- * @param {Number} boost An optional boost that can be applied to terms in this
- * field.
+ * @param {String} fieldName The name of the field within the document that should be indexed
  * @return {elasticlunr.Index}
  * @memberOf Index
  */
-elasticlunr.Index.prototype.field = function (fieldName, opts) {
-  var opts = opts || {},
-      field = { name: fieldName, boost: opts.boost || 1 };
-
-  this._fields.push(field);
+elasticlunr.Index.prototype.field = function (fieldName) {
+  this._fields.push(fieldName);
+  this.index[fieldName] = new elasticlunr.InvertedIndex;
   return this;
 };
 
@@ -905,7 +899,7 @@ elasticlunr.Index.prototype.ref = function (refName) {
 };
 
 /**
- * Add a document to the index.
+ * Add a JSON format document to the index.
  *
  * This is the way new documents enter the index, this function will run the
  * fields from the document through the index's pipeline and then add it to
@@ -915,37 +909,31 @@ elasticlunr.Index.prototype.ref = function (refName) {
  * the document has been added to. This event can be silenced by passing false
  * as the second argument to add.
  *
- * @param {Object} doc The document to add to the index.
+ * @param {Object} doc The JSON format document to add to the index.
  * @param {Boolean} emitEvent Whether or not to emit events, default true.
  * @memberOf Index
  */
-elasticlunr.Index.prototype.add = function (doc, emitEvent) {
-  var docTokens = {},
-      allDocumentTokens = new elasticlunr.SortedSet,
-      docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent;
+elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
+  if (!doc) return;
+  var emitEvent = emitEvent === undefined ? true : emitEvent;
 
+  var docRef = doc[this._ref];
+  this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field.name]));
+    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    var fieldLength = fieldTokens.length;
+    var tokenCount = {};
+    fieldTokens.forEach(function (token) {
+      if (token in tokenCount) tokenCount[token] += 1;
+      else tokenCount[token] = 1;
+    }, this);
 
-    docTokens[field.name] = fieldTokens;
-    elasticlunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens);
+    for (var token in tokenCount) {
+      var tf = tokenCount[token];
+      tf = Math.sqrt(tf);
+      this.index[field].addToken(token, { ref: docRef, tf: tf });
+    }
   }, this);
-
-  this.documentStore.set(docRef, allDocumentTokens);
-  elasticlunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray());
-
-  for (var i = 0; i < allDocumentTokens.length; i++) {
-    var token = allDocumentTokens.elements[i];
-    var tf = this._fields.reduce( function (memo, field) {
-      var fieldLength = docTokens[field.name].length;
-      if (!fieldLength) return memo;
-      var tokenCount = docTokens[field.name].filter(function (t) { return t === token }).length;
-      return memo + (tokenCount / fieldLength * field.boost);
-    }, 0);
-
-    this.invertedIndex.addToken(token, { ref: docRef, tf: tf });
-  };
 
   if (emitEvent) this.eventEmitter.emit('add', doc, this);
 };
@@ -956,34 +944,32 @@ elasticlunr.Index.prototype.add = function (doc, emitEvent) {
  * To make sure documents no longer show up in search results they can be
  * removed from the index using this method.
  *
- * The document passed only needs to have the same ref property value as the
- * document that was added to the index, they could be completely different
- * objects.
- *
  * A 'remove' event is emitted with the document that has been removed and the index
  * the document has been removed from. This event can be silenced by passing false
  * as the second argument to remove.
  *
- * @param {Object} doc The document to remove from the index.
+ * @param {Object} docRef The document to remove from the index.
  * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
  * @memberOf Index
  */
-elasticlunr.Index.prototype.remove = function (doc, emitEvent) {
-  var docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent;
+elasticlunr.Index.prototype.removeDoc = function (docRef, emitEvent) {
+  if (!docRef) return;
+  var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  if (!this.documentStore.has(docRef)) return;
+  if (!this.documentStore.hasDoc(docRef)) return;
 
-  var docTokens = this.documentStore.get(docRef);
+  var doc = this.documentStore.getDoc(docRef);
+  this.documentStore.removeDoc(docRef);
 
-  this.documentStore.remove(docRef);
-
-  docTokens.forEach(function (token) {
-    this.invertedIndex.removeToken(token, docRef);
+  this._fields.forEach(function (field) {
+    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    for (var token in fieldTokens) {
+      this.index[field].removeToken(token);
+    }
   }, this);
 
-  if (emitEvent) this.eventEmitter.emit('remove', doc, this);
-}
+  if (emitEvent) this.eventEmitter.emit('remove', docRef, this);
+};
 
 /**
  * Updates a document in the index.
@@ -1008,40 +994,38 @@ elasticlunr.Index.prototype.remove = function (doc, emitEvent) {
 elasticlunr.Index.prototype.update = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.remove(doc, false);
-  this.add(doc, false);
+  this.removeDoc(doc[this._ref], false);
+  this.addDoc(doc, false);
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
 };
 
 /**
- * Calculates the inverse document frequency for a token within the index.
+ * Calculates the inverse document frequency for a token within the index of a field.
  *
  * @param {String} token The token to calculate the idf of.
+ * @param {String} field The field to compute idf.
  * @see Index.prototype.idf
  * @private
  * @memberOf Index
  */
-elasticlunr.Index.prototype.idf = function (term) {
-  var cacheKey = "@" + term;
+elasticlunr.Index.prototype.idf = function (term, field) {
+  var cacheKey = "@" + field + '/' + term;
   if (Object.prototype.hasOwnProperty.call(this._idfCache, cacheKey)) return this._idfCache[cacheKey];
 
-  var documentFrequency = this.invertedIndex.getDocFreq(term),
-      idf = 1;
+  var df = this.index[field].getDocFreq(term);
+  var idf = 1 + Math.log(this.index[field].length / (df + 1));
+  this._idfCache[cacheKey] = idf;
 
-  if (documentFrequency > 0) {
-    idf = 1 + Math.log(this.documentStore.length / documentFrequency);
-  }
-
-  return this._idfCache[cacheKey] = idf;
+  return idf;
 };
 
 /**
  * Searches the index using the passed query.
- *
- * Queries should be a string, multiple words are allowed and will lead to an
- * AND based query, e.g. `idx.search('foo bar')` will run a search for
- * documents containing both 'foo' and 'bar'.
+ * Queries should be a string, multiple words are allowed.
+ * 
+ * If config is null, will search all fields defaultly, and lead to AND based query.
+ * If config is specified, will search specified with query time boosting.
  *
  * All query tokens are passed through the same pipeline that document tokens
  * are passed through, so any language processing involved will be run on every
@@ -1055,98 +1039,85 @@ elasticlunr.Index.prototype.idf = function (term) {
  * for this document against the query.
  *
  * @param {String} query The query to search the index with.
+ * @param {Object} config The query config, JSON format.
  * @return {Object}
  * @see Index.prototype.idf
  * @see Index.prototype.documentVector
  * @memberOf Index
  */
-elasticlunr.Index.prototype.search = function (query) {
-  var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query)),
-      queryVector = new elasticlunr.Vector,
-      documentSets = [],
-      fieldBoosts = this._fields.reduce(function (memo, f) { return memo + f.boost }, 0)
+elasticlunr.Index.prototype.search = function (query, config) {
+  if (!query) return [];
+  var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
-  var hasSomeToken = queryTokens.some(function (token) {
-    return this.invertedIndex.hasToken(token);
-  }, this);
+  var searchFields = {};
+  if (config == null || config['fileds'] == null) {
+    this._fields.forEach(function (field) {
+      searchFields[field] = {boost: 1};
+    }, this);
+  } else {
+    searchFields = config['fields'];
+  }
 
-  if (!hasSomeToken) return [];
+  var queryResults = {};
 
-  queryTokens
-    .forEach(function (token, i, tokens) {
-      var tokenCount = tokens.filter(function (t) { return t === token; }).length;
-      var tf = tokenCount / tokens.length * this._fields.length * fieldBoosts,
-          self = this
+  for (var field in searchFields) {
+    var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
+    for (var docRef in fieldSearchResults) {
+      if (docRef in queryResults) {
+        queryResults[docRef] += fieldSearchResults[docRef];
+      } else {
+        queryResults[docRef] = fieldSearchResults[docRef];
+      }
+    }
+  }
 
-      var set = this.invertedIndex.expandToken(token).reduce(function (memo, key) {
-        var pos = self.corpusTokens.indexOf(key),
-            idf = self.idf(key),
-            similarityBoost = 1,
-            set = new elasticlunr.SortedSet;
+  var results = [];
+  for (var docRef in queryResults) {
+    results.push({ref: docRef, score: queryResults[docRef]});
+  }
 
-        // if the expanded key is not an exact match to the token then
-        // penalise the score for this key by how different the key is
-        // to the token.
-        if (key !== token) {
-          var diff = Math.max(3, key.length - token.length);
-          similarityBoost = 1 / Math.log(diff);
-        }
-
-        // calculate the query tf-idf score for this token
-        // applying an similarityBoost to ensure exact matches
-        // these rank higher than expanded terms
-        if (pos > -1) queryVector.insert(pos, tf * idf * similarityBoost);
-
-        // add all the documents that have this key into a set
-        Object.keys(self.invertedIndex.getDocs(key)).forEach(function (ref) { set.add(ref) })
-
-        return memo.union(set);
-      }, new elasticlunr.SortedSet);
-
-      documentSets.push(set);
-    }, this)
-
-  var documentSet = documentSets.reduce(function (memo, set) {
-    return memo.intersect(set)
-  })
-
-  return documentSet
-    .map(function (ref) {
-      return { ref: ref, score: queryVector.similarity(this.documentVector(ref)) }
-    }, this)
-    .sort(function (a, b) {
-      return b.score - a.score
-    })
-}
+  results.sort(function (a, b) { return b.score - a.score });
+  return results;
+};
 
 /**
- * Generates a vector containing all the tokens in the document matching the
- * passed documentRef.
+ * search queryTokens in specified field.
  *
- * The vector contains the tf-idf score for each token contained in the
- * document with the passed documentRef.  The vector will contain an element
- * for every token in the indexes corpus, if the document does not contain that
- * token the element will be 0.
- *
- * @param {Object} documentRef The ref to find the document with.
- * @return {elasticlunr.Vector}
- * @private
- * @memberOf Index
+ * @param {Array} queryTokens The query tokens to query in this field.
+ * @param {String} field Field to query in.
+ * @param {Object} config search config.
+ * @return {Object}
  */
-elasticlunr.Index.prototype.documentVector = function (documentRef) {
-  var documentTokens = this.documentStore.get(documentRef),
-      documentTokensLength = documentTokens.length,
-      documentVector = new elasticlunr.Vector;
+elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
+  var boost = (config == null || 
+               config['fields'] == null || 
+               config['fields'].fieldName.boost == null) ? 1 : config['fields'].fieldName.boost;
 
-  for (var i = 0; i < documentTokensLength; i++) {
-    var token = documentTokens.elements[i],
-        tf = this.invertedIndex.getDocs(token)[documentRef].tf,
-        idf = this.idf(token);
+  console.log('searching in field:')
+  console.log(fieldName)
+  var fieldQueryResults = {};
+  queryTokens.forEach(function (token) {
+    var docs = this.index[fieldName].getDocs(token);
 
-    documentVector.insert(this.corpusTokens.indexOf(token), tf * idf);
-  };
+    for (var docRef in docs) {
+      var tf = docs[docRef].tf;
+      var idf = this.idf(token, fieldName);
+      var score = tf * idf * idf;
+      if (docRef in fieldQueryResults) {
+        fieldQueryResults[docRef] += score;
+      } else {
+        fieldQueryResults[docRef] = score;
+      }
+    }
+  }, this);
 
-  return documentVector;
+  for (var docRef in fieldQueryResults) {
+    fieldQueryResults[docRef] *= boost;
+  }
+
+  console.log('field results:')
+  console.log(fieldQueryResults)
+  return fieldQueryResults;
 };
 
 /**
@@ -1156,13 +1127,18 @@ elasticlunr.Index.prototype.documentVector = function (documentRef) {
  * @memberOf Index
  */
 elasticlunr.Index.prototype.toJSON = function () {
+  var indexJson = {};
+  for (var idx in this._fields) {
+    var fieldName = this._fields[idx];
+    indexJson[fieldName] = this.index[fieldName].toJSON();
+  }
+
   return {
     version: elasticlunr.version,
     fields: this._fields,
     ref: this._ref,
     documentStore: this.documentStore.toJSON(),
-    invertedIndex: this.invertedIndex.toJSON(),
-    corpusTokens: this.corpusTokens.toJSON(),
+    index: indexJson,
     pipeline: this.pipeline.toJSON()
   };
 };
@@ -1233,47 +1209,48 @@ elasticlunr.DocumentStore.load = function (serialisedData) {
 
 /**
  * Stores the given doc in the document store against the given id.
+ * If docRef already exist, then update doc.
  *
- * @param {Object} doc_id The key used to store the JSON format doc.
+ * @param {Object} docRef The key used to store the JSON format doc.
  * @param {Object} doc The JSON format doc.
  */
-elasticlunr.DocumentStore.prototype.set = function (doc_id, doc) {
-  if (!this.has(doc_id)) this.length++;
-  this.docs[doc_id] = doc;
+elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
+  if (!this.hasDoc(docRef)) this.length++;
+  this.docs[docRef] = doc;
 };
 
 /**
  * Retrieves the JSON doc from the document store for a given key.
  *
- * @param {Object} doc_id, The key to lookup and retrieve from the document store.
+ * @param {Object} docRef, The key to lookup and retrieve from the document store.
  * @return {Object}
  * @memberOf Store
  */
-elasticlunr.DocumentStore.prototype.get = function (doc_id) {
-  return this.docs[doc_id];
+elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
+  return this.docs[docRef];
 };
 
 /**
- * Checks whether the document store contains a key (doc_id).
+ * Checks whether the document store contains a key (docRef).
  *
- * @param {Object} doc_id The id to look up in the document store.
+ * @param {Object} docRef The id to look up in the document store.
  * @return {Boolean}
  * @memberOf Store
  */
-elasticlunr.DocumentStore.prototype.has = function (doc_id) {
-  return doc_id in this.docs;
+elasticlunr.DocumentStore.prototype.hasDoc = function (docRef) {
+  return docRef in this.docs;
 };
 
 /**
  * Removes the value for a key in the document store.
  *
- * @param {Object} doc_id The id to remove from the document store.
+ * @param {Object} docRef The id to remove from the document store.
  * @memberOf Store
  */
-elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
-  if (!this.has(doc_id)) return;
+elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
+  if (!this.hasDoc(docRef)) return;
 
-  delete this.docs[doc_id];
+  delete this.docs[docRef];
   this.length--;
 };
 

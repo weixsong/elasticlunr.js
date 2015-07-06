@@ -123,11 +123,12 @@
             </tbody>
           </table>
           <div class="description"><p>Convenience function for instantiating a new elasticLunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><p>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</p><p>elasticlunr.stemmer - stems the tokens before entering the index.</p><p>Example:</p><pre><code>var idx = elasticLunr(function () {
-  this.field(&#39;title&#39;, {boost: 10})
-  this.field(&#39;tags&#39;, {boost: 100})
+  this.field(&#39;id&#39;)
+  this.field(&#39;title&#39;)
+  this.field(&#39;tags&#39;)
   this.field(&#39;body&#39;)
 
-  this.ref(&#39;cid&#39;)
+  //this.ref(&#39;cid&#39;) // default ref is &#39;id&#39;
 
   this.pipeline.add(function () {
     // some custom pipeline function

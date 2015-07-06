@@ -24,7 +24,7 @@ fs.readFile('./example/example_data.json', function (err, data) {
   })
 
   questions.forEach(function (question) {
-    idx.add(question)
+    idx.addDoc(question)
   })
 
   fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {

@@ -100,13 +100,15 @@
               </li>
               <li><a href="#ref"><i class="alert alert-info"></i><span>ref</span></a>
               </li>
-              <li><a href="#add"><i class="alert alert-info"></i><span>add</span></a>
+              <li><a href="#addDoc"><i class="alert alert-info"></i><span>addDoc</span></a>
               </li>
-              <li><a href="#remove"><i class="alert alert-info"></i><span>remove</span></a>
+              <li><a href="#removeDoc"><i class="alert alert-info"></i><span>removeDoc</span></a>
               </li>
               <li><a href="#update"><i class="alert alert-info"></i><span>update</span></a>
               </li>
               <li><a href="#search"><i class="alert alert-info"></i><span>search</span></a>
+              </li>
+              <li><a href="#fieldSearch"><i class="alert alert-info"></i><span>fieldSearch</span></a>
               </li>
               <li><a href="#toJSON"><i class="alert alert-info"></i><span>toJSON</span></a>
               </li>
@@ -129,8 +131,7 @@
   this._ref = 'id';
   this.pipeline = new elasticlunr.Pipeline;
   this.documentStore = new elasticlunr.DocumentStore;
-  this.invertedIndex = new elasticlunr.InvertedIndex;
-  this.corpusTokens = new elasticlunr.SortedSet;
+  this.index = {};
   this.eventEmitter =  new elasticlunr.EventEmitter;
 
   this._idfCache = {};
@@ -243,11 +244,12 @@
 
   idx._fields = serialisedData.fields;
   idx._ref = serialisedData.ref;
-
   idx.documentStore = elasticlunr.DocumentStore.load(serialisedData.documentStore);
-  idx.invertedIndex = elasticlunr.InvertedIndex.load(serialisedData.invertedIndex);
-  idx.corpusTokens = elasticlunr.SortedSet.load(serialisedData.corpusTokens);
   idx.pipeline = elasticlunr.Pipeline.load(serialisedData.pipeline);
+  idx.index = {};
+  for (var field in serialisedData.index) {
+    idx.index[field] = elasticlunr.InvertedIndex.load(serialisedData.index[field]);
+  }
 
   return idx;
 };</code></pre>
@@ -273,23 +275,16 @@
                 <td><p>The name of the field within the document that should be indexed</p></td>
               </tr>
               <tr>
-                <td>boost</td>
-                <td>Number</td>
-                <td><p>An optional boost that can be applied to terms in this field.</p></td>
-              </tr>
-              <tr>
                 <td>return</td>
                 <td>elasticlunr.Index</td>
                 <td></td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds a field to the list of fields that will be searchable within documents<br />in the index.</p><p>An optional boost param can be passed to affect how much tokens in this field<br />rank in search results, by default the boost value is 1.</p><p>Fields should be added before any documents are added to the index, fields<br />that are added after documents are added to the index will only apply to new<br />documents added to the index.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.field = function (fieldName, opts) {
-  var opts = opts || {},
-      field = { name: fieldName, boost: opts.boost || 1 };
-
-  this._fields.push(field);
+          <div class="description"><p>Adds a field to the list of fields that will be searchable within documents in the index.</p><p>Remember that inner index is build based on field, which means each field has one inverted index.</p><p>Fields should be added before any documents are added to the index, fields<br />that are added after documents are added to the index will only apply to new<br />documents added to the index.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.field = function (fieldName) {
+  this._fields.push(fieldName);
+  this.index[fieldName] = new elasticlunr.InvertedIndex;
   return this;
 };</code></pre>
           <section id="ref">
@@ -330,11 +325,11 @@
   this._ref = refName;
   return this;
 };</code></pre>
-          <section id="add">
-            <h1>add</h1>
+          <section id="addDoc">
+            <h1>addDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.add()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.addDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -349,7 +344,7 @@
               <tr>
                 <td>doc</td>
                 <td>Object</td>
-                <td><p>The document to add to the index.</p></td>
+                <td><p>The JSON format document to add to the index.</p></td>
               </tr>
               <tr>
                 <td>emitEvent</td>
@@ -358,42 +353,36 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Add a document to the index.</p><p>This is the way new documents enter the index, this function will run the<br />fields from the document through the index&#39;s pipeline and then add it to<br />the index, it will then show up in search results.</p><p>An &#39;add&#39; event is emitted with the document that has been added and the index<br />the document has been added to. This event can be silenced by passing false<br />as the second argument to add.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.add = function (doc, emitEvent) {
-  var docTokens = {},
-      allDocumentTokens = new elasticlunr.SortedSet,
-      docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent;
+          <div class="description"><p>Add a JSON format document to the index.</p><p>This is the way new documents enter the index, this function will run the<br />fields from the document through the index&#39;s pipeline and then add it to<br />the index, it will then show up in search results.</p><p>An &#39;add&#39; event is emitted with the document that has been added and the index<br />the document has been added to. This event can be silenced by passing false<br />as the second argument to add.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
+  if (!doc) return;
+  var emitEvent = emitEvent === undefined ? true : emitEvent;
 
+  var docRef = doc[this._ref];
+  this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field.name]));
+    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    var fieldLength = fieldTokens.length;
+    var tokenCount = {};
+    fieldTokens.forEach(function (token) {
+      if (token in tokenCount) tokenCount[token] += 1;
+      else tokenCount[token] = 1;
+    }, this);
 
-    docTokens[field.name] = fieldTokens;
-    elasticlunr.SortedSet.prototype.add.apply(allDocumentTokens, fieldTokens);
+    for (var token in tokenCount) {
+      var tf = tokenCount[token];
+      tf = Math.sqrt(tf);
+      this.index[field].addToken(token, { ref: docRef, tf: tf });
+    }
   }, this);
-
-  this.documentStore.set(docRef, allDocumentTokens);
-  elasticlunr.SortedSet.prototype.add.apply(this.corpusTokens, allDocumentTokens.toArray());
-
-  for (var i = 0; i &lt; allDocumentTokens.length; i++) {
-    var token = allDocumentTokens.elements[i];
-    var tf = this._fields.reduce( function (memo, field) {
-      var fieldLength = docTokens[field.name].length;
-      if (!fieldLength) return memo;
-      var tokenCount = docTokens[field.name].filter(function (t) { return t === token }).length;
-      return memo + (tokenCount / fieldLength * field.boost);
-    }, 0);
-
-    this.invertedIndex.addToken(token, { ref: docRef, tf: tf });
-  };
 
   if (emitEvent) this.eventEmitter.emit('add', doc, this);
 };</code></pre>
-          <section id="remove">
-            <h1>remove</h1>
+          <section id="removeDoc">
+            <h1>removeDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.remove()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.removeDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -406,7 +395,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>doc</td>
+                <td>docRef</td>
                 <td>Object</td>
                 <td><p>The document to remove from the index.</p></td>
               </tr>
@@ -417,23 +406,25 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Removes a document from the index.</p><p>To make sure documents no longer show up in search results they can be<br />removed from the index using this method.</p><p>The document passed only needs to have the same ref property value as the<br />document that was added to the index, they could be completely different<br />objects.</p><p>A &#39;remove&#39; event is emitted with the document that has been removed and the index<br />the document has been removed from. This event can be silenced by passing false<br />as the second argument to remove.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.remove = function (doc, emitEvent) {
-  var docRef = doc[this._ref],
-      emitEvent = emitEvent === undefined ? true : emitEvent;
+          <div class="description"><p>Removes a document from the index.</p><p>To make sure documents no longer show up in search results they can be<br />removed from the index using this method.</p><p>A &#39;remove&#39; event is emitted with the document that has been removed and the index<br />the document has been removed from. This event can be silenced by passing false<br />as the second argument to remove.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.removeDoc = function (docRef, emitEvent) {
+  if (!docRef) return;
+  var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  if (!this.documentStore.has(docRef)) return;
+  if (!this.documentStore.hasDoc(docRef)) return;
 
-  var docTokens = this.documentStore.get(docRef);
+  var doc = this.documentStore.getDoc(docRef);
+  this.documentStore.removeDoc(docRef);
 
-  this.documentStore.remove(docRef);
-
-  docTokens.forEach(function (token) {
-    this.invertedIndex.removeToken(token, docRef);
+  this._fields.forEach(function (field) {
+    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    for (var token in fieldTokens) {
+      this.index[field].removeToken(token);
+    }
   }, this);
 
-  if (emitEvent) this.eventEmitter.emit('remove', doc, this);
-}</code></pre>
+  if (emitEvent) this.eventEmitter.emit('remove', docRef, this);
+};</code></pre>
           <section id="update">
             <h1>update</h1>
             <h5 class="subheader"></h5>
@@ -466,8 +457,8 @@
           <pre><code class="language-javascript">elasticlunr.Index.prototype.update = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.remove(doc, false);
-  this.add(doc, false);
+  this.removeDoc(doc[this._ref], false);
+  this.addDoc(doc, false);
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
 };</code></pre>
@@ -493,71 +484,122 @@
                 <td><p>The query to search the index with.</p></td>
               </tr>
               <tr>
+                <td>config</td>
+                <td>Object</td>
+                <td><p>The query config, JSON format.</p></td>
+              </tr>
+              <tr>
                 <td>return</td>
                 <td>Object</td>
                 <td></td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Searches the index using the passed query.</p><p>Queries should be a string, multiple words are allowed and will lead to an<br />AND based query, e.g. <code>idx.search(&#39;foo bar&#39;)</code> will run a search for<br />documents containing both &#39;foo&#39; and &#39;bar&#39;.</p><p>All query tokens are passed through the same pipeline that document tokens<br />are passed through, so any language processing involved will be run on every<br />query term.</p><p>Each query term is expanded, so that the term &#39;he&#39; might be expanded to<br />&#39;hello&#39; and &#39;help&#39; if those terms were already included in the index.</p><p>Matching documents are returned as an array of objects, each object contains<br />the matching document ref, as set for this index, and the similarity score<br />for this document against the query.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.search = function (query) {
-  var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query)),
-      queryVector = new elasticlunr.Vector,
-      documentSets = [],
-      fieldBoosts = this._fields.reduce(function (memo, f) { return memo + f.boost }, 0)
+          <div class="description"><p>Searches the index using the passed query.<br />Queries should be a string, multiple words are allowed.</p><p>If config is null, will search all fields defaultly, and lead to AND based query.<br />If config is specified, will search specified with query time boosting.</p><p>All query tokens are passed through the same pipeline that document tokens<br />are passed through, so any language processing involved will be run on every<br />query term.</p><p>Each query term is expanded, so that the term &#39;he&#39; might be expanded to<br />&#39;hello&#39; and &#39;help&#39; if those terms were already included in the index.</p><p>Matching documents are returned as an array of objects, each object contains<br />the matching document ref, as set for this index, and the similarity score<br />for this document against the query.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.search = function (query, config) {
+  if (!query) return [];
+  var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
-  var hasSomeToken = queryTokens.some(function (token) {
-    return this.invertedIndex.hasToken(token);
+  var searchFields = {};
+  if (config == null || config['fileds'] == null) {
+    this._fields.forEach(function (field) {
+      searchFields[field] = {boost: 1};
+    }, this);
+  } else {
+    searchFields = config['fields'];
+  }
+
+  var queryResults = {};
+
+  for (var field in searchFields) {
+    var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
+    for (var docRef in fieldSearchResults) {
+      if (docRef in queryResults) {
+        queryResults[docRef] += fieldSearchResults[docRef];
+      } else {
+        queryResults[docRef] = fieldSearchResults[docRef];
+      }
+    }
+  }
+
+  var results = [];
+  for (var docRef in queryResults) {
+    results.push({ref: docRef, score: queryResults[docRef]});
+  }
+
+  results.sort(function (a, b) { return b.score - a.score });
+  return results;
+};</code></pre>
+          <section id="fieldSearch">
+            <h1>fieldSearch</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.fieldSearch()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>queryTokens</td>
+                <td>Array</td>
+                <td><p>The query tokens to query in this field.</p></td>
+              </tr>
+              <tr>
+                <td>field</td>
+                <td>String</td>
+                <td><p>Field to query in.</p></td>
+              </tr>
+              <tr>
+                <td>config</td>
+                <td>Object</td>
+                <td><p>search config.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>search queryTokens in specified field.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
+  var boost = (config == null || 
+               config['fields'] == null || 
+               config['fields'].fieldName.boost == null) ? 1 : config['fields'].fieldName.boost;
+
+  console.log('searching in field:')
+  console.log(fieldName)
+  var fieldQueryResults = {};
+  queryTokens.forEach(function (token) {
+    var docs = this.index[fieldName].getDocs(token);
+
+    for (var docRef in docs) {
+      var tf = docs[docRef].tf;
+      var idf = this.idf(token, fieldName);
+      var score = tf * idf * idf;
+      if (docRef in fieldQueryResults) {
+        fieldQueryResults[docRef] += score;
+      } else {
+        fieldQueryResults[docRef] = score;
+      }
+    }
   }, this);
 
-  if (!hasSomeToken) return [];
+  for (var docRef in fieldQueryResults) {
+    fieldQueryResults[docRef] *= boost;
+  }
 
-  queryTokens
-    .forEach(function (token, i, tokens) {
-      var tokenCount = tokens.filter(function (t) { return t === token; }).length;
-      var tf = tokenCount / tokens.length * this._fields.length * fieldBoosts,
-          self = this
-
-      var set = this.invertedIndex.expandToken(token).reduce(function (memo, key) {
-        var pos = self.corpusTokens.indexOf(key),
-            idf = self.idf(key),
-            similarityBoost = 1,
-            set = new elasticlunr.SortedSet;
-
-        // if the expanded key is not an exact match to the token then
-        // penalise the score for this key by how different the key is
-        // to the token.
-        if (key !== token) {
-          var diff = Math.max(3, key.length - token.length);
-          similarityBoost = 1 / Math.log(diff);
-        }
-
-        // calculate the query tf-idf score for this token
-        // applying an similarityBoost to ensure exact matches
-        // these rank higher than expanded terms
-        if (pos &gt; -1) queryVector.insert(pos, tf * idf * similarityBoost);
-
-        // add all the documents that have this key into a set
-        Object.keys(self.invertedIndex.getDocs(key)).forEach(function (ref) { set.add(ref) })
-
-        return memo.union(set);
-      }, new elasticlunr.SortedSet);
-
-      documentSets.push(set);
-    }, this)
-
-  var documentSet = documentSets.reduce(function (memo, set) {
-    return memo.intersect(set)
-  })
-
-  return documentSet
-    .map(function (ref) {
-      return { ref: ref, score: queryVector.similarity(this.documentVector(ref)) }
-    }, this)
-    .sort(function (a, b) {
-      return b.score - a.score
-    })
-}</code></pre>
+  console.log('field results:')
+  console.log(fieldQueryResults)
+  return fieldQueryResults;
+};</code></pre>
           <section id="toJSON">
             <h1>toJSON</h1>
             <h5 class="subheader"></h5>
@@ -567,13 +609,18 @@
           </section>
           <div class="description"><p>Returns a representation of the index ready for serialisation.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.toJSON = function () {
+  var indexJson = {};
+  for (var idx in this._fields) {
+    var fieldName = this._fields[idx];
+    indexJson[fieldName] = this.index[fieldName].toJSON();
+  }
+
   return {
     version: elasticlunr.version,
     fields: this._fields,
     ref: this._ref,
     documentStore: this.documentStore.toJSON(),
-    invertedIndex: this.invertedIndex.toJSON(),
-    corpusTokens: this.corpusTokens.toJSON(),
+    index: indexJson,
     pipeline: this.pipeline.toJSON()
   };
 };</code></pre>

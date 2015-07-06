@@ -92,13 +92,13 @@
               </li>
               <li><a href="#load"><i class="alert alert-info"></i><span>load</span></a>
               </li>
-              <li><a href="#set"><i class="alert alert-info"></i><span>set</span></a>
+              <li><a href="#addDoc"><i class="alert alert-info"></i><span>addDoc</span></a>
               </li>
-              <li><a href="#get"><i class="alert alert-info"></i><span>get</span></a>
+              <li><a href="#getDoc"><i class="alert alert-info"></i><span>getDoc</span></a>
               </li>
-              <li><a href="#has"><i class="alert alert-info"></i><span>has</span></a>
+              <li><a href="#hasDoc"><i class="alert alert-info"></i><span>hasDoc</span></a>
               </li>
-              <li><a href="#remove"><i class="alert alert-info"></i><span>remove</span></a>
+              <li><a href="#removeDoc"><i class="alert alert-info"></i><span>removeDoc</span></a>
               </li>
               <li><a href="#toJSON"><i class="alert alert-info"></i><span>toJSON</span></a>
               </li>
@@ -155,11 +155,11 @@
 
   return store;
 };</code></pre>
-          <section id="set">
-            <h1>set</h1>
+          <section id="addDoc">
+            <h1>addDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.set()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.addDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -172,7 +172,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>doc_id</td>
+                <td>docRef</td>
                 <td>Object</td>
                 <td><p>The key used to store the JSON format doc.</p></td>
               </tr>
@@ -183,16 +183,16 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Stores the given doc in the document store against the given id.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.set = function (doc_id, doc) {
-  if (!this.has(doc_id)) this.length++;
-  this.docs[doc_id] = doc;
+          <div class="description"><p>Stores the given doc in the document store against the given id.<br />If docRef already exist, then update doc.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
+  if (!this.hasDoc(docRef)) this.length++;
+  this.docs[docRef] = doc;
 };</code></pre>
-          <section id="get">
-            <h1>get</h1>
+          <section id="getDoc">
+            <h1>getDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.get()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.getDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -205,7 +205,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>doc_id,</td>
+                <td>docRef,</td>
                 <td>Object</td>
                 <td><p>The key to lookup and retrieve from the document store.</p></td>
               </tr>
@@ -217,14 +217,14 @@
             </tbody>
           </table>
           <div class="description"><p>Retrieves the JSON doc from the document store for a given key.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.get = function (doc_id) {
-  return this.docs[doc_id];
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
+  return this.docs[docRef];
 };</code></pre>
-          <section id="has">
-            <h1>has</h1>
+          <section id="hasDoc">
+            <h1>hasDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.has()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.hasDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -237,7 +237,7 @@
             </thead>
             <tbody>
               <tr>
-                <td>doc_id</td>
+                <td>docRef</td>
                 <td>Object</td>
                 <td><p>The id to look up in the document store.</p></td>
               </tr>
@@ -248,15 +248,15 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Checks whether the document store contains a key (doc_id).</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.has = function (doc_id) {
-  return doc_id in this.docs;
+          <div class="description"><p>Checks whether the document store contains a key (docRef).</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.hasDoc = function (docRef) {
+  return docRef in this.docs;
 };</code></pre>
-          <section id="remove">
-            <h1>remove</h1>
+          <section id="removeDoc">
+            <h1>removeDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.remove()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.removeDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -269,17 +269,17 @@
             </thead>
             <tbody>
               <tr>
-                <td>doc_id</td>
+                <td>docRef</td>
                 <td>Object</td>
                 <td><p>The id to remove from the document store.</p></td>
               </tr>
             </tbody>
           </table>
           <div class="description"><p>Removes the value for a key in the document store.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.remove = function (doc_id) {
-  if (!this.has(doc_id)) return;
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
+  if (!this.hasDoc(docRef)) return;
 
-  delete this.docs[doc_id];
+  delete this.docs[docRef];
   this.length--;
 };</code></pre>
           <section id="toJSON">

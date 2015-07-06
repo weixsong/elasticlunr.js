@@ -12,35 +12,35 @@ module('serialisation', {
       id: 'c',
       title: 'Scarlett helps Professor',
       body: 'Miss Scarlett watered Professor Plumbs green plant while he was away from his office last week.'
-    }]
+    }];
   }
 })
 
 test('dumping and loading an index', function () {
-  var idx = new elasticlunr.Index
+  var idx = new elasticlunr.Index;
 
-  idx.field('title', { boost: 10 })
-  idx.field('body')
+  idx.field('title');
+  idx.field('body');
 
-  this.corpus.forEach(function (doc) { idx.add(doc) })
+  this.corpus.forEach(function (doc) { idx.addDoc(doc) });
 
   var dumpedIdx = JSON.stringify(idx),
-      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx))
+      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx));
 
-  deepEqual(idx.search('green plant'), clonedIdx.search('green plant'))
-})
+  deepEqual(idx.search('green plant'), clonedIdx.search('green plant'));
+});
 
 test('dumping and loading an index with a populated pipeline', function () {
   var idx = elasticlunr(function () {
-    this.field('title', { boost: 10 })
-    this.field('body')
-  })
+    this.field('title');
+    this.field('body');
+  });
 
-  this.corpus.forEach(function (doc) { idx.add(doc) })
+  this.corpus.forEach(function (doc) { idx.addDoc(doc) });
 
   var dumpedIdx = JSON.stringify(idx),
-      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx))
+      clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx));
 
-  deepEqual(idx.pipeline._stack, clonedIdx.pipeline._stack)
-  deepEqual(idx.search('water'), clonedIdx.search('water'))
-})
+  deepEqual(idx.pipeline._stack, clonedIdx.pipeline._stack);
+  deepEqual(idx.search('water'), clonedIdx.search('water'));
+});
