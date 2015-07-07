@@ -140,7 +140,7 @@ var idx = lunr(function () {
 ```
 For more details, please go to [lunr-languages](https://github.com/weixsong/lunr-languages).
 
-## Add document to index
+## 2. Add document to index
 
 Add document to index is very simple, just prepare you document in JSON format, then add it to index.
 
@@ -163,7 +163,7 @@ index.addDoc(doc2);
 
 If your JSON document contains field that not configured in index, then that field will not be indexed, which means that field is not searchable.
 
-## Remove document from index
+## 3. Remove document from index
 
 Elasticlunr.js support remove a document from index, just provide JSON document to <code>elasticlunr.Index.prototype.removeDoc()</code> function.
 
@@ -180,7 +180,7 @@ index.removeDoc(doc);
 
 Remove a document will remove each token of that document's each field from field-specified inverted index.
 
-## Update a document in index
+## 4. Update a document in index
 Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.
 
 For example:
@@ -194,13 +194,13 @@ var doc = {
 index.update(doc);
 ```
 
-## Query from Index
+## 5. Query from Index
 
 Elasticlunr.js provides flexible query configuration, supports query-time boosting and Boolean logic setting.
 You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.
 Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.
 
-### 1. Simple Query
+### 5.1 Simple Query
 
 **Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple would be easy to meet your requirement.**
 
@@ -214,9 +214,9 @@ Output is a results array, each element of results array is an Object contain a 
 
 Results array is sorted descent by <code>score</code>.
 
-### 2. Configuration Query
+### 5.2 Configuration Query
 
-#### 2.1 **Query-Time Boosting**
+#### 5.2.1 **Query-Time Boosting**
 
 Setup which fields to search in by passing in a JSON configuration, and setup boosting for each search field.
 If you setup this configuration, then elasticlunr.js will only search the query string in the specified fields with boosting weight.
@@ -233,7 +233,7 @@ index.search("Oracle database profit", {
 });
 ```
 
-#### 2.2 **Boolean Model**
+#### 5.2.2 **Boolean Model**
 
 Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic defaulty. By "OR" default logic, elasticlunr.js could reach a high **Recall**.
 
