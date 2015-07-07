@@ -91,32 +91,88 @@
           </div>
         </div>
         <div class="span9">
-          <section id="Main"><h1>Lunr.js</h1>
-<p><a href="https://gitter.im/olivernn/lunr.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/olivernn/lunr.js"></a></p><p><a href="https://travis-ci.org/olivernn/lunr.js"><img src="https://travis-ci.org/olivernn/lunr.js.png?branch=master" alt="Build Status"></a></p><p>A bit like Solr, but much smaller and not as bright.</p><h2>Example</h2>
-<p>A very simple search index can be created using the following:</p><pre><code class="lang-javascript">var idx = lunr(function () {
-    this.field(&#39;title&#39;, { boost: 10 })
-    this.field(&#39;body&#39;)
-})
+          <section id="Main"><h1>Elasticlunr.js</h1>
+<p><a href="https://travis-ci.org/olivernn/lunr.js"><img src="https://travis-ci.org/olivernn/lunr.js.png?branch=master" alt="Build Status"></a></p><p>Elasticlunr.js is developed based on Lunr.js, but more flexible that lunr.js. Elasticlunr.js provides Query-Time boosting and field search.<br />A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p><h1>Key Features Comparing with Lunr.js</h1>
+<ul>
+<li><ol>
+<li><strong>Query-Time boosting</strong>, you don&#39;t need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>More rational scoring mechanism</strong>, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>Field-search</strong>, you could choose which field to index and which field to search.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>Boolean Model</strong>, you could set which field to search and the boolean model for each query token, such as &quot;OR&quot;, &quot;AND&quot;.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>Combined Boolean Model, TF/IDF Model and the Vector Space Model</strong>, make the results ranking more reliable.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>Fast</strong>, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to compute the vector of a document to compute the score of a document, this improve the search speed significantly.</li>
+</ol>
+</li>
+<li><ol>
+<li><strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.</li>
+</ol>
+</li>
+</ul>
+<h2>Example</h2>
+<p>A very simple search index can be created using the following scripts:</p><pre><code class="lang-javascript">var index = elasticlunr(function () {
+    this.addField(&#39;title&#39;);
+    this.addField(&#39;body&#39;);
+    this.setRef(&#39;id&#39;);
+});
 </code></pre>
-<p>Adding documents to be indexed is as simple as:</p><pre><code class="lang-javascript">var doc = {
-    &quot;title&quot;: &quot;Twelfth-Night&quot;,
-    &quot;body&quot;: &quot;If music be the food of love, play on: Give me excess of it…&quot;,
-    &quot;author&quot;: &quot;William Shakespeare&quot;,
-    &quot;id&quot;: 1
+<p>Adding documents to the index is as simple as:</p><pre><code class="lang-javascript">var doc1 = {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
+    &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
 }
-idx.add(doc)
+
+var doc2 = {
+    &quot;id&quot;: 2,
+    &quot;title&quot;: &quot;Oracle released its profit report of 2015&quot;,
+    &quot;body&quot;: &quot;As expected, Oracle released its profit report of 2015, during the good sales of database and hardware, Oracle&#39;s profit of 2015 reached 12.5 Billion.&quot;
+}
+
+index.addDoc(doc1);
+index.addDoc(doc2);
 </code></pre>
-<p>Then searching is as simple:</p><pre><code class="lang-javascript">idx.search(&quot;love&quot;)
+<p>Then searching is as simple:</p><pre><code class="lang-javascript">index.search(&quot;Oracle database profit&quot;);
+</code></pre>
+<p>Also, you could do query-time boosting by passing in a configuration.</p><pre><code class="lang-javascript">index.search(&quot;Oracle database profit&quot;, {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    }
+});
 </code></pre>
 <p>This returns a list of matching documents with a score of how closely they match the search query:</p><pre><code class="lang-javascript">[{
     &quot;ref&quot;: 1,
-    &quot;score&quot;: 0.87533
+    &quot;score&quot;: 0.5376053707962494
+},
+{
+    &quot;ref&quot;: 2,
+    &quot;score&quot;: 0.5237481076838757
 }]
 </code></pre>
-<p><a href="http://lunrjs.com/docs">API documentation</a> is available, as well as a <a href="http://lunrjs.com/example/">full working example</a>.</p><h2>Description</h2>
-<p>Lunr.js is a small, full-text search library for use in the browser.  It indexes JSON documents and provides a simple search interface for retrieving documents that best match text queries.</p><h2>Why</h2>
-<p>For web applications with all their data already sitting in the client, it makes sense to be able to search that data on the client too.  It saves adding extra, compacted services on the server.  A local search index will be quicker, there is no network overhead, and will remain available and useable even without a network connection.</p><h2>Installation</h2>
-<p>Simply include the lunr.js source file in the page that you want to use it.  Lunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Lunr to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
+<p><a href="http://weixsong.github.io/assets/elasticlunr/docs/index.html">API documentation</a> is available, as well as a <a href="http://weixsong.github.io/assets/elasticlunr/docs/index.html">full working example</a>.</p><h2>Description</h2>
+<p>Elasticlunr.js is developed based on Lunr.js, but more flexible that lunr.js. Elasticlunr.js provides Query-Time boosting and field search.<br />A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p><h2>Why</h2>
+<ol>
+<li>In some system, you don&#39;t want to deploy any Web Server(such as Apache, Nginx, etc.), you only provide some static web pages and provide search function in client side. Then you could build index in previous and load index in client side.</li>
+<li>Provide offline search functionality. For some documents, user usually download these documents, you could build index and put index in the documents package, then provide offline search functionality.</li>
+<li>For some limited or restricted network, such WAN or LAN, offline search is a better choice.</li>
+<li>For mobile device, Iphone or Android phone, network traffic maybe very expensive, then provide offline search is a good choice.</li>
+</ol>
+<h2>Installation</h2>
+<p>Simply include the elasticlunr.js source file in the page that you want to use it.  Elasticlunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.js to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
         </div>
       </div>
