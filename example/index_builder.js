@@ -2,11 +2,11 @@ var lunr = require('./../elasticlunr.js'),
     fs = require('fs')
 
 var idx = lunr(function () {
-  this.ref('id')
+  this.setRef('id')
 
-  this.field('title', { boost: 10 })
-  this.field('tags', { boost: 100 })
-  this.field('body')
+  this.addField('title', { boost: 10 })
+  this.addField('tags', { boost: 100 })
+  this.addField('body')
 })
 
 fs.readFile('./example/example_data.json', function (err, data) {

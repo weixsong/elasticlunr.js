@@ -95,9 +95,9 @@
               </li>
               <li><a href="#load"><i class="alert alert-info"></i><span>load</span></a>
               </li>
-              <li><a href="#field"><i class="alert alert-info"></i><span>field</span></a>
+              <li><a href="#addField"><i class="alert alert-info"></i><span>addField</span></a>
               </li>
-              <li><a href="#ref"><i class="alert alert-info"></i><span>ref</span></a>
+              <li><a href="#setRef"><i class="alert alert-info"></i><span>setRef</span></a>
               </li>
               <li><a href="#addDoc"><i class="alert alert-info"></i><span>addDoc</span></a>
               </li>
@@ -252,11 +252,11 @@
 
   return idx;
 };</code></pre>
-          <section id="field">
-            <h1>field</h1>
+          <section id="addField">
+            <h1>addField</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.field()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.addField()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -281,16 +281,16 @@
             </tbody>
           </table>
           <div class="description"><p>Adds a field to the list of fields that will be searchable within documents in the index.</p><p>Remember that inner index is build based on field, which means each field has one inverted index.</p><p>Fields should be added before any documents are added to the index, fields<br />that are added after documents are added to the index will only apply to new<br />documents added to the index.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.field = function (fieldName) {
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.addField = function (fieldName) {
   this._fields.push(fieldName);
   this.index[fieldName] = new elasticlunr.InvertedIndex;
   return this;
 };</code></pre>
-          <section id="ref">
-            <h1>ref</h1>
+          <section id="setRef">
+            <h1>setRef</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.ref()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.setRef()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -320,7 +320,7 @@
             </tbody>
           </table>
           <div class="description"><p>Sets the property used to uniquely identify documents added to the index,<br />by default this property is &#39;id&#39;.</p><p>This should only be changed before adding documents to the index, changing<br />the ref property without resetting the index can lead to unexpected results.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.ref = function (refName) {
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.setRef = function (refName) {
   this._ref = refName;
   return this;
 };</code></pre>

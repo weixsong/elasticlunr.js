@@ -25,12 +25,12 @@
  * Example:
  *
  *     var idx = elasticLunr(function () {
- *       this.field('id')
- *       this.field('title')
- *       this.field('tags')
- *       this.field('body')
+ *       this.addField('id')
+ *       this.addField('title')
+ *       this.addField('tags')
+ *       this.addField('body')
  *       
- *       //this.ref('cid') // default ref is 'id'
+ *       //this.setRef('cid') // default ref is 'id'
  *       
  *       this.pipeline.add(function () {
  *         // some custom pipeline function
@@ -743,7 +743,7 @@ elasticlunr.Index.load = function (serialisedData) {
  * @return {elasticlunr.Index}
  * @memberOf Index
  */
-elasticlunr.Index.prototype.field = function (fieldName) {
+elasticlunr.Index.prototype.addField = function (fieldName) {
   this._fields.push(fieldName);
   this.index[fieldName] = new elasticlunr.InvertedIndex;
   return this;
@@ -762,7 +762,7 @@ elasticlunr.Index.prototype.field = function (fieldName) {
  * @return {elasticlunr.Index}
  * @memberOf Index
  */
-elasticlunr.Index.prototype.ref = function (refName) {
+elasticlunr.Index.prototype.setRef = function (refName) {
   this._ref = refName;
   return this;
 };
