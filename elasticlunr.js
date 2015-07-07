@@ -1036,7 +1036,7 @@ elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, search
  * @return {Object}
  */
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
-  var searchType = (config == null || config['type'] == null) ? 'OR' : config['type'];
+  var booleanType = (config == null || config['boolean'] == null) ? 'OR' : config['boolean'];
   var tokenResults = {};
 
   queryTokens.forEach(function (token) {
@@ -1045,9 +1045,9 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
   }, this);
 
   var res = {};
-  if (searchType == 'OR') {
+  if (booleanType == 'OR') {
     res = this.union(tokenResults);
-  } else if (searchType == 'AND') {
+  } else if (booleanType == 'AND') {
     res = this.intersect(tokenResults, queryTokens);
   }
   

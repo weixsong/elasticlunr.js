@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/olivernn/lunr.js.png?branch=master)](https://travis-ci.org/olivernn/lunr.js)
 
-Elasticlunr.js is developed based on Lunr.js, but more flexible that lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
+Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
 A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.
 
 # Key Features Comparing with Lunr.js
@@ -80,7 +80,7 @@ This returns a list of matching documents with a score of how closely they match
 
 ## Description
 
-Elasticlunr.js is developed based on Lunr.js, but more flexible that lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
+Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
 A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.
 
 ## Why
@@ -196,7 +196,58 @@ index.update(doc);
 
 ## Query from Index
 
+Elasticlunr.js provides flexible query configuration, supports query-time boosting and Boolean logic setting.
+You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.
+Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.
 
+1. Simple Query
+
+**Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple would be easy to meet your requirement.**
+
+```javascript
+index.search("Oracle database profit");
+```
+
+Output is a results array, each element of results array is an Object contain a <code>ref</code> field and a <code>score</code> field.
+<code>ref</code> is the document reference.
+<code>score</code> is the similarity measurement.
+
+Results array is sorted descent by <code>score</code>.
+
+2. Configuration Query
+
+2.1 **Query-Time Boosting**
+
+Setup which fields to search in by passing in a JSON configuration, and setup boosting for each search field.
+If you setup this configuration, then elasticlunr.js will only search the query string in the specified fields with boosting weight.
+
+**The scoring mechanism used in elasticlunr.js is very complex**, please goto [details](https://www.elastic.co/guide/en/elasticsearch/guide/current/practical-scoring-function.html) for more information.
+
+
+```javascript
+index.search("Oracle database profit", {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    }
+});
+```
+
+2.2 **Boolean Model**
+
+Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic defaulty. By "OR" default logic, elasticlunr.js could reach a high **Recall**.
+
+```javascript
+index.search("Oracle database profit", {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    },
+    boolean: "OR"
+});
+```
+
+Boolean operation is performed based on field. This means that if you choose "AND" logic, documents with all the query tokens in the query field will be returned as a field results. If you query in multiple fields, different field results will be merged together to give a final query results.
 
 
 # Contributing
