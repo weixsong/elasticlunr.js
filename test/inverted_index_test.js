@@ -184,6 +184,60 @@ test('expand a non existing token', function () {
   deepEqual(tokens, []);
 });
 
+test('test get term frequency from inverted index', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 2 },
+      doc2 = { ref: 456, tf: 3 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
+
+  equal(invertedIndex.getTF(token, 123), 2);
+  equal(invertedIndex.getTF(token, 456), 3);
+});
+
+test('test get term frequency from inverted index by non-exist token', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 2 },
+      doc2 = { ref: 456, tf: 3 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
+
+  equal(invertedIndex.getTF('token', 123), 0);
+  equal(invertedIndex.getTF('token', 456), 0);
+});
+
+test('test get term frequency from inverted index by non-exist docRef', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 2 },
+      doc2 = { ref: 456, tf: 3 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
+
+  equal(invertedIndex.getTF(token, 1), 0);
+  equal(invertedIndex.getTF(token, 2), 0);
+});
+
+test('test get term frequency from inverted index by non-exist token and non-exist docRef', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc1 = { ref: 123, tf: 2 },
+      doc2 = { ref: 456, tf: 3 },
+      token = 'foo';
+
+  invertedIndex.addToken(token, doc1);
+  invertedIndex.addToken(token, doc2);
+
+  equal(invertedIndex.getTF('token', 1), 0);
+  equal(invertedIndex.getTF('abc', 2), 0);
+});
+
+
+
 test('serialisation', function () {
   var invertedIndex = new elasticlunr.InvertedIndex;
 

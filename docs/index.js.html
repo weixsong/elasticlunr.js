@@ -107,7 +107,15 @@
               </li>
               <li><a href="#search"><i class="alert alert-info"></i><span>search</span></a>
               </li>
+              <li><a href="#computeScore"><i class="alert alert-info"></i><span>computeScore</span></a>
+              </li>
+              <li><a href="#computeSquaredWeight"><i class="alert alert-info"></i><span>computeSquaredWeight</span></a>
+              </li>
               <li><a href="#fieldSearch"><i class="alert alert-info"></i><span>fieldSearch</span></a>
+              </li>
+              <li><a href="#union"><i class="alert alert-info"></i><span>union</span></a>
+              </li>
+              <li><a href="#intersect"><i class="alert alert-info"></i><span>intersect</span></a>
               </li>
               <li><a href="#toJSON"><i class="alert alert-info"></i><span>toJSON</span></a>
               </li>
@@ -500,7 +508,7 @@
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
   var searchFields = {};
-  if (config == null || config['fileds'] == null) {
+  if (config == null || config['fields'] == null) {
     this._fields.forEach(function (field) {
       searchFields[field] = {boost: 1};
     }, this);
@@ -509,14 +517,26 @@
   }
 
   var queryResults = {};
+  var squaredWeight = this.computeSquaredWeight(queryTokens, searchFields);
 
   for (var field in searchFields) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
+    var fieldSearchScores = {};
+    var fieldBoost = searchFields[field].boost || 1;
+    var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
+    console.log('queryNorm: ' + queryNorm +' in field:' + field);
+
     for (var docRef in fieldSearchResults) {
+      var score = this.computeScore(queryTokens, docRef, field);
+      score = queryNorm * score;
+      fieldSearchScores[docRef] = score;
+    }
+
+    for (var docRef in fieldSearchScores) {
       if (docRef in queryResults) {
-        queryResults[docRef] += fieldSearchResults[docRef];
+        queryResults[docRef] += fieldSearchScores[docRef];
       } else {
-        queryResults[docRef] = fieldSearchResults[docRef];
+        queryResults[docRef] = fieldSearchScores[docRef];
       }
     }
   }
@@ -528,6 +548,110 @@
 
   results.sort(function (a, b) { return b.score - a.score });
   return results;
+};</code></pre>
+          <section id="computeScore">
+            <h1>computeScore</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.computeScore()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>queryTokens</td>
+                <td>Array</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>docRef</td>
+                <td>String,Integer</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>field</td>
+                <td>String</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>compute the score of a documents in given field.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.computeScore = function (queryTokens, docRef, field) {
+  var doc = this.documentStore.getDoc(docRef);
+
+  var coord = 0;
+  var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+  queryTokens.forEach(function (token) {
+    if (fieldTokens.indexOf(token) != -1) coord += 1;
+  }, this);
+
+  coord = coord / queryTokens.length;
+
+  var score = 0.0;
+  queryTokens.forEach(function name(token) {
+    var tf = this.index[field].getTF(token, docRef);
+    var idf = this.idf(token, field);
+    var norm = 1 / Math.sqrt(fieldTokens.length);
+    score += tf * idf * norm;
+  }, this);
+
+  score *= coord;
+  return score;
+};</code></pre>
+          <section id="computeSquaredWeight">
+            <h1>computeSquaredWeight</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.computeSquaredWeight()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>queryTokens</td>
+                <td>Array</td>
+                <td><p>query tokens.</p></td>
+              </tr>
+              <tr>
+                <td>searchFields</td>
+                <td>Object</td>
+                <td><p>fields to search.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Float</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>compute squared weight of query tokens.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, searchFields) {
+  var weight = 0.0;
+  queryTokens.forEach(function (token) {
+    var fieldWeight = 0.0;
+    for (var field in searchFields) {
+      var fieldBoost = searchFields[field].boost || 1;
+      var idf = this.idf(token, field);
+      fieldWeight += idf * idf * fieldBoost * fieldBoost;
+    }
+    weight += fieldWeight;
+  }, this);
+
+  return weight;
 };</code></pre>
           <section id="fieldSearch">
             <h1>fieldSearch</h1>
@@ -569,31 +693,114 @@
           </table>
           <div class="description"><p>search queryTokens in specified field.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
-  var boost = (config == null || 
-               config['fields'] == null || 
-               config['fields'].fieldName.boost == null) ? 1 : config['fields'].fieldName.boost;
+  var searchType = (config == null || config['type'] == null) ? 'OR' : config['type'];
+  var tokenResults = {};
 
-  var fieldQueryResults = {};
   queryTokens.forEach(function (token) {
     var docs = this.index[fieldName].getDocs(token);
-
-    for (var docRef in docs) {
-      var tf = docs[docRef].tf;
-      var idf = this.idf(token, fieldName);
-      var score = tf * idf * idf;
-      if (docRef in fieldQueryResults) {
-        fieldQueryResults[docRef] += score;
-      } else {
-        fieldQueryResults[docRef] = score;
-      }
-    }
+    tokenResults[token] = docs; 
   }, this);
 
-  for (var docRef in fieldQueryResults) {
-    fieldQueryResults[docRef] *= boost;
+  var res = {};
+  if (searchType == 'OR') {
+    res = this.union(tokenResults);
+  } else if (searchType == 'AND') {
+    res = this.intersect(tokenResults, queryTokens);
+  }
+  
+  return res;
+};</code></pre>
+          <section id="union">
+            <h1>union</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.union()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>tokenResults</td>
+                <td>Object</td>
+                <td><p>results of all query tokens</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>union tokenResults among each token results.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.union = function (tokenResults) {
+  var res = {};
+  for (var token in tokenResults) {
+    for (var docRef in tokenResults[token]) {
+      res[docRef] = true;
+    }
   }
 
-  return fieldQueryResults;
+  return res;
+};</code></pre>
+          <section id="intersect">
+            <h1>intersect</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.intersect()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>results</td>
+                <td>Object</td>
+                <td><p>first results</p></td>
+              </tr>
+              <tr>
+                <td>docs</td>
+                <td>Object</td>
+                <td><p>field search results of a token</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>intersect the two results</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.intersect = function (tokenResults, queryTokens) {
+  var res = {};
+  var token = queryTokens[0];
+  for (var docRef in tokenResults[token]) {
+    var flag = true;
+    for (var key in tokenResults) {
+      if (!(docRef in tokenResults[key])) {
+        flag = false;
+        break;
+      }
+    }
+
+    if (flag == true) {
+      res[docRef] = true;
+    }
+  }
+
+  return res;
 };</code></pre>
           <section id="toJSON">
             <h1>toJSON</h1>

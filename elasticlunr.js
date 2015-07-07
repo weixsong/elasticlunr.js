@@ -883,7 +883,7 @@ elasticlunr.Index.prototype.idf = function (term, field) {
   if (Object.prototype.hasOwnProperty.call(this._idfCache, cacheKey)) return this._idfCache[cacheKey];
 
   var df = this.index[field].getDocFreq(term);
-  var idf = 1 + Math.log(this.index[field].length / (df + 1));
+  var idf = 1 + Math.log(this.documentStore.length / (df + 1));
   this._idfCache[cacheKey] = idf;
 
   return idf;
@@ -919,7 +919,7 @@ elasticlunr.Index.prototype.search = function (query, config) {
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
   var searchFields = {};
-  if (config == null || config['fileds'] == null) {
+  if (config == null || config['fields'] == null) {
     this._fields.forEach(function (field) {
       searchFields[field] = {boost: 1};
     }, this);
@@ -928,14 +928,26 @@ elasticlunr.Index.prototype.search = function (query, config) {
   }
 
   var queryResults = {};
+  var squaredWeight = this.computeSquaredWeight(queryTokens, searchFields);
 
   for (var field in searchFields) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
+    var fieldSearchScores = {};
+    var fieldBoost = searchFields[field].boost || 1;
+    var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
+    console.log('queryNorm: ' + queryNorm +' in field:' + field);
+
     for (var docRef in fieldSearchResults) {
+      var score = this.computeScore(queryTokens, docRef, field);
+      score = queryNorm * score;
+      fieldSearchScores[docRef] = score;
+    }
+
+    for (var docRef in fieldSearchScores) {
       if (docRef in queryResults) {
-        queryResults[docRef] += fieldSearchResults[docRef];
+        queryResults[docRef] += fieldSearchScores[docRef];
       } else {
-        queryResults[docRef] = fieldSearchResults[docRef];
+        queryResults[docRef] = fieldSearchScores[docRef];
       }
     }
   }
@@ -950,6 +962,58 @@ elasticlunr.Index.prototype.search = function (query, config) {
 };
 
 /**
+ * compute the score of a documents in given field.
+ * 
+ * @param {Array} queryTokens
+ * @param {String|Integer} docRef
+ * @param {String} field
+ */
+elasticlunr.Index.prototype.computeScore = function (queryTokens, docRef, field) {
+  var doc = this.documentStore.getDoc(docRef);
+
+  var coord = 0;
+  var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+  queryTokens.forEach(function (token) {
+    if (fieldTokens.indexOf(token) != -1) coord += 1;
+  }, this);
+
+  coord = coord / queryTokens.length;
+
+  var score = 0.0;
+  queryTokens.forEach(function name(token) {
+    var tf = this.index[field].getTF(token, docRef);
+    var idf = this.idf(token, field);
+    var norm = 1 / Math.sqrt(fieldTokens.length);
+    score += tf * idf * norm;
+  }, this);
+
+  score *= coord;
+  return score;
+};
+
+/**
+ * compute squared weight of query tokens.
+ *
+ * @param {Array} queryTokens query tokens.
+ * @param {Object} searchFields fields to search.
+ * @return {Float}
+ */
+elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, searchFields) {
+  var weight = 0.0;
+  queryTokens.forEach(function (token) {
+    var fieldWeight = 0.0;
+    for (var field in searchFields) {
+      var fieldBoost = searchFields[field].boost || 1;
+      var idf = this.idf(token, field);
+      fieldWeight += idf * idf * fieldBoost * fieldBoost;
+    }
+    weight += fieldWeight;
+  }, this);
+
+  return weight;
+};
+
+/**
  * search queryTokens in specified field.
  *
  * @param {Array} queryTokens The query tokens to query in this field.
@@ -958,31 +1022,64 @@ elasticlunr.Index.prototype.search = function (query, config) {
  * @return {Object}
  */
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
-  var boost = (config == null || 
-               config['fields'] == null || 
-               config['fields'].fieldName.boost == null) ? 1 : config['fields'].fieldName.boost;
+  var searchType = (config == null || config['type'] == null) ? 'OR' : config['type'];
+  var tokenResults = {};
 
-  var fieldQueryResults = {};
   queryTokens.forEach(function (token) {
     var docs = this.index[fieldName].getDocs(token);
-
-    for (var docRef in docs) {
-      var tf = docs[docRef].tf;
-      var idf = this.idf(token, fieldName);
-      var score = tf * idf * idf;
-      if (docRef in fieldQueryResults) {
-        fieldQueryResults[docRef] += score;
-      } else {
-        fieldQueryResults[docRef] = score;
-      }
-    }
+    tokenResults[token] = docs; 
   }, this);
 
-  for (var docRef in fieldQueryResults) {
-    fieldQueryResults[docRef] *= boost;
+  var res = {};
+  if (searchType == 'OR') {
+    res = this.union(tokenResults);
+  } else if (searchType == 'AND') {
+    res = this.intersect(tokenResults, queryTokens);
+  }
+  
+  return res;
+};
+
+/**
+ * union tokenResults among each token results.
+ * @param {Object} tokenResults results of all query tokens
+ * @return {Object}
+ */
+elasticlunr.Index.prototype.union = function (tokenResults) {
+  var res = {};
+  for (var token in tokenResults) {
+    for (var docRef in tokenResults[token]) {
+      res[docRef] = true;
+    }
   }
 
-  return fieldQueryResults;
+  return res;
+};
+
+/**
+ * intersect the two results
+ * @param {Object} results first results
+ * @param {Object} docs field search results of a token
+ * @return {Object}
+ */
+elasticlunr.Index.prototype.intersect = function (tokenResults, queryTokens) {
+  var res = {};
+  var token = queryTokens[0];
+  for (var docRef in tokenResults[token]) {
+    var flag = true;
+    for (var key in tokenResults) {
+      if (!(docRef in tokenResults[key])) {
+        flag = false;
+        break;
+      }
+    }
+
+    if (flag == true) {
+      res[docRef] = true;
+    }
+  }
+
+  return res;
 };
 
 /**
@@ -1580,14 +1677,15 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
     root = root[key];
   }
 
-  if (!root.docs[tokenInfo.ref]) {
+  var docRef = tokenInfo.ref;
+  if (!root.docs[docRef]) {
     // if this doc not exist, then add this doc
-    root.docs[tokenInfo.ref] = tokenInfo;
+    root.docs[docRef] = {tf: tokenInfo.tf};
     root.df += 1;
     this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
-    root.docs[tokenInfo.ref] = tokenInfo;
+    root.docs[docRef] = {tf: tokenInfo.tf};
   }
 };
 
@@ -1651,6 +1749,30 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token) {
   }
 
   return node.docs;
+};
+
+/**
+ * Retrieve the term frequency of given token in given docRef.
+ * If token or docRef not found, return 0.
+ *
+ *
+ * @param {String} token The token to get the documents for.
+ * @param {String|Integer} docRef
+ * @return {Object}
+ * @memberOf InvertedIndex
+ */
+elasticlunr.InvertedIndex.prototype.getTF = function (token, docRef) {
+  var node = this.getNode(token);
+
+  if (node == null) {
+    return 0;
+  }
+
+  if (!(docRef in node.docs)) {
+    return 0;
+  }
+
+  return node.docs[docRef].tf;
 };
 
 /**
