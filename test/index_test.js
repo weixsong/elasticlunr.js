@@ -111,7 +111,6 @@ test('triggering remove events', function () {
   ok(callbackCalled);
   equal(callbackArgs.length, 2);
   deepEqual(callbackArgs[0], doc);
-
 });
 
 test('silencing remove events', function () {

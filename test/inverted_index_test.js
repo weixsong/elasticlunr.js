@@ -15,7 +15,7 @@ test('adding a token to the invertedIndex', function () {
 
   invertedIndex.addToken(token, doc);
 
-  ok(invertedIndex.root['f']['o']['o']['docs'][123] === doc);
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1});
   equal(invertedIndex.getDocFreq('foo'), 1);
   equal(invertedIndex.length, 1);
 });
@@ -29,8 +29,8 @@ test('adding another document to the token', function () {
   invertedIndex.addToken(token, doc1);
   invertedIndex.addToken(token, doc2);
 
-  ok(invertedIndex.root['f']['o']['o']['docs'][123] === doc1);
-  ok(invertedIndex.root['f']['o']['o']['docs'][456] === doc2);
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1});
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 1});
   equal(invertedIndex.getDocFreq('foo'), 2);
 });
 
@@ -57,7 +57,7 @@ test('adding existing doc', function () {
   invertedIndex.addToken(token, doc2);
   invertedIndex.addToken(token, { ref: 456, tf: 100 });
 
-  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], { ref: 456, tf: 100 });
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 100 });
 
   equal(invertedIndex.getDocFreq('foo'), 2);
 });
@@ -89,7 +89,7 @@ test('retrieving items from the invertedIndex', function () {
 
   invertedIndex.addToken(token, doc);
   deepEqual(invertedIndex.getDocs(token), {
-    '123': doc
+    '123': {tf: 1}
   });
 
   deepEqual(invertedIndex.getDocs(''), {});
@@ -125,7 +125,7 @@ test('removing a document from the token invertedIndex', function () {
 
   invertedIndex.addToken('foo', doc);
   deepEqual(invertedIndex.getDocs('foo'), {
-    '123': doc
+    '123': {tf: 1}
   });
 
   invertedIndex.removeToken('foo', 123);
@@ -142,7 +142,7 @@ test('removing a document that is not in the invertedIndex', function () {
   invertedIndex.addToken('bar', doc2);
   invertedIndex.removeToken('foo', 456);
 
-  deepEqual(invertedIndex.getDocs('foo'), { 123: doc1 });
+  deepEqual(invertedIndex.getDocs('foo'), { 123: {tf: 1} });
   equal(invertedIndex.getDocFreq('foo'), 1);
 });
 
@@ -181,7 +181,6 @@ test('expand a non existing token', function () {
   invertedIndex.addToken('bar', doc);
 
   var tokens = invertedIndex.expandToken('wax');
-  console.log(tokens)
   deepEqual(tokens, []);
 });
 
@@ -205,7 +204,7 @@ test('serialisation', function () {
             docs: {},
             o: {
               df: 1,
-              docs: { 123: { ref: 123, tf: 1 } }
+              docs: { 123: { tf: 1 } }
             }
           }
         }
@@ -228,7 +227,7 @@ test('loading a serialised story', function () {
             docs: {},
             o: {
               df: 1,
-              docs: { 123: { ref: 123, tf: 1 } }
+              docs: { 123: { tf: 1 } }
             }
           }
         }
@@ -239,6 +238,6 @@ test('loading a serialised story', function () {
   var invertedIndex = elasticlunr.InvertedIndex.load(serialisedData),
       documents = invertedIndex.getDocs('foo');
 
-  equal(invertedIndex.length, 1)
-  deepEqual(documents, { 123: { ref: 123, tf: 1 }});
+  equal(invertedIndex.length, 1);
+  deepEqual(documents, { 123: {tf: 1 }});
 });
