@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Full-text search engine in Javascript for browser search and offline search. - @VERSION
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - @VERSION
  *
  * Copyright (C) @YEAR Oliver Nightingale
  * Copyright (C) @YEAR Wei Song

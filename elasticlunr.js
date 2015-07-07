@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Full-text search engine in Javascript for browser search and offline search. - 0.6.1
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.1
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -27,7 +27,6 @@
  *     var idx = elasticLunr(function () {
  *       this.addField('id')
  *       this.addField('title')
- *       this.addField('tags')
  *       this.addField('body')
  *       
  *       //this.setRef('cid') // default ref is 'id'
@@ -37,6 +36,21 @@
  *       })
  *       
  *     })
+ * 
+ *    idx.addDoc({
+ *      id: 1, 
+ *      title: 'Oracle released database 12g',
+ *      body: 'Yestaday, Oracle has released their latest database, named 12g, more robust. this product will increase Oracle profit.'
+ *    });
+ * 
+ *    idx.addDoc({
+ *      id: 2, 
+ *      title: 'Oracle released annual profit report',
+ *      body: 'Yestaday, Oracle has released their annual profit report of 2015, total profit is 12.5 Billion.'
+ *    });
+ * 
+ *    # search with query-time boosting
+ *    idx.search('oracle database', {fields: {title: {boost: 2}, body: {boost: 1}}})
  *
  * @param {Function} config A function that will be called with the new instance
  * of the elasticlunr.Index as both its context and first parameter. It can be used to
