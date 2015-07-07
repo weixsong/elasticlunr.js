@@ -574,8 +574,6 @@
                config['fields'] == null || 
                config['fields'].fieldName.boost == null) ? 1 : config['fields'].fieldName.boost;
 
-  console.log('searching in field:')
-  console.log(fieldName)
   var fieldQueryResults = {};
   queryTokens.forEach(function (token) {
     var docs = this.index[fieldName].getDocs(token);
