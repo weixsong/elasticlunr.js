@@ -200,7 +200,7 @@ Elasticlunr.js provides flexible query configuration, supports query-time boosti
 You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.
 Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.
 
-1. Simple Query
+### 1. Simple Query
 
 **Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple would be easy to meet your requirement.**
 
@@ -214,9 +214,9 @@ Output is a results array, each element of results array is an Object contain a 
 
 Results array is sorted descent by <code>score</code>.
 
-2. Configuration Query
+### 2. Configuration Query
 
-2.1 **Query-Time Boosting**
+#### 2.1 **Query-Time Boosting**
 
 Setup which fields to search in by passing in a JSON configuration, and setup boosting for each search field.
 If you setup this configuration, then elasticlunr.js will only search the query string in the specified fields with boosting weight.
@@ -233,7 +233,7 @@ index.search("Oracle database profit", {
 });
 ```
 
-2.2 **Boolean Model**
+#### 2.2 **Boolean Model**
 
 Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic defaulty. By "OR" default logic, elasticlunr.js could reach a high **Recall**.
 
