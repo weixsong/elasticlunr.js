@@ -4,7 +4,6 @@ SRC = lib/elasticlunr.js \
 	lib/event_emitter.js \
 	lib/tokenizer.js \
 	lib/pipeline.js \
-	lib/vector.js \
 	lib/sorted_set.js \
 	lib/index.js \
 	lib/document_store.js \
