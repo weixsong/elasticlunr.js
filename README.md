@@ -1,10 +1,18 @@
-# Lunr.js
-
-[![Join the chat at https://gitter.im/olivernn/lunr.js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/olivernn/lunr.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# elasticlunr.js
 
 [![Build Status](https://travis-ci.org/olivernn/lunr.js.png?branch=master)](https://travis-ci.org/olivernn/lunr.js)
 
-A bit like Solr, but much smaller and not as bright.
+Elasticlunr.js is developed based on Lunr.js, but more flexible that lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
+A bit like Solr, but much smaller and not as bright, but also provide flexible usage and query-time boosting.
+
+# Key Features Comparing with Lunr.js
+
+ * 1. Query-Time boosting, you don't need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.
+ * 2. More rational scoring mechanism, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.
+ * 3. Field-search, you could choose which field to index and which field to search.
+ * 4. Combined Boolean Model, TF/IDF Model and the Vector Space Model, make the results ranking more reliable.
+ * 5. Fast, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to compute the vector of a document to compute the score of a document, this improve the search speed significantly.
+ * 6. Small index file, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.
 
 ## Example
 
