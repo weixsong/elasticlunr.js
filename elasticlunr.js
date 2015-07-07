@@ -111,7 +111,7 @@ elasticlunr.EventEmitter = function () {
 elasticlunr.EventEmitter.prototype.addListener = function () {
   var args = Array.prototype.slice.call(arguments),
       fn = args.pop(),
-      names = args
+      names = args;
 
   if (typeof fn !== "function") throw new TypeError ("last argument must be a function")
 
@@ -147,13 +147,13 @@ elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
  * @memberOf EventEmitter
  */
 elasticlunr.EventEmitter.prototype.emit = function (name) {
-  if (!this.hasHandler(name)) return
+  if (!this.hasHandler(name)) return;
 
-  var args = Array.prototype.slice.call(arguments, 1)
+  var args = Array.prototype.slice.call(arguments, 1);
 
   this.events[name].forEach(function (fn) {
-    fn.apply(undefined, args)
-  })
+    fn.apply(undefined, args);
+  });
 }
 
 /**
@@ -821,13 +821,13 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
  * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
  * @memberOf Index
  */
-elasticlunr.Index.prototype.removeDoc = function (docRef, emitEvent) {
-  if (!docRef) return;
+elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
+  if (!doc) return;
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
+  var docRef = doc[this._ref];
   if (!this.documentStore.hasDoc(docRef)) return;
 
-  var doc = this.documentStore.getDoc(docRef);
   this.documentStore.removeDoc(docRef);
 
   this._fields.forEach(function (field) {
@@ -837,7 +837,7 @@ elasticlunr.Index.prototype.removeDoc = function (docRef, emitEvent) {
     }
   }, this);
 
-  if (emitEvent) this.eventEmitter.emit('remove', docRef, this);
+  if (emitEvent) this.eventEmitter.emit('remove', doc, this);
 };
 
 /**

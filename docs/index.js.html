@@ -406,13 +406,13 @@
             </tbody>
           </table>
           <div class="description"><p>Removes a document from the index.</p><p>To make sure documents no longer show up in search results they can be<br />removed from the index using this method.</p><p>A &#39;remove&#39; event is emitted with the document that has been removed and the index<br />the document has been removed from. This event can be silenced by passing false<br />as the second argument to remove.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.removeDoc = function (docRef, emitEvent) {
-  if (!docRef) return;
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
+  if (!doc) return;
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
+  var docRef = doc[this._ref];
   if (!this.documentStore.hasDoc(docRef)) return;
 
-  var doc = this.documentStore.getDoc(docRef);
   this.documentStore.removeDoc(docRef);
 
   this._fields.forEach(function (field) {
@@ -422,7 +422,7 @@
     }
   }, this);
 
-  if (emitEvent) this.eventEmitter.emit('remove', docRef, this);
+  if (emitEvent) this.eventEmitter.emit('remove', doc, this);
 };</code></pre>
           <section id="update">
             <h1>update</h1>

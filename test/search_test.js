@@ -1,8 +1,8 @@
 module('search', {
   setup: function () {
-    var idx = new elasticlunr.Index
-    idx.field('body')
-    idx.field('title', { boost: 10 })
+    var idx = new elasticlunr.Index;
+    idx.addField('body');
+    idx.addField('title');
 
     ;([{
       id: 'a',
@@ -25,53 +25,48 @@ module('search', {
       body: 'handsome',
     },{
       id: 'e',
-      title: 'title',
+      title: 'title abc',
       body: 'hand',
-    }]).forEach(function (doc) { idx.add(doc) })
+    }]).forEach(function (doc) { idx.addDoc(doc) })
 
-    this.idx = idx
+    this.idx = idx;
   }
-})
+});
 
 test('returning the correct results', function () {
-  var results = this.idx.search('green plant')
-
-  equal(results.length, 2)
-  equal(results[0].ref, 'b')
-})
+  var results = this.idx.search('green plant');
+  equal(results.length, 3);
+  equal(results[0].ref, 'b');
+});
 
 test('search term not in the index', function () {
-  var results = this.idx.search('foo')
+  var results = this.idx.search('foo');
 
-  equal(results.length, 0)
-})
+  equal(results.length, 0);
+});
 
 test('one search term not in the index', function () {
   var results = this.idx.search('foo green')
 
-  equal(results.length, 0)
+  equal(results.length, 3);
 })
 
 test('search contains one term not in the index', function () {
-  var results = this.idx.search('green foo')
+  var results = this.idx.search('green foo');
 
-  equal(results.length, 0)
-})
+  equal(results.length, 3);
+});
 
 test('search takes into account boosts', function () {
-  var results = this.idx.search('professor')
+  var results = this.idx.search('professor');
 
-  equal(results.length, 2)
-  equal(results[0].ref, 'c')
-
-  ok(results[0].score > 10 * results[1].score)
-})
+  equal(results.length, 2);
+  equal(results[0].ref, 'c');
+});
 
 test('search boosts exact matches', function () {
-  var results = this.idx.search('hand')
+  var results = this.idx.search('title');
 
-  equal(results.length, 2)
-  equal(results[0].ref, 'e')
-
-  ok(results[0].score > results[1].score)
-})
+  equal(results.length, 2);
+  equal(results[0].ref, 'd');
+});

@@ -142,7 +142,7 @@
           <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.addListener = function () {
   var args = Array.prototype.slice.call(arguments),
       fn = args.pop(),
-      names = args
+      names = args;
 
   if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;)
 
@@ -213,13 +213,13 @@
           </table>
           <div class="description"><p>Calls all functions bound to the given event.</p><p>Additional data can be passed to the event handler as arguments to <code>emit</code><br />after the event name.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.emit = function (name) {
-  if (!this.hasHandler(name)) return
+  if (!this.hasHandler(name)) return;
 
-  var args = Array.prototype.slice.call(arguments, 1)
+  var args = Array.prototype.slice.call(arguments, 1);
 
   this.events[name].forEach(function (fn) {
-    fn.apply(undefined, args)
-  })
+    fn.apply(undefined, args);
+  });
 }</code></pre>
         </div>
       </div>

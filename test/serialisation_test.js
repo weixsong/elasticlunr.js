@@ -19,8 +19,8 @@ module('serialisation', {
 test('dumping and loading an index', function () {
   var idx = new elasticlunr.Index;
 
-  idx.field('title');
-  idx.field('body');
+  idx.addField('title');
+  idx.addField('body');
 
   this.corpus.forEach(function (doc) { idx.addDoc(doc) });
 
@@ -32,8 +32,8 @@ test('dumping and loading an index', function () {
 
 test('dumping and loading an index with a populated pipeline', function () {
   var idx = elasticlunr(function () {
-    this.field('title');
-    this.field('body');
+    this.addField('title');
+    this.addField('body');
   });
 
   this.corpus.forEach(function (doc) { idx.addDoc(doc) });
