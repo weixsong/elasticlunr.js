@@ -172,7 +172,67 @@ index.addDoc(doc2);
 <li>For mobile device, Iphone or Android phone, network traffic maybe very expensive, then provide offline search is a good choice.</li>
 </ol>
 <h2>Installation</h2>
-<p>Simply include the elasticlunr.js source file in the page that you want to use it.  Elasticlunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.js to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h2>Contributing</h2>
+<p>Simply include the elasticlunr.js source file in the page that you want to use it.  Elasticlunr.js is supported in all modern browsers.</p><p>Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.js to work. You can either use <a href="https://github.com/olivernn/augment.js">Augment.js</a>, <a href="https://github.com/kriskowal/es5-shim">ES5-Shim</a> or any library that patches old browsers to provide an ES5 compatible JavaScript environment.</p><h1>Documentation</h1>
+<p>This part only contain important apects of elasticlunr.js, for the whole documentation, please go to <a href="http://weixsong.github.io/assets/elasticlunr/docs/index.html">API documentation</a>.</p><h2>1. Build Index</h2>
+<p>When you first create a index instance, you need to specify which field you want to index. If you did not specify which field to index, then no field will be searchable for your documents.<br />You could specify fields by:</p><pre><code class="lang-javascript">var index = elasticlunr(function () {
+    this.addField(&#39;title&#39;);
+    this.addField(&#39;body&#39;);
+    this.setRef(&#39;id&#39;);
+});
+</code></pre>
+<p>You could also set the document reference by <code>this.setRef(&#39;id&#39;)</code>, if you did not set document ref, elasticlunr.js will use <strong>&#39;id&#39;</strong> as default.</p><p>You could do the above index setup as followings:</p><pre><code class="lang-javascript">var index = elasticlunr();
+index.addField(&#39;title&#39;);
+index.addField(&#39;body&#39;);
+index.setRef(&#39;id&#39;);
+</code></pre>
+<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var lunr = require(&#39;./lib/lunr.js&#39;);
+require(&#39;./lunr.stemmer.support.js&#39;)(lunr);
+require(&#39;./lunr.de.js&#39;)(lunr);
+
+var idx = lunr(function () {
+    // use the language (de)
+    this.use(lunr.de);
+    // then, the normal lunr index initialization
+    this.field(&#39;title&#39;)
+    this.field(&#39;body&#39;)
+});
+</code></pre>
+<p>For more details, please go to <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.</p><h2>Add document to index</h2>
+<p>Add document to index is very simple, just prepare you document in JSON format, then add it to index.</p><pre><code class="lang-javascript">var doc1 = {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
+    &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
+}
+
+var doc2 = {
+    &quot;id&quot;: 2,
+    &quot;title&quot;: &quot;Oracle released its profit report of 2015&quot;,
+    &quot;body&quot;: &quot;As expected, Oracle released its profit report of 2015, during the good sales of database and hardware, Oracle&#39;s profit of 2015 reached 12.5 Billion.&quot;
+}
+
+index.addDoc(doc1);
+index.addDoc(doc2);
+</code></pre>
+<p>If your JSON document contains field that not configured in index, then that field will not be indexed, which means that field is not searchable.</p><h2>Remove document from index</h2>
+<p>Elasticlunr.js support remove a document from index, just provide JSON document to <code>elasticlunr.Index.prototype.removeDoc()</code> function.</p><p>For example:</p><pre><code class="lang-javascript">var doc = {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
+    &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
+}
+
+index.removeDoc(doc);
+</code></pre>
+<p>Remove a document will remove each token of that document&#39;s each field from field-specified inverted index.</p><h2>Update a document in index</h2>
+<p>Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.</p><p>For example:</p><pre><code class="lang-javascript">var doc = {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
+    &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
+}
+
+index.update(doc);
+</code></pre>
+<h2>Query from Index</h2>
+<h1>Contributing</h1>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
         </div>
       </div>

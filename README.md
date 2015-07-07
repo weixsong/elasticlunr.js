@@ -96,6 +96,109 @@ Simply include the elasticlunr.js source file in the page that you want to use i
 
 Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.js to work. You can either use [Augment.js](https://github.com/olivernn/augment.js), [ES5-Shim](https://github.com/kriskowal/es5-shim) or any library that patches old browsers to provide an ES5 compatible JavaScript environment.
 
-## Contributing
+# Documentation
+
+This part only contain important apects of elasticlunr.js, for the whole documentation, please go to [API documentation](http://weixsong.github.io/assets/elasticlunr/docs/index.html).
+
+## 1. Build Index
+
+When you first create a index instance, you need to specify which field you want to index. If you did not specify which field to index, then no field will be searchable for your documents.
+You could specify fields by:
+```javascript
+var index = elasticlunr(function () {
+    this.addField('title');
+    this.addField('body');
+    this.setRef('id');
+});
+```
+
+You could also set the document reference by <code>this.setRef('id')</code>, if you did not set document ref, elasticlunr.js will use **'id'** as default.
+
+You could do the above index setup as followings:
+```javascript
+var index = elasticlunr();
+index.addField('title');
+index.addField('body');
+index.setRef('id');
+```
+
+Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/weixsong/lunr-languages).
+Assume you're using lunr-language in Node.js envrionment, you could import lunr-language as followings:
+
+```javascript
+var lunr = require('./lib/lunr.js');
+require('./lunr.stemmer.support.js')(lunr);
+require('./lunr.de.js')(lunr);
+
+var idx = lunr(function () {
+    // use the language (de)
+    this.use(lunr.de);
+    // then, the normal lunr index initialization
+    this.field('title')
+    this.field('body')
+});
+```
+For more details, please go to [lunr-languages](https://github.com/weixsong/lunr-languages).
+
+## Add document to index
+
+Add document to index is very simple, just prepare you document in JSON format, then add it to index.
+
+```javascript
+var doc1 = {
+    "id": 1,
+    "title": "Oracle released its latest database Oracle 12g",
+    "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
+}
+
+var doc2 = {
+    "id": 2,
+    "title": "Oracle released its profit report of 2015",
+    "body": "As expected, Oracle released its profit report of 2015, during the good sales of database and hardware, Oracle's profit of 2015 reached 12.5 Billion."
+}
+
+index.addDoc(doc1);
+index.addDoc(doc2);
+```
+
+If your JSON document contains field that not configured in index, then that field will not be indexed, which means that field is not searchable.
+
+## Remove document from index
+
+Elasticlunr.js support remove a document from index, just provide JSON document to <code>elasticlunr.Index.prototype.removeDoc()</code> function.
+
+For example:
+```javascript
+var doc = {
+    "id": 1,
+    "title": "Oracle released its latest database Oracle 12g",
+    "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
+}
+
+index.removeDoc(doc);
+```
+
+Remove a document will remove each token of that document's each field from field-specified inverted index.
+
+## Update a document in index
+Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.
+
+For example:
+```javascript
+var doc = {
+    "id": 1,
+    "title": "Oracle released its latest database Oracle 12g",
+    "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
+}
+
+index.update(doc);
+```
+
+## Query from Index
+
+
+
+
+# Contributing
 
 See the [`CONTRIBUTING.mdown` file](CONTRIBUTING.mdown).
