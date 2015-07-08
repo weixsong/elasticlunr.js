@@ -2,8 +2,9 @@
 
 [![Build Status](https://travis-ci.org/weixsong/elasticlunr.js.svg?branch=master)](https://travis-ci.org/weixsong/elasticlunr.js)
 
+Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search.
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
-A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.
+Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.
 
 # Key Features Comparing with Lunr.js
 
