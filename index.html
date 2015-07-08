@@ -14,27 +14,27 @@
 	<link rel="stylesheet" href="assets/bootstrap/css/style.css">
 </head>
 <body>
-  <div id="wrapper">
-    <main class="main" role="main">
-	  <div class="container">
-        <hr class="featurette-divider">
-		<div class="row mbxl">
-		  <div class="text-left">
-			<div class="service">
-			  <div class="desc">
-				<p>Kore is an easy to use web application framework for writing scalable web APIs in C.<br />Its main goals are security, scalability and allowing rapid development and deployment of such APIs.</p><p>Because of this Kore is an ideal candidate for building robust, scalable and secure web things.</p>
-			  </div>
-			</div>
-			<div class="col-md-10 col-md-offset-1" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
-			  <div class="col-md-4 col-md-offset-2">
-				<a class="btn btn-lg btn-padded btn-kore btn-block mbs" href="/downloads" role="button">Get the source</a>
-			  </div>
-			  <div class="col-md-4">
-				<a class="btn btn-lg btn-padded btn-kore btn-block" href="/doc/#features" role="button">View features</a>
-			  </div>
-			</div>
-		  </div>
-		</div>
+
+	<div id="wrapper">
+		<main class="main" role="main">
+			<div class="container">
+				<div class="row mbxl">
+				<div class="text-center">
+					<div class="service">
+						<div class="desc">
+							<p>Kore is an easy to use web application framework for writing scalable web APIs in C.<br />Its main goals are security, scalability and allowing rapid development and deployment of such APIs.</p><p>Because of this Kore is an ideal candidate for building robust, scalable and secure web things.</p>
+						</div>
+					</div>
+					<div class="col-md-10 col-md-offset-1" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
+						<div class="col-md-4 col-md-offset-2">
+							<a class="btn btn-lg btn-padded btn-kore btn-block mbs" href="/downloads" role="button">Get the source</a>
+						</div>
+						<div class="col-md-4">
+							<a class="btn btn-lg btn-padded btn-kore btn-block" href="/doc/#features" role="button">View features</a>
+						</div>
+					</div>
+				</div>
+				</div>
 
 				<div class="row">
 					<div class="col-md-6">
@@ -45,7 +45,7 @@
 								<p>Kore makes it easy to get started without having to fiddle with build frameworks such as make. Using the builtin commands you can create, compile and run Kore applications. However if you prefer building Makefiles and linking the libraries together yourself, go for it.</p>
 		        			</div>
 		        		</div>
-						<pre><code>$ kore create myapp
+						<pre>$ kore create myapp
 $ cd myapp
 $ kore run
 compiling myapp.c
@@ -53,7 +53,7 @@ myapp built succesfully!
 [parent]: running on https://127.0.0.1:8888
 [parent]: kore is starting up
 [wrk 0]: worker 0 started (cpu#0)
-</code></pre>
+</pre>
 					</div>
 					<div class="col-md-6">
 						<div class="box">
@@ -63,17 +63,13 @@ myapp built succesfully!
 								<p>Kore exposes an easy to use API to build your applications. Below is an example of how simple it is to get going with writing web applications in C. The code will respond to all requests with an "Hello world" response.</p>
 		        			</div>
 		        		</div>
-						<pre class="c"><code>#include &lt;kore/kore.h&gt;
-#include &lt;kore/http.h&gt;
-
-int	page(struct http_request *);
-
-int
-page(struct http_request *req)
-{
-    http_response(req, 200, "Hello world", 11);
-    return (KORE_RESULT_OK);
-}</code></pre>
+						<pre class="c">
+index.search("Oracle database profit", {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    }
+});</code></pre>
 					</div>
 				</div>
 				<div class="row text-center">
@@ -82,16 +78,20 @@ page(struct http_request *req)
 					</div>
 				</div>
 			</div>
+ 
+        <div class="col-md-10 col-md-offset-1" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
 		</main>
+  <footer>
+	<div class="container">
+	  <div class="row text-center">
+		<div class="col-lg-12 text-center">
+		  <p>Copyright &copy; 2015 Wei Song</p>
+		</div>
+	  </div>
+	</div>
+ </footer>
 	</div><!-- end of wrapper -->
-    <!-- Begin footer -->
-    <footer class="footer">
-      <div class="container">
-        <p class="pull-right text-muted"><a href="#">Back to top</a></p>
-        <p class="text-muted">&copy; Wei Song 2015}
-        <a href="https://github.com/weixsong">https://github.com/weixsong</a> watkinsong@163.com</p>
-      </div>
-    </footer>
+
 
 <script src="assets/bootstrap/js/jquery-1.11.3.min.js"></script>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
