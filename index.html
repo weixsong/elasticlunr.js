@@ -18,7 +18,7 @@
 		<main class="main" role="main">
 			<div class="container">
 				<div class="row mbxl">
-				<div class="text-center">
+				<div class="text-left">
 					<div class="service">
 						<div class="desc">
 							<p>Kore is an easy to use web application framework for writing scalable web APIs in C.<br />Its main goals are security, scalability and allowing rapid development and deployment of such APIs.</p><p>Because of this Kore is an ideal candidate for building robust, scalable and secure web things.</p>
@@ -83,15 +83,14 @@ page(struct http_request *req)
 			</div>
 		</main>
 	</div><!-- end of wrapper -->
-	<footer class="footer" role="contentinfo">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<p>Copyright &copy; 2013-2015 Joris Vink</p>
-				</div>
-			</div>
-		</div>
-	</footer>
+    <!-- Begin footer -->
+    <footer class="footer">
+      <div class="container">
+        <p class="pull-right text-muted"><a href="#">Back to top</a></p>
+        <p class="text-muted">&copy; {{ site.author.name }} {{ site.time | date: '%Y' }}  
+        <a href="https://github.com/weixsong">https://github.com/weixsong</a> watkinsong@163.com</p>
+      </div>
+    </footer>
 
 <script src="assets/bootstrap/js/jquery-1.11.3.min.js"></script>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
