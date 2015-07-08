@@ -1,55 +1,49 @@
-module('lunr.Index')
+module('elasticlunr.Index');
 
 test("defining what fields to index", function () {
-  var idx = new lunr.Index
-  idx.field('foo')
+  var idx = new elasticlunr.Index;
+  idx.addField('foo');
 
-  deepEqual(idx._fields[0], {name: 'foo', boost: 1})
-})
-
-test("giving a particular field a weighting", function () {
-  var idx = new lunr.Index
-  idx.field('foo', { boost: 10 })
-
-  deepEqual(idx._fields[0], {name: 'foo', boost: 10})
-})
+  equal(idx._fields[0], 'foo');
+});
 
 test('default reference should be id', function () {
-  var idx = new lunr.Index
-  equal(idx._ref, 'id')
-})
+  var idx = new elasticlunr.Index;
+  equal(idx._ref, 'id');
+});
 
 test("defining the reference field for the index", function () {
-  var idx = new lunr.Index
-  idx.ref('foo')
+  var idx = new elasticlunr.Index;
+  idx.setRef('foo');
 
-  deepEqual(idx._ref, 'foo')
-})
+  deepEqual(idx._ref, 'foo');
+});
 
 test('adding a document to the index', function () {
-  var idx = new lunr.Index,
-      doc = {id: 1, body: 'this is a test'}
+  var idx = new elasticlunr.Index,
+      doc = {id: 1, body: 'this is a test'};
 
-  idx.field('body')
-  idx.add(doc)
+  idx.addField('body');
+  idx.addDoc(doc);
 
-  equal(idx.documentStore.length, 1)
-  ok(!!idx.documentStore.get(1))
-})
+  equal(idx.documentStore.length, 1);
+  ok(!!idx.documentStore.getDoc(1));
+});
 
 test('adding a document with an empty field', function () {
-  var idx = new lunr.Index,
-      doc = {id: 1, body: 'test', title: ''}
+  var idx = new elasticlunr.Index,
+      doc = {id: 1, body: 'test', title: ''};
 
-  idx.field('title')
-  idx.field('body')
+  idx.addField('title');
+  idx.addField('body');
 
-  idx.add(doc)
-  ok(!isNaN(idx.tokenStore.get('test')[1].tf))
-})
+  idx.addDoc(doc);
+  equal(idx.index['body'].getDocFreq('test'), 1);
+  equal(idx.index['body'].getDocs('test')[1].tf, 1);
+});
 
 test('triggering add events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'this is a test'},
       callbackCalled = false,
       callbackArgs = []
@@ -59,8 +53,8 @@ test('triggering add events', function () {
     callbackArgs = Array.prototype.slice.call(arguments)
   })
 
-  idx.field('body')
-  idx.add(doc)
+  idx.addField('body')
+  idx.addDoc(doc)
 
   ok(callbackCalled)
   equal(callbackArgs.length, 2)
@@ -69,7 +63,7 @@ test('triggering add events', function () {
 })
 
 test('silencing add events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'this is a test'},
       callbackCalled = false,
       callbackArgs = []
@@ -79,49 +73,48 @@ test('silencing add events', function () {
     callbackArgs = Array.prototype.slice.call(arguments)
   })
 
-  idx.field('body')
-  idx.add(doc, false)
+  idx.addField('body')
+  idx.addDoc(doc, false)
 
   ok(!callbackCalled)
 })
 
 test('removing a document from the index', function () {
-  var idx = new lunr.Index,
-      doc = {id: 1, body: 'this is a test'}
+  var idx = new elasticlunr.Index,
+      doc = {id: 1, body: 'this is a test'};
 
-  idx.field('body')
-  equal(idx.documentStore.length, 0)
+  idx.addField('body');
+  equal(idx.documentStore.length, 0);
 
-  idx.add(doc)
-  equal(idx.documentStore.length, 1)
+  idx.addDoc(doc);
+  equal(idx.documentStore.length, 1);
 
-  idx.remove(doc)
-  equal(idx.documentStore.length, 0)
+  idx.removeDoc(doc);
+  equal(idx.documentStore.length, 0);
 })
 
 test('triggering remove events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'this is a test'},
       callbackCalled = false,
-      callbackArgs = []
+      callbackArgs = [];
 
   idx.on('remove', function (doc, index) {
-    callbackCalled = true
-    callbackArgs = Array.prototype.slice.call(arguments)
-  })
+    callbackCalled = true;
+    callbackArgs = Array.prototype.slice.call(arguments);
+  });
 
-  idx.field('body')
-  idx.add(doc)
-  idx.remove(doc)
+  idx.addField('body');
+  idx.addDoc(doc);
+  idx.removeDoc(doc);
 
-  ok(callbackCalled)
-  equal(callbackArgs.length, 2)
-  deepEqual(callbackArgs[0], doc)
-  deepEqual(callbackArgs[1], idx)
-})
+  ok(callbackCalled);
+  equal(callbackArgs.length, 2);
+  deepEqual(callbackArgs[0], doc);
+});
 
 test('silencing remove events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'this is a test'},
       callbackCalled = false,
       callbackArgs = []
@@ -131,15 +124,15 @@ test('silencing remove events', function () {
     callbackArgs = Array.prototype.slice.call(arguments)
   })
 
-  idx.field('body')
-  idx.add(doc)
-  idx.remove(doc, false)
+  idx.addField('body')
+  idx.addDoc(doc)
+  idx.removeDoc(doc, false)
 
   ok(!callbackCalled)
 })
 
 test('removing a non-existent document from the index', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'this is a test'},
       doc2 = {id: 2, body: 'i dont exist'},
       callbackCalled = false
@@ -148,46 +141,46 @@ test('removing a non-existent document from the index', function () {
     callbackCalled = true
   })
 
-  idx.field('body')
+  idx.addField('body')
   equal(idx.documentStore.length, 0)
 
-  idx.add(doc)
+  idx.addDoc(doc)
   equal(idx.documentStore.length, 1)
 
-  idx.remove(doc2)
+  idx.removeDoc(doc2)
   equal(idx.documentStore.length, 1)
 
   ok(!callbackCalled)
 })
 
 test('updating a document', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'foo'}
 
-  idx.field('body')
-  idx.add(doc)
+  idx.addField('body')
+  idx.addDoc(doc)
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  ok(idx.index['body'].hasToken('foo'))
 
   doc.body = 'bar'
   idx.update(doc)
 
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('bar'))
+  ok(idx.index['body'].hasToken('bar'))
 })
 
 test('emitting update events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'foo'},
       addCallbackCalled = false,
       removeCallbackCalled = false,
       updateCallbackCalled = false,
       callbackArgs = []
 
-  idx.field('body')
-  idx.add(doc)
+  idx.addField('body')
+  idx.addDoc(doc)
   equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  ok(idx.index['body'].hasToken('foo'))
 
   idx.on('update', function (doc, index) {
     updateCallbackCalled = true
@@ -216,55 +209,51 @@ test('emitting update events', function () {
 })
 
 test('silencing update events', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       doc = {id: 1, body: 'foo'},
-      callbackCalled = false
+      callbackCalled = false;
 
-  idx.field('body')
-  idx.add(doc)
-  equal(idx.documentStore.length, 1)
-  ok(idx.tokenStore.has('foo'))
+  idx.addField('body');
+  idx.addDoc(doc);
+  equal(idx.documentStore.length, 1);
+  ok(idx.index['body'].hasToken('foo'));
 
   idx.on('update', function (doc, index) {
     callbackCalled = true
-  })
+  });
 
-  doc.body = 'bar'
-  idx.update(doc, false)
+  doc.body = 'bar';
+  idx.update(doc, false);
 
-  ok(!callbackCalled)
-})
+  ok(!callbackCalled);
+});
 
 test('serialising', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       mockDocumentStore = { toJSON: function () { return 'documentStore' }},
-      mockTokenStore = { toJSON: function () { return 'tokenStore' }},
-      mockCorpusTokens = { toJSON: function () { return 'corpusTokens' }},
-      mockPipeline = { toJSON: function () { return 'pipeline' }}
+      mockIndex = {title: { toJSON: function () { return 'index' }},
+                   body: { toJSON: function () { return 'index' }}},
+        
+      mockPipeline = { toJSON: function () { return 'pipeline' }};
 
-  idx.documentStore = mockDocumentStore
-  idx.tokenStore = mockTokenStore
-  idx.corpusTokens = mockCorpusTokens
-  idx.pipeline = mockPipeline
+  idx.setRef('id');
 
-  idx.ref('id')
+  idx.addField('title');
+  idx.addField('body');
 
-  idx.field('title', { boost: 10 })
-  idx.field('body')
+  idx.documentStore = mockDocumentStore;
+  idx.index = mockIndex;
+  idx.pipeline = mockPipeline;
 
   deepEqual(idx.toJSON(), {
     version: '@VERSION', // this is what the lunr version is set to before being built
-    fields: [
-      { name: 'title', boost: 10 },
-      { name: 'body', boost: 1 }
-    ],
+    fields: [ 'title', 'body' ],
     ref: 'id',
     documentStore: 'documentStore',
-    tokenStore: 'tokenStore',
-    corpusTokens: 'corpusTokens',
+    index: {title: 'index', body: 'index'},
     pipeline: 'pipeline'
-  })
-})
+  });
+});
 
 test('loading a serialised index', function () {
   var serialisedData = {
@@ -274,20 +263,21 @@ test('loading a serialised index', function () {
       { name: 'body', boost: 1 }
     ],
     ref: 'id',
-    documentStore: { store: {}, length: 0 },
-    tokenStore: { root: {}, length: 0 },
+    documentStore: { document_store: {}, length: 0 },
+    invertedIndex: { root: {}, length: 0 },
     corpusTokens: [],
     pipeline: ['stopWordFilter', 'stemmer']
   }
 
-  var idx = lunr.Index.load(serialisedData)
+  var idx = elasticlunr.Index.load(serialisedData)
 
   deepEqual(idx._fields, serialisedData.fields)
   equal(idx._ref, 'id')
 })
 
 test('idf cache with reserved words', function () {
-  var idx = new lunr.Index
+  var idx = new elasticlunr.Index;
+  idx.addField('body');
 
   var troublesomeTokens = [
     'constructor',
@@ -301,12 +291,12 @@ test('idf cache with reserved words', function () {
   ]
 
   troublesomeTokens.forEach(function (token) {
-    equal(typeof(idx.idf(token)), 'number', 'Using token: ' + token)
+    equal(typeof(idx.idf(token, 'body')), 'number', 'Using token: ' + token)
   })
 })
 
 test('using a plugin', function () {
-  var idx = new lunr.Index,
+  var idx = new elasticlunr.Index,
       ctx, args,
       plugin = function () {
         ctx = this

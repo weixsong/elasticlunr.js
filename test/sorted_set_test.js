@@ -1,7 +1,7 @@
-module('lunr.SortedSet')
+module('elasticlunr.SortedSet')
 
 test('adding an element that doesn\'t exist into the set', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
 
   equal(set.length, 0)
   set.add('foo')
@@ -9,7 +9,7 @@ test('adding an element that doesn\'t exist into the set', function () {
 })
 
 test('adding an element that does exist into the set', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
   set.add('foo')
   equal(set.length, 1)
 
@@ -18,7 +18,7 @@ test('adding an element that does exist into the set', function () {
 })
 
 test('sort is maintained when adding elements to the set', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
 
   set.add('b')
   set.add('d')
@@ -29,19 +29,19 @@ test('sort is maintained when adding elements to the set', function () {
 })
 
 test('adding more than one element to the set in one go', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
   set.add('foo', 'bar', 'baz', 'foo')
   equal(set.length, 3)
 })
 
 test('converting to an array', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
   set.add('foo', 'bar', 'baz')
   deepEqual(set.toArray(), ['bar', 'baz', 'foo'])
 })
 
 test('mapping the set', function () {
-  var set = new lunr.SortedSet, a = []
+  var set = new elasticlunr.SortedSet, a = []
 
   set.add('foo', 'bar')
 
@@ -51,7 +51,7 @@ test('mapping the set', function () {
 })
 
 test('getting the index of an item in the set', function () {
-  var set = new lunr.SortedSet
+  var set = new elasticlunr.SortedSet
 
   equal(set.indexOf('non member'), -1)
 
@@ -68,8 +68,8 @@ test('getting the index of an item in the set', function () {
 })
 
 test('intersecting this set with another set', function () {
-  var set1 = new lunr.SortedSet,
-      set2 = new lunr.SortedSet,
+  var set1 = new elasticlunr.SortedSet,
+      set2 = new elasticlunr.SortedSet,
       setIntersect
 
   set1.add('foo', 'bar')
@@ -83,8 +83,8 @@ test('intersecting this set with another set', function () {
 })
 
 test('unioning this set with another set', function () {
-  var set1 = new lunr.SortedSet,
-      set2 = new lunr.SortedSet,
+  var set1 = new elasticlunr.SortedSet,
+      set2 = new elasticlunr.SortedSet,
       setUnion
 
   set1.add('foo', 'bar')
@@ -100,8 +100,8 @@ test('unioning this set with another set', function () {
 })
 
 test('serialising', function () {
-  var emptySet = new lunr.SortedSet,
-      nonEmptySet = new lunr.SortedSet
+  var emptySet = new elasticlunr.SortedSet,
+      nonEmptySet = new elasticlunr.SortedSet
 
   nonEmptySet.add(1,2,3,4)
 
@@ -111,7 +111,7 @@ test('serialising', function () {
 
 test('loading serialised dump', function () {
   var serialisedData = [1,2,3,4],
-      set = lunr.SortedSet.load(serialisedData)
+      set = elasticlunr.SortedSet.load(serialisedData)
 
   equal(set.length, 4)
   deepEqual(set.elements, [1,2,3,4])

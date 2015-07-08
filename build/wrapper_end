@@ -16,7 +16,7 @@
       module.exports = factory()
     } else {
       // Browser globals (root is window)
-      root.lunr = factory()
+      root.elasticlunr = factory()
     }
   }(this, function () {
     /**
@@ -24,6 +24,6 @@
      * This example returns an object, but the module
      * can return a function as the exported value.
      */
-    return lunr
+    return elasticlunr
   }))
 })()

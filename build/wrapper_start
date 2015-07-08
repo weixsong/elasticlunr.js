@@ -1,6 +1,9 @@
 /**
- * lunr - http://lunrjs.com - A bit like Solr, but much smaller and not as bright - @VERSION
+ * elasticlunr - http://weixsong.github.io
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - @VERSION
+ *
  * Copyright (C) @YEAR Oliver Nightingale
+ * Copyright (C) @YEAR Wei Song
  * MIT Licensed
  * @license
  */

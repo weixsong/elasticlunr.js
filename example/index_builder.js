@@ -1,12 +1,12 @@
-var lunr = require('./../lunr.js'),
+var lunr = require('./../elasticlunr.js'),
     fs = require('fs')
 
 var idx = lunr(function () {
-  this.ref('id')
+  this.setRef('id')
 
-  this.field('title', { boost: 10 })
-  this.field('tags', { boost: 100 })
-  this.field('body')
+  this.addField('title', { boost: 10 })
+  this.addField('tags', { boost: 100 })
+  this.addField('body')
 })
 
 fs.readFile('./example/example_data.json', function (err, data) {
@@ -24,7 +24,7 @@ fs.readFile('./example/example_data.json', function (err, data) {
   })
 
   questions.forEach(function (question) {
-    idx.add(question)
+    idx.addDoc(question)
   })
 
   fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {

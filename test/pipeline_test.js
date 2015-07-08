@@ -1,19 +1,19 @@
-module('lunr.Pipeline', {
+module('elasticlunr.Pipeline', {
   setup: function () {
-    this.existingRegisteredFunctions = lunr.Pipeline.registeredFunctions
-    lunr.Pipeline.registeredFunctions = {}
+    this.existingRegisteredFunctions = elasticlunr.Pipeline.registeredFunctions
+    elasticlunr.Pipeline.registeredFunctions = {}
 
-    this.existingWarnIfFunctionNotRegistered = lunr.Pipeline.warnIfFunctionNotRegistered
-    lunr.Pipeline.warnIfFunctionNotRegistered = $.noop
+    this.existingWarnIfFunctionNotRegistered = elasticlunr.Pipeline.warnIfFunctionNotRegistered
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered = $.noop
   },
   teardown: function () {
-    lunr.Pipeline.registeredFunctions = this.existingRegisteredFunctions
-    lunr.Pipeline.warnIfFunctionNotRegistered = this.existingWarnIfFunctionNotRegistered
+    elasticlunr.Pipeline.registeredFunctions = this.existingRegisteredFunctions
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered = this.existingWarnIfFunctionNotRegistered
   }
 })
 
 test("adding a new item to the pipeline", function () {
-  var pipeline = new lunr.Pipeline
+  var pipeline = new elasticlunr.Pipeline
   equal(pipeline._stack.length, 0)
 
   pipeline.add($.noop)
@@ -21,14 +21,14 @@ test("adding a new item to the pipeline", function () {
 })
 
 test("adding multiple items to the pipeline in one go", function () {
-  var pipeline = new lunr.Pipeline
+  var pipeline = new elasticlunr.Pipeline
 
   pipeline.add($.noop, $.noop)
   equal(pipeline._stack.length, 2)
 })
 
 test("removing an item from the pipeline", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn = $.noop
 
   pipeline.add(fn)
@@ -38,8 +38,20 @@ test("removing an item from the pipeline", function () {
   equal(pipeline._stack.length, 0)
 })
 
+test("removing a nonexistent item from the pipeline", function () {
+  var pipeline = new elasticlunr.Pipeline,
+      fn1 = $.noop,
+      fn2 = function () {}
+
+  pipeline.add(fn1)
+  equal(pipeline._stack.length, 1)
+
+  pipeline.remove(fn2)
+  equal(pipeline._stack.length, 1)
+})
+
 test("adding an item to the pipeline before another item", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn1 = $.noop,
       fn2 = function () {}
 
@@ -49,8 +61,23 @@ test("adding an item to the pipeline before another item", function () {
   deepEqual(pipeline._stack, [fn2, fn1])
 })
 
+test("adding an item to the pipeline before nonexistent item", function () {
+  var pipeline = new elasticlunr.Pipeline,
+      fn1 = $.noop,
+      fn2 = function () {},
+      fn3 = function () {}
+
+  pipeline.add(fn1, fn2)
+
+  throws(function () {
+    pipeline.before(fn3, fn1)
+  })
+
+  deepEqual(pipeline._stack, [fn1, fn2])
+})
+
 test("adding an item to the pipeline after another item", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn1 = $.noop,
       fn2 = function () {},
       fn3 = function () {}
@@ -61,8 +88,23 @@ test("adding an item to the pipeline after another item", function () {
   deepEqual(pipeline._stack, [fn1, fn3, fn2])
 })
 
+test("adding an item to the pipeline after nonexistent item", function () {
+  var pipeline = new elasticlunr.Pipeline,
+      fn1 = $.noop,
+      fn2 = function () {},
+      fn3 = function () {}
+
+  pipeline.add(fn1, fn2)
+
+  throws(function () {
+    pipeline.after(fn3, fn1)
+  })
+
+  deepEqual(pipeline._stack, [fn1, fn2])
+})
+
 test("run calls each member of the pipeline for each input", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       count1 = 0, count2 = 0,
       fn1 = function (token) { count1++ ; return token },
       fn2 = function (token) { count2++ ; return token }
@@ -76,7 +118,7 @@ test("run calls each member of the pipeline for each input", function () {
 })
 
 test("run should pass three inputs to the pipeline fn", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       input, index, arr,
       fn1 = function () { input = arguments[0], index = arguments[1], arr = arguments[2] }
 
@@ -90,7 +132,7 @@ test("run should pass three inputs to the pipeline fn", function () {
 })
 
 test("run should pass the output of one into the input of the next", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       output,
       fn1 = function (t1) { return t1.toUpperCase() },
       fn2 = function (t2) { output = t2 }
@@ -104,14 +146,14 @@ test("run should pass the output of one into the input of the next", function ()
 })
 
 test("run should return the result of running the entire pipeline on each element", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn1 = function (t1) { return t1.toUpperCase() }
   pipeline.add(fn1)
   deepEqual(pipeline.run(['a']), ['A'])
 })
 
 test("run should filter out any undefined values at each stage in the pipeline", function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn2Count = 0,
       fn1 = function (t) { if (t < 5) return t },
       fn2 = function (t) { fn2Count++ ; return t }
@@ -124,12 +166,12 @@ test("run should filter out any undefined values at each stage in the pipeline",
 })
 
 test('toJSON', function () {
-  var pipeline = new lunr.Pipeline,
+  var pipeline = new elasticlunr.Pipeline,
       fn1 = function () {},
       fn2 = function () {}
 
-  lunr.Pipeline.registerFunction(fn1, 'fn1')
-  lunr.Pipeline.registerFunction(fn2, 'fn2')
+  elasticlunr.Pipeline.registerFunction(fn1, 'fn1')
+  elasticlunr.Pipeline.registerFunction(fn2, 'fn2')
 
   pipeline.add(fn1, fn2)
 
@@ -139,25 +181,25 @@ test('toJSON', function () {
 test('registering a pipeline function', function () {
   var fn1 = function () {}
 
-  equal(Object.keys(lunr.Pipeline.registeredFunctions).length, 0)
+  equal(Object.keys(elasticlunr.Pipeline.registeredFunctions).length, 0)
 
-  lunr.Pipeline.registerFunction(fn1, 'fn1')
+  elasticlunr.Pipeline.registerFunction(fn1, 'fn1')
 
   equal(fn1.label, 'fn1')
-  equal(Object.keys(lunr.Pipeline.registeredFunctions).length, 1)
-  deepEqual(lunr.Pipeline.registeredFunctions['fn1'], fn1)
+  equal(Object.keys(elasticlunr.Pipeline.registeredFunctions).length, 1)
+  deepEqual(elasticlunr.Pipeline.registeredFunctions['fn1'], fn1)
 })
 
 test('load', function () {
   var fn1 = function () {},
       fn2 = function () {}
 
-  lunr.Pipeline.registerFunction(fn1, 'fn1')
-  lunr.Pipeline.registerFunction(fn2, 'fn2')
+  elasticlunr.Pipeline.registerFunction(fn1, 'fn1')
+  elasticlunr.Pipeline.registerFunction(fn2, 'fn2')
 
   var serialised = ['fn1', 'fn2']
 
-  var pipeline = lunr.Pipeline.load(serialised)
+  var pipeline = elasticlunr.Pipeline.load(serialised)
 
   equal(pipeline._stack.length, 2)
   deepEqual(pipeline._stack[0], fn1)
@@ -168,14 +210,14 @@ test('loading an un-registered pipeline function', function () {
   var serialised = ['fn1']
 
   throws(function () {
-    lunr.Pipeline.load(serialised)
+    elasticlunr.Pipeline.load(serialised)
   })
 })
 
 test('resetting the pipeline', function () {
   var fn1 = function () {},
       fn2 = function () {},
-      pipeline = new lunr.Pipeline
+      pipeline = new elasticlunr.Pipeline
 
   pipeline.add(fn1, fn2)
   deepEqual(pipeline._stack, [fn1, fn2])
