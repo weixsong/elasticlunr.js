@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.1
+
+ * 1. Support field search, each field of document has a separted index.
+ * 2. Support query-time boosting, no need to do index-time boosting.
+ * 3. Change scoring mechanism as the same as Elasticsearch.
+ * 4. Support boolean model.
+ * 5. Combined Boolean Model, TF/IDF Model and the Vector Space Model, make the results ranking more reliable.
+ * 6. Removed CorpusToken and Vector.js, no need to computer query vector and document vector to compute score.
+ * 7. Store original JSON documents, not pipeline processed document.
+
 ## git clone --bare
 
 I want to add some other features to this lunr.js, and because if I forked the repo and then work on the forked repo, there will be some issues, so I'd to break the connection of my fork with original repo.
