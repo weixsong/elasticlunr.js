@@ -92,7 +92,7 @@
         </div>
         <div class="span9">
           <section id="Main"><h1>Elasticlunr.js</h1>
-<p><a href="https://travis-ci.org/weixsong/elasticlunr.js"><img src="https://travis-ci.org/weixsong/elasticlunr.js.svg?branch=master" alt="Build Status"></a></p><p>Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.<br />A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p><h1>Key Features Comparing with Lunr.js</h1>
+<p><a href="https://travis-ci.org/weixsong/elasticlunr.js"><img src="https://travis-ci.org/weixsong/elasticlunr.js.svg?branch=master" alt="Build Status"></a></p><p>Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search.<br />Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.<br />Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p><h1>Key Features Comparing with Lunr.js</h1>
 <ul>
 <li><ol>
 <li><strong>Query-Time boosting</strong>, you don&#39;t need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.</li>
@@ -233,7 +233,7 @@ index.update(doc);
 </code></pre>
 <h2>5. Query from Index</h2>
 <p>Elasticlunr.js provides flexible query configuration, supports query-time boosting and Boolean logic setting.<br />You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.<br />Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.</p><h3>5.1 Simple Query</h3>
-<p><strong>Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple would be easy to meet your requirement.</strong></p><pre><code class="lang-javascript">index.search(&quot;Oracle database profit&quot;);
+<p><strong>Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple search would be easy to meet your requirement.</strong></p><pre><code class="lang-javascript">index.search(&quot;Oracle database profit&quot;);
 </code></pre>
 <p>Output is a results array, each element of results array is an Object contain a <code>ref</code> field and a <code>score</code> field.<br /><code>ref</code> is the document reference.<br /><code>score</code> is the similarity measurement.</p><p>Results array is sorted descent by <code>score</code>.</p><h3>5.2 Configuration Query</h3>
 <h4>5.2.1 <strong>Query-Time Boosting</strong></h4>
