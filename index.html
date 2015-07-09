@@ -1,86 +1,78 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>Elasticlurn.js, lightweight full-text search engine in Javascript for browser search and offline search.</title>
-	<meta name="description" content="Elasticlurn.js, lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting." />
-	<meta name="keywords" content="elasticlunr, full-text search, information retrieval, offline search" />
-	<meta name="author" content="Wei Song" />
-	<meta name="google-site-verification" content="" />
 
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+<head>
+    <meta charset="utf-8">
+    <title>Elasticlurn.js, lightweight full-text search engine in Javascript for browser search and offline search.</title>
+    <meta name="description" content="Elasticlurn.js, lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting." />
+    <meta name="keywords" content="elasticlunr, full-text search, information retrieval, offline search" />
+    <meta name="author" content="Wei Song" />
+    <meta name="google-site-verification" content="" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/bootstrap/css/sticky-footer-navbar.css">
     <link rel="stylesheet" href="assets/bootstrap/css/font-awesome.css">
     <link rel="stylesheet" href="elasticlunr.min.css">
-	<link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
     <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-25695442-4']);
+        _gaq.push(['_trackPageview']);
 
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-25695442-4']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
     </script>
 </head>
+
 <body>
-  <div id="wrapper">
-	<main class="main" role="main" style="margin-top: 30px">
-	  <div class="container">
-        <div class="row">
-          <header>
-            <h1>Elasticlunr<span>.js</span></h1>
-            <h2>Lightweight full-text search engine in Javascript for browser search and offline search.</h2>
-          </header>
-        </div>
+    <div id="wrapper">
+        <main class="main" role="main" style="margin-top: 30px">
+            <div class="container">
+                <div class="row">
+                    <header>
+                        <h1>Elasticlunr<span>.js</span></h1>
+                        <h2>Lightweight full-text search engine in Javascript for browser search and offline search.</h2>
+                        <p style="margin-top: 30px">Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p>
+                        <div class="col-md-12" style="margin-top: 30px; padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
+                            <div class="col-md-4">
+                                <a class="btn btn-primary btn-lg btn-block" href="https://github.com/weixsong/elasticlunr.js" role="button"><i class="fa fa-file-code-o"></i> Get the source</a>
+                            </div>
+                            <div class="col-md-4">
+                                <a class="btn btn-primary btn-lg btn-block" href="./docs/index.html" role="button">View Documentation</a>
+                            </div>
+                            <div class="col-md-4">
+                                <a class="btn btn-primary btn-lg btn-block" href="./docs/index.html" role="button">Example</a>
+                            </div>
+                        </div>
+                    </header>
+                </div>
 
-		<div class="row">
-		  <div class="text-left">
-			<div class="service">
-			  <div class="desc" style="margin-top: 10px">
-				<p>Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p>
-			  </div>
-			</div>
-			<div class="col-md-12" style="margin-top: 30px; padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
-			  <div class="col-md-4">
-                <a class="btn btn-primary btn-lg btn-block" href="https://github.com/weixsong/elasticlunr.js" role="button"><i class="fa fa-file-code-o"></i> Get the source</a>
-			  </div>
-			  <div class="col-md-4">
-				<a class="btn btn-primary btn-lg btn-block" href="http://weixsong.github.io/assets/elasticlunr/docs/index.html" role="button">View Documentation</a>
-			  </div>
-			  <div class="col-md-4">
-				<a class="btn btn-primary btn-lg btn-block" href="http://weixsong.github.io/assets/elasticlunr/docs/index.html" role="button">Example</a>
-			  </div>
-			</div>
-		  </div>
-		</div>
-
-		<div class="row">
-  		  <div class="col-md-6">
-			<div class="box">
-  			  <div style="margin-top: 20px; overflow:hidden;">
-				<i class="fa fa-magic box-icon" style="font-size: 1.8em;"></i>
-				<h2 style="display:inline;">Getting Started</h2>
-				<p style="margin-top: 10px">Open your browser's <a id="developer-tools" target="_blank">developer tools</a> on this page to follow along or you could use Node.js to try in different way.</p>
-                <p>A very simple search index can be created using the following scripts:</p>
-		       </div>
-		      </div>
-
-              <pre>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-magic box-icon" style="font-size: 1.8em;"></i>
+                                <h2 style="display:inline;">Getting Started</h2>
+                                <p style="margin-top: 10px">Open your browser's <a id="developer-tools" target="_blank">developer tools</a> on this page to follow along or you could use Node.js to try in different way.</p>
+                                <p>A very simple search index can be created using the following scripts:</p>
+                            </div>
+                        </div>
+                        <pre>
 var index = elasticlunr(function () {
     this.addField('title');
     this.addField('body');
     this.setRef('id');
 });</pre>
-
-              <p>Adding documents to the index is as simple as:</p>
-              <pre>
+                        <p>Adding documents to the index is as simple as:</p>
+                        <pre>
 var doc1 = {
     "id": 1,
     "title": "Oracle released its latest database Oracle 12g",
@@ -96,65 +88,110 @@ var doc2 = {
 index.addDoc(doc1);
 index.addDoc(doc2);</pre>
 
-              <p>Then searching is as simple:</p>
-              <pre>
+                        <p>Then searching is as simple:</p>
+                        <pre>
 index.search("Oracle database");</pre>
 
-              <p>Also, you could do query-time boosting by passing in a configuration:</p>
-              <pre>
+                        <p>Also, you could do query-time boosting by passing in a configuration:</p>
+                        <pre>
 index.search("Oracle database profit", {
     fields: {
         title: {boost: 2},
         body: {boost: 1}
     }
 });</pre>
-			</div>
+                    </div>
 
-			<div class="col-md-6">
-			  <div class="box">
-				<div style="margin-top: 20px; overflow:hidden;">
-				  <i class="fa fa-code box-icon"  style="font-size: 2.0em;"></i>
-				  <h2 style="display:inline;">Features</h2>
-                  <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
+
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-code box-icon" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Features</h2>
+                                <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
+                            </div>
+                        </div>
+                        <ul style="padding-left: 20px;">
+                            <li>1. <strong>Query-Time boosting</strong>, you don't need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.</li>
+                            <li>2. <strong>More rational scoring mechanism</strong>, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.</li>
+                            <li>3. <strong>Field-search</strong>, you could choose which field to index and which field to search.</li>
+                            <li>4. <strong>Boolean Model</strong>, you could set which field to search and the boolean model for each query token, such as "OR", "AND".</li>
+                            <li>5. <strong>Combined Boolean Model, TF/IDF Model and the Vector Space Model</strong>, make the results ranking more reliable.</li>
+                            <li>6. <strong>Fast</strong>, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to compute the vector of a document to compute the score of a document, this improve the search speed significantly.</li>
+                            <li>7. <strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.</li>
+                        </ul>
+
+                        <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+                        <div class="box" style="clear: both; padding-top: 30px;">
+                            <div>
+                                <i class="fa fa-download" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Download</h2>
+                                <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
+                            </div>
+                        </div>
+
+                        <ul style="padding-left: 20px;">
+                            <li><a href="./elasticlunr.js" target="_blank">elasticlunr.js</a> - uncompressed</li>
+                            <li><a href="./elasticlunr.min.js" target="_blank">elasticlunr.min.js</a> - minified</li>
+                        </ul>
+
+                    </div>
+                    <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
                 </div>
-		      </div>
-              <ul style="padding-left: 20px;">
-                <li>1. <strong>Query-Time boosting</strong>, you don't need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.</li>
-                <li>2. <strong>More rational scoring mechanism</strong>, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.</li>
-                <li>3. <strong>Field-search</strong>, you could choose which field to index and which field to search.</li>
-                <li>4. <strong>Boolean Model</strong>, you could set which field to search and the boolean model for each query token, such as "OR", "AND".</li>
-                <li>5. <strong>Combined Boolean Model, TF/IDF Model and the Vector Space Model</strong>, make the results ranking more reliable.</li>
-                <li>6. <strong>Fast</strong>, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to  compute the vector of a document to compute the score of a document, this improve the search speed significantly.</li>
-                <li>7. <strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.</li>
-              </ul>
 
-              <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
-              <div class="box" style="clear: both; padding-top: 30px;">
-				<div>
-                  <i class="fa fa-download" style="font-size: 2.0em;"></i>
-				  <h2 style="display:inline;">Download</h2>
-                  <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
-                </div>
-		      </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-line-chart" style="font-size: 1.8em;"></i>
+                                <h2 style="display:inline;">Query-time Boosting</h2>
+                                <p>Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple search would be easy to meet your requirement.</p>
+<pre>index.search("Oracle database profit");</pre>
 
-              <ul style="padding-left: 20px;">
-                <li><a href="./elasticlunr.js" target="_blank">elasticlunr.js</a> - uncompressed</li>
-                <li><a href="./elasticlunr.min.js" target="_blank">elasticlunr.min.js</a> - minified</li>
-              </ul>
+                                <p>It's easy to setup which fields to search in by passing in a JSON configuration, and setup boosting for each search field. If you setup this configuration, then elasticlunr.js will only search the query string in the specified fields with boosting weight. If on fields is specified, elasticlunr.js will search all the fields that your configured when you created the index.</p>
 
-			</div>
-		  </div>
+                                <p><strong>The scoring mechanism used in elasticlunr.js is very complex</strong>, please goto <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/practical-scoring-function.html">details</a> for more information.</p>
+                                <pre>
+index.search("Oracle database", {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    }
+});
+</pre>
+                            </div>
+                        </div>
+                    </div>
 
-          <div class="row">
-            <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
-            <div class="col-md-12">
-              <div class="box" style="clear: both; padding-top: 30px;">
-				<div>
-                  <i class="fa fa-list-ol" style="font-size: 1.8em;"></i>
-				  <h2 style="display:inline;">Pipeline</h2>
-                  <p>Every document and search query that enters lunr is passed through a text <a href="./docs/pipeline.js.html">processing pipeline</a>.  The pipeline is simply a stack of functions that perform some processing on the text. Pipeline functions act on the text one token at a time, and what they return is passed to the next function in the pipeline.</p>
-                  <p>By default lunr adds a <a href="./docs/stop_word_filter.js.html">stop word filter</a> and <a href="./docs/stemmer.js.html">stemmer</a> to the pipeline. You can also add your own processors or remove the default ones depending on your requirements. The stemmer currently used is an English language stemmer, which could be replaced with a non-English language stemmer if required, or a <a href="http://en.wikipedia.org/wiki/Metaphone">Metaphoning</a> processor could be added.</p>
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-magic" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Boolean Model</h2>
+                                <p>Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic defaulty. By "OR" default logic, elasticlunr.js could reach a high Recall.</p>
 <pre>
+index.search("Oracle database profit", {
+    fields: {
+        title: {boost: 2},
+        body: {boost: 1}
+    },
+    boolean: "OR"
+});</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box" style="clear: both; padding-top: 30px;">
+                            <div>
+                                <i class="fa fa-list-ol" style="font-size: 1.8em;"></i>
+                                <h2 style="display:inline;">Pipeline</h2>
+                                <p>Every document and search query that enters lunr is passed through a text <a href="./docs/pipeline.js.html">processing pipeline</a>. The pipeline is simply a stack of functions that perform some processing on the text. Pipeline functions act on the text one token at a time, and what they return is passed to the next function in the pipeline.</p>
+                                <p>By default lunr adds a <a href="./docs/stop_word_filter.js.html">stop word filter</a> and <a href="./docs/stemmer.js.html">stemmer</a> to the pipeline. You can also add your own processors or remove the default ones depending on your requirements. The stemmer currently used is an English language stemmer, which could be replaced with a non-English language stemmer if required, or a <a href="http://en.wikipedia.org/wiki/Metaphone">Metaphoning</a> processor could be added.</p>
+                                <pre>
   var index = lunr(function () {
     this.pipeline.add(function (token, tokenIndex, tokens) {
       // text processing in here
@@ -164,208 +201,211 @@ index.search("Oracle database profit", {
       // text processing in here
     })
   })</pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-		      </div>
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
-            <div class="col-md-6">
-			  <div class="box">
-				<div style="margin-top: 20px; overflow:hidden;">
-				  <i class="fa fa-scissors" style="font-size: 1.8em;"></i>
-				  <h2 style="display:inline;">Tokenization</h2>
-                  <p>Tokenization is how lunr converts documents and searches into individual tokens, ready to be run through the text processing pipeline and entered or looked up in the index.</p>
+                <div class="row">
+                    <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-scissors" style="font-size: 1.8em;"></i>
+                                <h2 style="display:inline;">Tokenization</h2>
+                                <p>Tokenization is how lunr converts documents and searches into individual tokens, ready to be run through the text processing pipeline and entered or looked up in the index.</p>
 
-                  <p>The default tokenizer included with lunr is designed to handle general english text well, although application, or language specific tokenizers can be used instead.</p>
+                                <p>The default tokenizer included with lunr is designed to handle general english text well, although application, or language specific tokenizers can be used instead.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-binoculars" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Stemming</h2>
+                                <p>Stemming increases the recall of the search index by reducing related words down to their stem, so that non-exact search terms still match relevant documents. For example 'search', 'searching' and 'searched' all get reduced to the stem 'search'.</p>
+
+                                <p>lunr automatically includes a stemmer based on <a href="http://tartarus.org/martin/PorterStemmer/">Martin Porter's</a> algorithms.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-filter" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Stop words filtering</h2>
+                                <p>Stop words are words that are very common and are not useful in differentiating between documents. These are automatically removed by lunr. This helps to reduce the size of the index and improve search speed and accuracy.</p>
+
+                                <p>The default stop word filter contains a large list of very common words in English. For best results a corpus specific stop word filter can also be added to the pipeline. The search algorithm already penalises more common words, but preventing them from entering the index at all can be very beneficial for both space and speed performance.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
                 </div>
-		      </div>
-            </div>
-
-            <div class="col-md-6">
-			  <div class="box">
-				<div style="margin-top: 20px; overflow:hidden;">
-				  <i class="fa fa-binoculars"  style="font-size: 2.0em;"></i>
-				  <h2 style="display:inline;">Stemming</h2>
-                  <p>Stemming increases the recall of the search index by reducing related words down to their stem, so that non-exact search terms still match relevant documents. For example 'search', 'searching' and 'searched' all get reduced to the stem 'search'.</p>
-
-                  <p>lunr automatically includes a stemmer based on <a href="http://tartarus.org/martin/PorterStemmer/">Martin Porter's</a> algorithms.</p>
-                </div>
-		      </div>
-            </div>
-
-            <div class="col-md-6">
-			  <div class="box">
-				<div style="margin-top: 20px; overflow:hidden;">
-				  <i class="fa fa-filter"  style="font-size: 2.0em;"></i>
-				  <h2 style="display:inline;">Stop words filtering</h2>
-                  <p>Stop words are words that are very common and are not useful in differentiating between documents. These are automatically removed by lunr.  This helps to reduce the size of the index and improve search speed and accuracy.</p>
-
-                  <p>The default stop word filter contains a large list of very common words in English. For best results a corpus specific stop word filter can also be added to the pipeline. The search algorithm already penalises more common words, but preventing them from entering the index at all can be very beneficial for both space and speed performance.</p>
-                </div>
-		      </div>
-            </div>
-
-          <div class="container">
-          <div class="col-md-12" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+            </main>
         </div>
-      </main>
-	</div><!-- end of wrapper -->
-
-    
-    <!-- Begin footer -->
-  <footer class="footer vertical-center">
-    <div class="container">
-      <p class="pull-right text-muted"><a href="#">Back to top</a></p>
-      <p class="text-muted">Copyright &copy; Wei Song 2015.
-      <a href="https://github.com/weixsong">https://github.com/weixsong</a> watkinsong@163.com</p>
-    </div>
-  </footer>
+        <!-- end of wrapper -->
 
 
-  <script>
-    (function (ua) {
-      // some _really_ basic browser sniffing to choose the right dev tools link.
+        <!-- Begin footer -->
+        <footer class="footer vertical-center">
+            <div class="container">
+                <p class="pull-right text-muted"><a href="#">Back to top</a>
+                </p>
+                <p class="text-muted">Copyright &copy; Wei Song 2015.
+                    <a href="https://github.com/weixsong">https://github.com/weixsong</a> watkinsong@163.com</p>
+            </div>
+        </footer>
 
-      var consoleSrc,
-          CHROME    = /Chrome/,
-          CHROMIUM  = /Chromium/,
-          FIREFOX   = /Firefox/,
-          MSIE      = /MSIE/
-          OPERA     = /(OPR|Opera)/,
-          SAFARI    = /Safari/,
-          SEAMONKEY = /Seamonkey/
 
-      switch (true) {
-        case FIREFOX.test(ua) && !SEAMONKEY.test(ua):
-          // firefox
-          consoleSrc = "https://developer.mozilla.org/en-US/docs/Tools/Web_Console"
-          break
+        <script>
+            (function(ua) {
+                // some _really_ basic browser sniffing to choose the right dev tools link.
 
-        case CHROME.test(ua):
-          // chrome
-          consoleSrc = "https://developer.chrome.com/devtools"
-          break
+                var consoleSrc,
+                    CHROME = /Chrome/,
+                    CHROMIUM = /Chromium/,
+                    FIREFOX = /Firefox/,
+                    MSIE = /MSIE/
+                OPERA = /(OPR|Opera)/,
+                    SAFARI = /Safari/,
+                    SEAMONKEY = /Seamonkey/
 
-        case SAFARI.test(ua) && !CHROME.test(ua) && !CHROMIUM.test(ua):
-          // safari
-          consoleSrc = "https://developer.apple.com/library/safari/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW1"
-          break
+                switch (true) {
+                    case FIREFOX.test(ua) && !SEAMONKEY.test(ua):
+                        // firefox
+                        consoleSrc = "https://developer.mozilla.org/en-US/docs/Tools/Web_Console"
+                        break
 
-        case OPERA.test(ua):
-          // opera
-          consoleSrc = "http://www.opera.com/dragonfly/"
-          break
+                    case CHROME.test(ua):
+                        // chrome
+                        consoleSrc = "https://developer.chrome.com/devtools"
+                        break
 
-        case MSIE.test(ua):
-          // IE
-          consoleSrc = "http://msdn.microsoft.com/en-us/library/ie/hh673541(v=vs.85).aspx"
-          break
-      }
+                    case SAFARI.test(ua) && !CHROME.test(ua) && !CHROMIUM.test(ua):
+                        // safari
+                        consoleSrc = "https://developer.apple.com/library/safari/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW1"
+                        break
 
-      if (consoleSrc) document.getElementById('developer-tools').href = consoleSrc
-    })(navigator.userAgent)
-  </script>
+                    case OPERA.test(ua):
+                        // opera
+                        consoleSrc = "http://www.opera.com/dragonfly/"
+                        break
 
-  <script>
-    (function (hijs) {
-    //
-    // hijs - JavaScript Syntax Highlighter
-    //
-    // Copyright (c) 2010 Alexis Sellier
-    //
-
-    // All elements which match this will be syntax highlighted.
-    var selector = hijs || 'pre';
-
-    var keywords = ('var function if else for while break switch case do new null in with void '
-                   +'continue delete return this true false throw catch typeof with instanceof').split(' '),
-        special  = ('eval window document undefined NaN Infinity parseInt parseFloat '
-                   +'encodeURI decodeURI encodeURIComponent decodeURIComponent').split(' ');
-
-    // Syntax definition
-    // The key becomes the class name of the <span>
-    // around the matched block of code.
-    var syntax = [
-      ['comment', /(\/\*(?:[^*\n]|\*+[^\/*])*\*+\/)/g],
-      ['comment', /(\/\/[^\n]*)/g],
-      ['string' , /("(?:(?!")[^\\\n]|\\.)*"|'(?:(?!')[^\\\n]|\\.)*')/g],
-      ['regexp' , /(\/.+\/[mgi]*)(?!\s*\w)/g],
-      ['class'  , /\b([A-Z][a-zA-Z]+)\b/g],
-      ['number' , /\b([0-9]+(?:\.[0-9]+)?)\b/g],
-      ['keyword', new(RegExp)('\\b(' + keywords.join('|') + ')\\b', 'g')],
-      ['special', new(RegExp)('\\b(' + special.join('|') + ')\\b', 'g')]
-    ];
-    var nodes, table = {};
-
-    if (/^[a-z]+$/.test(selector)) {
-        nodes = document.getElementsByTagName(selector);
-    } else if (/^\.[\w-]+$/.test(selector)) {
-        nodes = document.getElementsByClassName(selector.slice(1));
-    } else if (document.querySelectorAll) {
-        nodes = document.querySelectorAll(selector);
-    } else {
-        nodes = [];
-    }
-
-    for (var i = 0, children; i < nodes.length; i++) {
-        children = nodes[i].childNodes;
-
-        for (var j = 0, str; j < children.length; j++) {
-            code = children[j];
-
-            if (code.length >= 0) { // It's a text node
-                // Don't highlight command-line snippets
-                if (! /^\$/.test(code.nodeValue.trim())) {
-                    syntax.forEach(function (s) {
-                        var k = s[0], v = s[1];
-                        code.nodeValue = code.nodeValue.replace(v, function (_, m) {
-                            return '\u00ab' + encode(k) + '\u00b7'
-                                            + encode(m) +
-                                   '\u00b7' + encode(k) + '\u00bb';
-                        });
-                    });
+                    case MSIE.test(ua):
+                        // IE
+                        consoleSrc = "http://msdn.microsoft.com/en-us/library/ie/hh673541(v=vs.85).aspx"
+                        break
                 }
-            }
-        }
-    }
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].innerHTML =
-            nodes[i].innerHTML.replace(/\u00ab(.+?)\u00b7(.+?)\u00b7\1\u00bb/g, function (_, name, value) {
-                value = value.replace(/\u00ab[^\u00b7]+\u00b7/g, '').replace(/\u00b7[^\u00bb]+\u00bb/g, '');
-                return '<span class="' + decode(name) + '">' + escape(decode(value)) + '</span>';
-        });
-    }
 
-    function escape(str) {
-        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
+                if (consoleSrc) document.getElementById('developer-tools').href = consoleSrc
+            })(navigator.userAgent)
+        </script>
 
-    // Encode ASCII characters to, and from Braille
-    function encode (str, encoded) {
-        table[encoded = str.split('').map(function (s) {
-            if (s.charCodeAt(0) > 127) { return s }
-            return String.fromCharCode(s.charCodeAt(0) + 0x2800);
-        }).join('')] = str;
-        return encoded;
-    }
-    function decode (str) {
-        if (str in table) {
-            return table[str];
-        } else {
-            return str.trim().split('').map(function (s) {
-                if (s.charCodeAt(0) - 0x2800 > 127) { return s }
-                return String.fromCharCode(s.charCodeAt(0) - 0x2800);
-            }).join('');
-        }
-    }
+        <script>
+            (function(hijs) {
+                //
+                // hijs - JavaScript Syntax Highlighter
+                //
+                // Copyright (c) 2010 Alexis Sellier
+                //
 
-    })(window.hijs);
-  </script>
+                // All elements which match this will be syntax highlighted.
+                var selector = hijs || 'pre';
 
-<script src="assets/bootstrap/js/jquery-1.11.3.min.js"></script>
-<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+                var keywords = ('var function if else for while break switch case do new null in with void ' + 'continue delete return this true false throw catch typeof with instanceof').split(' '),
+                    special = ('eval window document undefined NaN Infinity parseInt parseFloat ' + 'encodeURI decodeURI encodeURIComponent decodeURIComponent').split(' ');
+
+                // Syntax definition
+                // The key becomes the class name of the <span>
+                // around the matched block of code.
+                var syntax = [
+                    ['comment', /(\/\*(?:[^*\n]|\*+[^\/*])*\*+\/)/g],
+                    ['comment', /(\/\/[^\n]*)/g],
+                    ['string', /("(?:(?!")[^\\\n]|\\.)*"|'(?:(?!')[^\\\n]|\\.)*')/g],
+                    ['regexp', /(\/.+\/[mgi]*)(?!\s*\w)/g],
+                    ['class', /\b([A-Z][a-zA-Z]+)\b/g],
+                    ['number', /\b([0-9]+(?:\.[0-9]+)?)\b/g],
+                    ['keyword', new(RegExp)('\\b(' + keywords.join('|') + ')\\b', 'g')],
+                    ['special', new(RegExp)('\\b(' + special.join('|') + ')\\b', 'g')]
+                ];
+                var nodes, table = {};
+
+                if (/^[a-z]+$/.test(selector)) {
+                    nodes = document.getElementsByTagName(selector);
+                } else if (/^\.[\w-]+$/.test(selector)) {
+                    nodes = document.getElementsByClassName(selector.slice(1));
+                } else if (document.querySelectorAll) {
+                    nodes = document.querySelectorAll(selector);
+                } else {
+                    nodes = [];
+                }
+
+                for (var i = 0, children; i < nodes.length; i++) {
+                    children = nodes[i].childNodes;
+
+                    for (var j = 0, str; j < children.length; j++) {
+                        code = children[j];
+
+                        if (code.length >= 0) { // It's a text node
+                            // Don't highlight command-line snippets
+                            if (!/^\$/.test(code.nodeValue.trim())) {
+                                syntax.forEach(function(s) {
+                                    var k = s[0],
+                                        v = s[1];
+                                    code.nodeValue = code.nodeValue.replace(v, function(_, m) {
+                                        return '\u00ab' + encode(k) + '\u00b7' + encode(m) +
+                                            '\u00b7' + encode(k) + '\u00bb';
+                                    });
+                                });
+                            }
+                        }
+                    }
+                }
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].innerHTML =
+                        nodes[i].innerHTML.replace(/\u00ab(.+?)\u00b7(.+?)\u00b7\1\u00bb/g, function(_, name, value) {
+                            value = value.replace(/\u00ab[^\u00b7]+\u00b7/g, '').replace(/\u00b7[^\u00bb]+\u00bb/g, '');
+                            return '<span class="' + decode(name) + '">' + escape(decode(value)) + '</span>';
+                        });
+                }
+
+                function escape(str) {
+                    return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                }
+
+                // Encode ASCII characters to, and from Braille
+                function encode(str, encoded) {
+                    table[encoded = str.split('').map(function(s) {
+                        if (s.charCodeAt(0) > 127) {
+                            return s
+                        }
+                        return String.fromCharCode(s.charCodeAt(0) + 0x2800);
+                    }).join('')] = str;
+                    return encoded;
+                }
+
+                function decode(str) {
+                    if (str in table) {
+                        return table[str];
+                    } else {
+                        return str.trim().split('').map(function(s) {
+                            if (s.charCodeAt(0) - 0x2800 > 127) {
+                                return s
+                            }
+                            return String.fromCharCode(s.charCodeAt(0) - 0x2800);
+                        }).join('');
+                    }
+                }
+
+            })(window.hijs);
+        </script>
+
+        <script src="assets/bootstrap/js/jquery-1.11.3.min.js"></script>
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
-</html>
 
+</html>
