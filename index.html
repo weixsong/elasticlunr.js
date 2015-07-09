@@ -11,87 +11,302 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/bootstrap/css/style.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/sticky-footer-navbar.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/font-awesome.css">
+    <link rel="stylesheet" href="elasticlunr.min.css">
+	<link rel="stylesheet" href="styles.css">
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25695442-4']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
 </head>
 <body>
+  <div id="wrapper">
+	<main class="main" role="main" style="margin-top: 30px">
+	  <div class="container">
+        <div class="row">
+          <header>
+            <h1>Elasticlunr<span>.js</span></h1>
+            <h2>Lightweight full-text search engine in Javascript for browser search and offline search.</h2>
+          </header>
+        </div>
 
-	<div id="wrapper">
-		<main class="main" role="main">
-			<div class="container">
-				<div class="row mbxl">
-				<div class="text-center">
-					<div class="service">
-						<div class="desc">
-							<p>Kore is an easy to use web application framework for writing scalable web APIs in C.<br />Its main goals are security, scalability and allowing rapid development and deployment of such APIs.</p><p>Because of this Kore is an ideal candidate for building robust, scalable and secure web things.</p>
-						</div>
-					</div>
-					<div class="col-md-10 col-md-offset-1" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
-						<div class="col-md-4 col-md-offset-2">
-							<a class="btn btn-lg btn-padded btn-kore btn-block mbs" href="/downloads" role="button">Get the source</a>
-						</div>
-						<div class="col-md-4">
-							<a class="btn btn-lg btn-padded btn-kore btn-block" href="/doc/#features" role="button">View features</a>
-						</div>
-					</div>
-				</div>
-				</div>
+		<div class="row">
+		  <div class="text-left">
+			<div class="service">
+			  <div class="desc" style="margin-top: 10px">
+				<p>Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p>
+			  </div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px; padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
+			  <div class="col-md-4">
+                <a class="btn btn-primary btn-lg btn-block" href="https://github.com/weixsong/elasticlunr.js" role="button"><i class="fa fa-file-code-o"></i> Get the source</a>
+			  </div>
+			  <div class="col-md-4">
+				<a class="btn btn-primary btn-lg btn-block" href="http://weixsong.github.io/assets/elasticlunr/docs/index.html" role="button">View Documentation</a>
+			  </div>
+			  <div class="col-md-4">
+				<a class="btn btn-primary btn-lg btn-block" href="http://weixsong.github.io/assets/elasticlunr/docs/index.html" role="button">Example</a>
+			  </div>
+			</div>
+		  </div>
+		</div>
 
-				<div class="row">
-					<div class="col-md-6">
-						<div class="box">
-							<div class="desc">
-							<i class="fa fa-magic box-icon"></i>
-							<h2>Getting started</h2>
-								<p>Kore makes it easy to get started without having to fiddle with build frameworks such as make. Using the builtin commands you can create, compile and run Kore applications. However if you prefer building Makefiles and linking the libraries together yourself, go for it.</p>
-		        			</div>
-		        		</div>
-						<pre>$ kore create myapp
-$ cd myapp
-$ kore run
-compiling myapp.c
-myapp built succesfully!
-[parent]: running on https://127.0.0.1:8888
-[parent]: kore is starting up
-[wrk 0]: worker 0 started (cpu#0)
-</pre>
-					</div>
-					<div class="col-md-6">
-						<div class="box">
-							<div class="desc">
-							<i class="fa fa-code box-icon"></i>
-							<h2>Hello world</h2>
-								<p>Kore exposes an easy to use API to build your applications. Below is an example of how simple it is to get going with writing web applications in C. The code will respond to all requests with an "Hello world" response.</p>
-		        			</div>
-		        		</div>
-						<pre class="c">
+
+		<div class="row">
+  		  <div class="col-md-6">
+			<div class="box">
+  			  <div style="margin-top: 20px; overflow:hidden;">
+				<i class="fa fa-magic box-icon" style="font-size: 1.8em;"></i>
+				<h2 style="display:inline;">Getting Started</h2>
+				<p style="margin-top: 10px">Open your browser's <a id="developer-tools" target="_blank">developer tools</a> on this page to follow along or you could use Node.js to try in different way.</p>
+                <p>A very simple search index can be created using the following scripts:</p>
+		       </div>
+		      </div>
+
+              <pre>
+var index = elasticlunr(function () {
+    this.addField('title');
+    this.addField('body');
+    this.setRef('id');
+});</pre>
+
+              <p>Adding documents to the index is as simple as:</p>
+              <pre>
+var doc1 = {
+    "id": 1,
+    "title": "Oracle released its latest database Oracle 12g",
+    "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
+}
+
+var doc2 = {
+    "id": 2,
+    "title": "Oracle released its profit report of 2015",
+    "body": "As expected, Oracle released its profit report of 2015, during the good sales of database and hardware, Oracle's profit of 2015 reached 12.5 Billion."
+}
+
+index.addDoc(doc1);
+index.addDoc(doc2);</pre>
+
+              <p>Then searching is as simple:</p>
+              <pre>
+index.search("Oracle database");</pre>
+
+              <p>Also, you could do query-time boosting by passing in a configuration:</p>
+              <pre>
 index.search("Oracle database profit", {
     fields: {
         title: {boost: 2},
         body: {boost: 1}
     }
-});</code></pre>
-					</div>
-				</div>
-				<div class="row text-center">
-					<div class="col-md-6 col-md-offset-3">
-						<a href="/doc/" class="btn btn-lg btn-padded btn-kore">View documentation</a>
-					</div>
-				</div>
+});</pre>
+
 			</div>
- 
-        <div class="col-md-10 col-md-offset-1" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+
+
+			<div class="col-md-6">
+			  <div class="box">
+				<div style="margin-top: 20px; overflow:hidden;">
+				  <i class="fa fa-code box-icon"  style="font-size: 2.0em;"></i>
+				  <h2 style="display:inline;">Features</h2>
+                  <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
+                </div>
+		      </div>
+              <ul style="padding-left: 20px;">
+                <li>1. <strong>Query-Time boosting</strong>, you don't need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.</li>
+                <li>2. <strong>More rational scoring mechanism</strong>, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.</li>
+                <li>3. <strong>Field-search</strong>, you could choose which field to index and which field to search.</li>
+                <li>4. <strong>Boolean Model</strong>, you could set which field to search and the boolean model for each query token, such as "OR", "AND".</li>
+                <li>5. <strong>Combined Boolean Model, TF/IDF Model and the Vector Space Model</strong>, make the results ranking more reliable.</li>
+                <li>6. <strong>Fast</strong>, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to  compute the vector of a document to compute the score of a document, this improve the search speed significantly.</li>
+                <li>7. <strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.</li>
+              </ul>
+
+              <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+              <div class="box" style="clear: both; padding-top: 30px;">
+				<div>
+                  <i class="fa fa-download" style="font-size: 2.0em;"></i>
+				  <h2 style="display:inline;">Download</h2>
+                  <p style="margin-top: 10px">Elasticlunr.js is developed based on lunr.js, but more flexible than lunr.js. The main featues are as followings:</p>
+                </div>
+		      </div>
+
+              <ul style="padding-left: 20px;">
+                <li><a href="./elasticlunr.js" target="_blank">elasticlunr.js</a> - uncompressed</li>
+                <li><a href="./elasticlunr.min.js" target="_blank">elasticlunr.min.js</a> - minified</li>
+              </ul>
+
+			</div>
+
+
+
+
+		  </div>
+            <div class="container">
+            <div class="col-md-12" style="padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
+            </div>
 		</main>
-  <footer>
-	<div class="container">
-	  <div class="row text-center">
-		<div class="col-lg-12 text-center">
-		  <p>Copyright &copy; 2015 Wei Song</p>
-		</div>
-	  </div>
-	</div>
- </footer>
 	</div><!-- end of wrapper -->
 
+    
+    <!-- Begin footer -->
+  <footer class="footer vertical-center">
+    <div class="container">
+      <p class="pull-right text-muted"><a href="#">Back to top</a></p>
+      <p class="text-muted">Copyright &copy; Wei Song 2015.
+      <a href="https://github.com/weixsong">https://github.com/weixsong</a> watkinsong@163.com</p>
+    </div>
+  </footer>
+
+
+  <script>
+    (function (ua) {
+      // some _really_ basic browser sniffing to choose the right dev tools link.
+
+      var consoleSrc,
+          CHROME    = /Chrome/,
+          CHROMIUM  = /Chromium/,
+          FIREFOX   = /Firefox/,
+          MSIE      = /MSIE/
+          OPERA     = /(OPR|Opera)/,
+          SAFARI    = /Safari/,
+          SEAMONKEY = /Seamonkey/
+
+      switch (true) {
+        case FIREFOX.test(ua) && !SEAMONKEY.test(ua):
+          // firefox
+          consoleSrc = "https://developer.mozilla.org/en-US/docs/Tools/Web_Console"
+          break
+
+        case CHROME.test(ua):
+          // chrome
+          consoleSrc = "https://developer.chrome.com/devtools"
+          break
+
+        case SAFARI.test(ua) && !CHROME.test(ua) && !CHROMIUM.test(ua):
+          // safari
+          consoleSrc = "https://developer.apple.com/library/safari/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW1"
+          break
+
+        case OPERA.test(ua):
+          // opera
+          consoleSrc = "http://www.opera.com/dragonfly/"
+          break
+
+        case MSIE.test(ua):
+          // IE
+          consoleSrc = "http://msdn.microsoft.com/en-us/library/ie/hh673541(v=vs.85).aspx"
+          break
+      }
+
+      if (consoleSrc) document.getElementById('developer-tools').href = consoleSrc
+    })(navigator.userAgent)
+  </script>
+
+  <script>
+    (function (hijs) {
+    //
+    // hijs - JavaScript Syntax Highlighter
+    //
+    // Copyright (c) 2010 Alexis Sellier
+    //
+
+    // All elements which match this will be syntax highlighted.
+    var selector = hijs || 'pre';
+
+    var keywords = ('var function if else for while break switch case do new null in with void '
+                   +'continue delete return this true false throw catch typeof with instanceof').split(' '),
+        special  = ('eval window document undefined NaN Infinity parseInt parseFloat '
+                   +'encodeURI decodeURI encodeURIComponent decodeURIComponent').split(' ');
+
+    // Syntax definition
+    // The key becomes the class name of the <span>
+    // around the matched block of code.
+    var syntax = [
+      ['comment', /(\/\*(?:[^*\n]|\*+[^\/*])*\*+\/)/g],
+      ['comment', /(\/\/[^\n]*)/g],
+      ['string' , /("(?:(?!")[^\\\n]|\\.)*"|'(?:(?!')[^\\\n]|\\.)*')/g],
+      ['regexp' , /(\/.+\/[mgi]*)(?!\s*\w)/g],
+      ['class'  , /\b([A-Z][a-zA-Z]+)\b/g],
+      ['number' , /\b([0-9]+(?:\.[0-9]+)?)\b/g],
+      ['keyword', new(RegExp)('\\b(' + keywords.join('|') + ')\\b', 'g')],
+      ['special', new(RegExp)('\\b(' + special.join('|') + ')\\b', 'g')]
+    ];
+    var nodes, table = {};
+
+    if (/^[a-z]+$/.test(selector)) {
+        nodes = document.getElementsByTagName(selector);
+    } else if (/^\.[\w-]+$/.test(selector)) {
+        nodes = document.getElementsByClassName(selector.slice(1));
+    } else if (document.querySelectorAll) {
+        nodes = document.querySelectorAll(selector);
+    } else {
+        nodes = [];
+    }
+
+    for (var i = 0, children; i < nodes.length; i++) {
+        children = nodes[i].childNodes;
+
+        for (var j = 0, str; j < children.length; j++) {
+            code = children[j];
+
+            if (code.length >= 0) { // It's a text node
+                // Don't highlight command-line snippets
+                if (! /^\$/.test(code.nodeValue.trim())) {
+                    syntax.forEach(function (s) {
+                        var k = s[0], v = s[1];
+                        code.nodeValue = code.nodeValue.replace(v, function (_, m) {
+                            return '\u00ab' + encode(k) + '\u00b7'
+                                            + encode(m) +
+                                   '\u00b7' + encode(k) + '\u00bb';
+                        });
+                    });
+                }
+            }
+        }
+    }
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].innerHTML =
+            nodes[i].innerHTML.replace(/\u00ab(.+?)\u00b7(.+?)\u00b7\1\u00bb/g, function (_, name, value) {
+                value = value.replace(/\u00ab[^\u00b7]+\u00b7/g, '').replace(/\u00b7[^\u00bb]+\u00bb/g, '');
+                return '<span class="' + decode(name) + '">' + escape(decode(value)) + '</span>';
+        });
+    }
+
+    function escape(str) {
+        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Encode ASCII characters to, and from Braille
+    function encode (str, encoded) {
+        table[encoded = str.split('').map(function (s) {
+            if (s.charCodeAt(0) > 127) { return s }
+            return String.fromCharCode(s.charCodeAt(0) + 0x2800);
+        }).join('')] = str;
+        return encoded;
+    }
+    function decode (str) {
+        if (str in table) {
+            return table[str];
+        } else {
+            return str.trim().split('').map(function (s) {
+                if (s.charCodeAt(0) - 0x2800 > 127) { return s }
+                return String.fromCharCode(s.charCodeAt(0) - 0x2800);
+            }).join('');
+        }
+    }
+
+    })(window.hijs);
+  </script>
 
 <script src="assets/bootstrap/js/jquery-1.11.3.min.js"></script>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
