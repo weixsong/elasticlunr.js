@@ -203,7 +203,7 @@ Or you could just use it by simply provide a query string, this will aslo works 
 
 ### 5.1 Simple Query
 
-**Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple would be easy to meet your requirement.**
+**Because elasticlunr.js has a very perfect scoring mechanism, so for most of your requirement, simple search would be easy to meet your requirement.**
 
 ```javascript
 index.search("Oracle database profit");
