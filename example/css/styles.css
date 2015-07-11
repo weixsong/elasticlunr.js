@@ -12,8 +12,9 @@ body {
 
 h1 {
   margin: 0;
+  margin-left: 15px;
   padding: 0;
-  font-size: 4em;
+  font-size: 3em;
 }
 
 a {
@@ -27,11 +28,18 @@ a:hover {
 
 h2 {
   font-weight: normal;
-  font-size: 2.2em;
+  margin-left: 15px;
+  font-size: 1.2em;
+}
+
+h2 {
+  font-weight: normal;
+  margin-left: 15px;
+  font-size: 1.2em;
 }
 
 h3 {
-  font-size: 2.6em;
+  font-size: 1.0em;
   margin: 0;
 }
 
@@ -59,6 +67,7 @@ nav li {
 
 .container ul li {
   padding-bottom: 10px;
+  margin-left: 0px; 
 }
 
 footer ul {
