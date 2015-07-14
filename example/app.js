@@ -69,10 +69,24 @@ require([
 
   $('input').bind('keyup', debounce(function () {
     if ($(this).val() < 2) return
+    var config = $('#configuration').val();
+    config.trim();
+    var json_config = null;
+    if (config != '') {
+        json_config = JSON.parse(config);
+    }
+
     var query = $(this).val()
-    var results = idx.search(query).map(function (result) {
-      return questions.filter(function (q) { return q.id === parseInt(result.ref, 10) })[0]
-    })
+    var results = null;
+    if (json_config == null) {
+        results = idx.search(query).map(function (result) {
+            return questions.filter(function (q) { return q.id === parseInt(result.ref, 10) })[0]
+        })
+    } else {
+        results = idx.search(query, json_config).map(function (result) {
+            return questions.filter(function (q) { return q.id === parseInt(result.ref, 10) })[0]
+        })
+    }
 
     renderQuestionList(results)
   }))
