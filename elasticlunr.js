@@ -11,7 +11,7 @@
 (function(){
 
 /**
- * Convenience function for instantiating a new elasticLunr index and configuring it
+ * Convenience function for instantiating a new elasticlunr index and configuring it
  * with the default pipeline functions and the passed config function.
  *
  * When using this convenience function a new index will be created with the
@@ -24,7 +24,7 @@
  *
  * Example:
  *
- *     var idx = elasticLunr(function () {
+ *     var idx = elasticlunr(function () {
  *       this.addField('id')
  *       this.addField('title')
  *       this.addField('body')
@@ -78,12 +78,13 @@ elasticlunr.version = "0.6.1";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
- * A namespace containing utils for the rest of the lunr library
+ * A namespace containing utils for the rest of the elasticlunr library
  */
-elasticlunr.utils = {}
+elasticlunr.utils = {};
 
 /**
  * Print a warning message to the console.
@@ -94,10 +95,10 @@ elasticlunr.utils = {}
 elasticlunr.utils.warn = (function (global) {
   return function (message) {
     if (global.console && console.warn) {
-      console.warn(message)
+      console.warn(message);
     }
-  }
-})(this)
+  };
+})(this);
 
 /*!
  * elasticlunr.EventEmitter
@@ -184,35 +185,36 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
 /*!
  * elasticlunr.tokenizer
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
- * A function for splitting a string into tokens ready to be inserted into
- * the search index.
+ * A function for splitting a string into tokens.
+ * Currently English is support as default.
  *
  * @module
- * @param {String} obj The string to convert into tokens
+ * @param {String} str The string that you want to tokenize.
  * @return {Array}
  */
 elasticlunr.tokenizer = function (obj) {
-  if (!arguments.length || obj == null || obj == undefined) return []
-  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase() })
+  if (!arguments.length || obj == null || obj == undefined) return [];
+  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase(); });
 
-  return obj.toString().trim().toLowerCase().split(/[\s\-]+/)
-}
+  return obj.toString().trim().toLowerCase().split(/[\s\-]+/);
+};
 
 /*!
  * elasticlunr.Pipeline
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
- * elasticlunr.Pipelines maintain an ordered list of functions to be applied to all
- * tokens in documents entering the search index and queries being ran against
- * the index.
+ * elasticlunr.Pipelines maintain an ordered list of functions to be applied to 
+ * both documents tokens and query tokens.
  *
- * An instance of elasticlunr.Index created with the lunr shortcut will contain a
- * pipeline with a stop word filter and an English language stemmer. Extra
+ * An instance of elasticlunr.Index created with the elasticlunr shortcut will contain a
+ * pipeline with a stop word filter, an English language stemmer and a trimmer. Extra
  * functions can be added before or after either of these functions or these
  * default functions can be removed.
  *
@@ -236,10 +238,10 @@ elasticlunr.tokenizer = function (obj) {
  * @constructor
  */
 elasticlunr.Pipeline = function () {
-  this._stack = []
-}
+  this._queue = [];
+};
 
-elasticlunr.Pipeline.registeredFunctions = {}
+elasticlunr.Pipeline.registeredFunctions = {};
 
 /**
  * Register a function with the pipeline.
@@ -256,12 +258,12 @@ elasticlunr.Pipeline.registeredFunctions = {}
  */
 elasticlunr.Pipeline.registerFunction = function (fn, label) {
   if (label in this.registeredFunctions) {
-    elasticlunr.utils.warn('Overwriting existing registered function: ' + label)
+    elasticlunr.utils.warn('Overwriting existing registered function: ' + label);
   }
 
-  fn.label = label
-  elasticlunr.Pipeline.registeredFunctions[fn.label] = fn
-}
+  fn.label = label;
+  elasticlunr.Pipeline.registeredFunctions[label] = fn;
+};
 
 /**
  * Warns if the function is not registered as a Pipeline function.
@@ -271,12 +273,12 @@ elasticlunr.Pipeline.registerFunction = function (fn, label) {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.warnIfFunctionNotRegistered = function (fn) {
-  var isRegistered = fn.label && (fn.label in this.registeredFunctions)
+  var isRegistered = fn.label && (fn.label in this.registeredFunctions);
 
   if (!isRegistered) {
-    elasticlunr.utils.warn('Function is not registered with pipeline. This may cause problems when serialising the index.\n', fn)
+    elasticlunr.utils.warn('Function is not registered with pipeline. This may cause problems when serialising the index.\n', fn);
   }
-}
+};
 
 /**
  * Loads a previously serialised pipeline.
@@ -290,20 +292,20 @@ elasticlunr.Pipeline.warnIfFunctionNotRegistered = function (fn) {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.load = function (serialised) {
-  var pipeline = new elasticlunr.Pipeline
+  var pipeline = new elasticlunr.Pipeline;
 
   serialised.forEach(function (fnName) {
-    var fn = elasticlunr.Pipeline.registeredFunctions[fnName]
+    var fn = elasticlunr.Pipeline.registeredFunctions[fnName];
 
     if (fn) {
-      pipeline.add(fn)
+      pipeline.add(fn);
     } else {
-      throw new Error('Cannot load un-registered function: ' + fnName)
+      throw new Error('Cannot load un-registered function: ' + fnName);
     }
-  })
+  });
 
-  return pipeline
-}
+  return pipeline;
+};
 
 /**
  * Adds new functions to the end of the pipeline.
@@ -314,56 +316,58 @@ elasticlunr.Pipeline.load = function (serialised) {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.add = function () {
-  var fns = Array.prototype.slice.call(arguments)
+  var fns = Array.prototype.slice.call(arguments);
 
   fns.forEach(function (fn) {
-    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
-    this._stack.push(fn)
-  }, this)
-}
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn);
+    this._queue.push(fn);
+  }, this);
+};
 
 /**
  * Adds a single function after a function that already exists in the
  * pipeline.
  *
  * Logs a warning if the function has not been registered.
+ * If existingFn is not found, throw an Exception.
  *
  * @param {Function} existingFn A function that already exists in the pipeline.
  * @param {Function} newFn The new function to add to the pipeline.
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.after = function (existingFn, newFn) {
-  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
-  var pos = this._stack.indexOf(existingFn)
+  var pos = this._queue.indexOf(existingFn);
   if (pos == -1) {
-    throw new Error('Cannot find existingFn')
+    throw new Error('Cannot find existingFn');
   }
 
-  pos = pos + 1
-  this._stack.splice(pos, 0, newFn)
-}
+  pos = pos + 1;
+  this._queue.splice(pos, 0, newFn);
+};
 
 /**
  * Adds a single function before a function that already exists in the
  * pipeline.
  *
  * Logs a warning if the function has not been registered.
+ * If existingFn is not found, throw an Exception.
  *
  * @param {Function} existingFn A function that already exists in the pipeline.
  * @param {Function} newFn The new function to add to the pipeline.
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
-  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
-  var pos = this._stack.indexOf(existingFn)
+  var pos = this._queue.indexOf(existingFn);
   if (pos == -1) {
-    throw new Error('Cannot find existingFn')
+    throw new Error('Cannot find existingFn');
   }
 
-  this._stack.splice(pos, 0, newFn)
-}
+  this._queue.splice(pos, 0, newFn);
+};
 
 /**
  * Removes a function from the pipeline.
@@ -372,17 +376,17 @@ elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.remove = function (fn) {
-  var pos = this._stack.indexOf(fn)
+  var pos = this._queue.indexOf(fn);
   if (pos == -1) {
-    return
+    return;
   }
 
-  this._stack.splice(pos, 1)
-}
+  this._queue.splice(pos, 1);
+};
 
 /**
  * Runs the current list of functions that make up the pipeline against the
- * passed tokens.
+ * input tokens.
  *
  * @param {Array} tokens The tokens to run through the pipeline.
  * @return {Array}
@@ -391,21 +395,21 @@ elasticlunr.Pipeline.prototype.remove = function (fn) {
 elasticlunr.Pipeline.prototype.run = function (tokens) {
   var out = [],
       tokenLength = tokens.length,
-      stackLength = this._stack.length
+      pipelineLength = this._queue.length;
 
   for (var i = 0; i < tokenLength; i++) {
-    var token = tokens[i]
+    var token = tokens[i];
 
-    for (var j = 0; j < stackLength; j++) {
-      token = this._stack[j](token, i, tokens)
-      if (token === void 0) break
+    for (var j = 0; j < pipelineLength; j++) {
+      token = this._queue[j](token, i, tokens);
+      if (token === void 0) break;
     };
 
-    if (token !== void 0) out.push(token)
+    if (token !== void 0) out.push(token);
   };
 
-  return out
-}
+  return out;
+};
 
 /**
  * Resets the pipeline by removing any existing processors.
@@ -413,8 +417,8 @@ elasticlunr.Pipeline.prototype.run = function (tokens) {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.reset = function () {
-  this._stack = []
-}
+  this._queue = [];
+};
 
 /**
  * Returns a representation of the pipeline ready for serialisation.
@@ -425,242 +429,11 @@ elasticlunr.Pipeline.prototype.reset = function () {
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.prototype.toJSON = function () {
-  return this._stack.map(function (fn) {
-    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
-
-    return fn.label
-  })
-}
-/*!
- * elasticlunr.SortedSet
- * Copyright (C) 2015 Oliver Nightingale
- */
-
-/**
- * elasticlunr.SortedSets are used to maintain an array of uniq values in a sorted
- * order.
- *
- * @constructor
- */
-elasticlunr.SortedSet = function () {
-  this.length = 0
-  this.elements = []
-}
-
-/**
- * Loads a previously serialised sorted set.
- *
- * @param {Array} serialisedData The serialised set to load.
- * @return {elasticlunr.SortedSet}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.load = function (serialisedData) {
-  var set = new this
-
-  set.elements = serialisedData
-  set.length = serialisedData.length
-
-  return set
-}
-
-/**
- * Inserts new items into the set in the correct position to maintain the
- * order.
- *
- * @param {Object} The objects to add to this set.
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.add = function () {
-  var i, element
-
-  for (i = 0; i < arguments.length; i++) {
-    element = arguments[i]
-    if (~this.indexOf(element)) continue
-    this.elements.splice(this.locationFor(element), 0, element)
-  }
-
-  this.length = this.elements.length
-}
-
-/**
- * Converts this sorted set into an array.
- *
- * @return {Array}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.toArray = function () {
-  return this.elements.slice()
-}
-
-/**
- * Creates a new array with the results of calling a provided function on every
- * element in this sorted set.
- *
- * Delegates to Array.prototype.map and has the same signature.
- *
- * @param {Function} fn The function that is called on each element of the
- * set.
- * @param {Object} ctx An optional object that can be used as the context
- * for the function fn.
- * @return {Array}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.map = function (fn, ctx) {
-  return this.elements.map(fn, ctx)
-}
-
-/**
- * Executes a provided function once per sorted set element.
- *
- * Delegates to Array.prototype.forEach and has the same signature.
- *
- * @param {Function} fn The function that is called on each element of the
- * set.
- * @param {Object} ctx An optional object that can be used as the context
- * @memberOf SortedSet
- * for the function fn.
- */
-elasticlunr.SortedSet.prototype.forEach = function (fn, ctx) {
-  return this.elements.forEach(fn, ctx)
-}
-
-/**
- * Returns the index at which a given element can be found in the
- * sorted set, or -1 if it is not present.
- *
- * @param {Object} elem The object to locate in the sorted set.
- * @return {Number}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.indexOf = function (elem) {
-  var start = 0,
-      end = this.elements.length - 1;
-
-  while (end >= start) {
-    var pivot = start + Math.floor((end - start + 1) / 2);
-    var pivotElem = this.elements[pivot];
-
-    if (pivotElem === elem) return pivot;
-    if (pivotElem < elem) start = pivot + 1;
-    else end = pivot - 1;
-  }
-
-  return -1;
-}
-
-/**
- * Returns the position within the sorted set that an element should be
- * inserted at to maintain the current order of the set.
- *
- * This function assumes that the element to search for does not already exist
- * in the sorted set.
- *
- * @param {Object} elem The elem to find the position for in the set
- * @return {Number}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.locationFor = function (elem) {
-  var start = 0,
-      end = this.elements.length - 1;
-
-  while (end >= start) {
-    var pivot = start + Math.floor((end - start + 1) / 2);
-    var pivotElem = this.elements[pivot];
-
-    if (pivotElem === elem) return pivot;
-    if (pivotElem < elem) start = pivot + 1;
-    else end = pivot - 1;
-  }
-
-  if (pivotElem > elem) return pivot;
-  if (pivotElem < elem) return pivot + 1;
-}
-
-/**
- * Creates a new elasticlunr.SortedSet that contains the elements in the intersection
- * of this set and the passed set.
- *
- * @param {elasticlunr.SortedSet} otherSet The set to intersect with this set.
- * @return {elasticlunr.SortedSet}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.intersect = function (otherSet) {
-  var intersectSet = new elasticlunr.SortedSet,
-      i = 0, j = 0,
-      a_len = this.length, b_len = otherSet.length,
-      a = this.elements, b = otherSet.elements
-
-  while (true) {
-    if (i > a_len - 1 || j > b_len - 1) break
-
-    if (a[i] === b[j]) {
-      intersectSet.add(a[i])
-      i++, j++
-      continue
-    }
-
-    if (a[i] < b[j]) {
-      i++
-      continue
-    }
-
-    if (a[i] > b[j]) {
-      j++
-      continue
-    }
-  };
-
-  return intersectSet
-}
-
-/**
- * Makes a copy of this set
- *
- * @return {elasticlunr.SortedSet}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.clone = function () {
-  var clone = new elasticlunr.SortedSet
-
-  clone.elements = this.toArray()
-  clone.length = clone.elements.length
-
-  return clone
-}
-
-/**
- * Creates a new elasticlunr.SortedSet that contains the elements in the union
- * of this set and the passed set.
- *
- * @param {elasticlunr.SortedSet} otherSet The set to union with this set.
- * @return {elasticlunr.SortedSet}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.union = function (otherSet) {
-  var longSet, shortSet, unionSet
-
-  if (this.length >= otherSet.length) {
-    longSet = this, shortSet = otherSet
-  } else {
-    longSet = otherSet, shortSet = this
-  }
-
-  unionSet = longSet.clone()
-
-  unionSet.add.apply(unionSet, shortSet.toArray())
-
-  return unionSet
-}
-
-/**
- * Returns a representation of the sorted set ready for serialisation.
- *
- * @return {Array}
- * @memberOf SortedSet
- */
-elasticlunr.SortedSet.prototype.toJSON = function () {
-  return this.toArray()
-}
+  return this._queue.map(function (fn) {
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn);
+    return fn.label;
+  });
+};
 /*!
  * elasticlunr.Index
  * Copyright (C) 2015 Oliver Nightingale
@@ -1244,6 +1017,7 @@ elasticlunr.DocumentStore.prototype.toJSON = function () {
 /*!
  * elasticlunr.stemmer
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
@@ -1458,10 +1232,11 @@ elasticlunr.stemmer = (function(){
   return porterStemmer;
 })();
 
-elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer')
+elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
 /*!
  * elasticlunr.stopWordFilter
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
@@ -1477,137 +1252,138 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer')
  * @see elasticlunr.Pipeline
  */
 elasticlunr.stopWordFilter = function (token) {
-  if (elasticlunr.stopWordFilter.stopWords.indexOf(token) === -1) return token
-}
+  if ((token in elasticlunr.stopWordFilter.stopWords) == false) {
+    return token;
+  }
+};
 
-elasticlunr.stopWordFilter.stopWords = new elasticlunr.SortedSet
-elasticlunr.stopWordFilter.stopWords.length = 119
-elasticlunr.stopWordFilter.stopWords.elements = [
-  "",
-  "a",
-  "able",
-  "about",
-  "across",
-  "after",
-  "all",
-  "almost",
-  "also",
-  "am",
-  "among",
-  "an",
-  "and",
-  "any",
-  "are",
-  "as",
-  "at",
-  "be",
-  "because",
-  "been",
-  "but",
-  "by",
-  "can",
-  "cannot",
-  "could",
-  "dear",
-  "did",
-  "do",
-  "does",
-  "either",
-  "else",
-  "ever",
-  "every",
-  "for",
-  "from",
-  "get",
-  "got",
-  "had",
-  "has",
-  "have",
-  "he",
-  "her",
-  "hers",
-  "him",
-  "his",
-  "how",
-  "however",
-  "i",
-  "if",
-  "in",
-  "into",
-  "is",
-  "it",
-  "its",
-  "just",
-  "least",
-  "let",
-  "like",
-  "likely",
-  "may",
-  "me",
-  "might",
-  "most",
-  "must",
-  "my",
-  "neither",
-  "no",
-  "nor",
-  "not",
-  "of",
-  "off",
-  "often",
-  "on",
-  "only",
-  "or",
-  "other",
-  "our",
-  "own",
-  "rather",
-  "said",
-  "say",
-  "says",
-  "she",
-  "should",
-  "since",
-  "so",
-  "some",
-  "than",
-  "that",
-  "the",
-  "their",
-  "them",
-  "then",
-  "there",
-  "these",
-  "they",
-  "this",
-  "tis",
-  "to",
-  "too",
-  "twas",
-  "us",
-  "wants",
-  "was",
-  "we",
-  "were",
-  "what",
-  "when",
-  "where",
-  "which",
-  "while",
-  "who",
-  "whom",
-  "why",
-  "will",
-  "with",
-  "would",
-  "yet",
-  "you",
-  "your"
-]
+elasticlunr.stopWordFilter.stopWords = {
+  "": true,
+  "a": true,
+  "able": true,
+  "about": true,
+  "across": true,
+  "after": true,
+  "all": true,
+  "almost": true,
+  "also": true,
+  "am": true,
+  "among": true,
+  "an": true,
+  "and": true,
+  "any": true,
+  "are": true,
+  "as": true,
+  "at": true,
+  "be": true,
+  "because": true,
+  "been": true,
+  "but": true,
+  "by": true,
+  "can": true,
+  "cannot": true,
+  "could": true,
+  "dear": true,
+  "did": true,
+  "do": true,
+  "does": true,
+  "either": true,
+  "else": true,
+  "ever": true,
+  "every": true,
+  "for": true,
+  "from": true,
+  "get": true,
+  "got": true,
+  "had": true,
+  "has": true,
+  "have": true,
+  "he": true,
+  "her": true,
+  "hers": true,
+  "him": true,
+  "his": true,
+  "how": true,
+  "however": true,
+  "i": true,
+  "if": true,
+  "in": true,
+  "into": true,
+  "is": true,
+  "it": true,
+  "its": true,
+  "just": true,
+  "least": true,
+  "let": true,
+  "like": true,
+  "likely": true,
+  "may": true,
+  "me": true,
+  "might": true,
+  "most": true,
+  "must": true,
+  "my": true,
+  "neither": true,
+  "no": true,
+  "nor": true,
+  "not": true,
+  "of": true,
+  "off": true,
+  "often": true,
+  "on": true,
+  "only": true,
+  "or": true,
+  "other": true,
+  "our": true,
+  "own": true,
+  "rather": true,
+  "said": true,
+  "say": true,
+  "says": true,
+  "she": true,
+  "should": true,
+  "since": true,
+  "so": true,
+  "some": true,
+  "than": true,
+  "that": true,
+  "the": true,
+  "their": true,
+  "them": true,
+  "then": true,
+  "there": true,
+  "these": true,
+  "they": true,
+  "this": true,
+  "tis": true,
+  "to": true,
+  "too": true,
+  "twas": true,
+  "us": true,
+  "wants": true,
+  "was": true,
+  "we": true,
+  "were": true,
+  "what": true,
+  "when": true,
+  "where": true,
+  "which": true,
+  "while": true,
+  "who": true,
+  "whom": true,
+  "why": true,
+  "will": true,
+  "with": true,
+  "would": true,
+  "yet": true,
+  "you": true,
+  "your": true
+};
 
-elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter')
+elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter');
 /*!
  * elasticlunr.trimmer
+ * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Oliver Nightingale
  */
 
@@ -1628,10 +1404,10 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilte
 elasticlunr.trimmer = function (token) {
   return token
     .replace(/^\W+/, '')
-    .replace(/\W+$/, '')
-}
+    .replace(/\W+$/, '');
+};
 
-elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer')
+elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');
 /*!
  * elasticlunr.InvertedIndex
  * Copyright (C) 2015 Oliver Nightingale

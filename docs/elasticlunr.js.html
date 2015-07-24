@@ -78,7 +78,6 @@
             <li><a href="index.js.html">index.js</a></li>
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li><a href="pipeline.js.html">pipeline.js</a></li>
-            <li><a href="sorted_set.js.html">sorted_set.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
@@ -121,7 +120,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Convenience function for instantiating a new elasticLunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><p>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</p><p>elasticlunr.stemmer - stems the tokens before entering the index.</p><p>Example:</p><pre><code>var idx = elasticLunr(function () {
+          <div class="description"><p>Convenience function for instantiating a new elasticlunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><p>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</p><p>elasticlunr.stemmer - stems the tokens before entering the index.</p><p>Example:</p><pre><code>var idx = elasticlunr(function () {
   this.addField(&#39;id&#39;)
   this.addField(&#39;title&#39;)
   this.addField(&#39;body&#39;)
