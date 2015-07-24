@@ -118,7 +118,7 @@ index.search("Oracle database profit", {
                             <li>4. <strong>Boolean Model</strong>, you could set which field to search and the boolean model for each query token, such as "OR", "AND".</li>
                             <li>5. <strong>Combined Boolean Model, TF/IDF Model and the Vector Space Model</strong>, make the results ranking more reliable.</li>
                             <li>6. <strong>Fast</strong>, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is need to compute the vector of a document to compute the score of a document, this improve the search speed significantly.</li>
-                            <li>7. <strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.</li>
+                            <li>7. <strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlunr.js is used as offline search.</li>
                         </ul>
 
                         <div class="col-md-12" style="padding-bottom: 15px; border-bottom:1px solid rgba(7,94,115,0.3);"></div>
