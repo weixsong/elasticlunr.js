@@ -1,7 +1,3 @@
 ** TODO:
 1. Add support for scoring model choice, such as sum up the field score or just use the max field score.
 2. Code review, make it more efficient.
-3. Project web page refactor.
-4. Example web page refactor, support query configuration setting, such as query time boosting, which field to search.
-
-

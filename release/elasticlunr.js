@@ -804,7 +804,6 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
   this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
     var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
-    var fieldLength = fieldTokens.length;
     var tokenCount = {};
     fieldTokens.forEach(function (token) {
       if (token in tokenCount) tokenCount[token] += 1;
