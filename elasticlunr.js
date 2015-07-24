@@ -214,7 +214,7 @@ elasticlunr.tokenizer = function (obj) {
  * both documents tokens and query tokens.
  *
  * An instance of elasticlunr.Index created with the elasticlunr shortcut will contain a
- * pipeline with a stop word filter, an English language stemmer and a trimmer. Extra
+ * pipeline with a trimmer, a stop word filter, an English language stemmer. Extra
  * functions can be added before or after either of these functions or these
  * default functions can be removed.
  *
