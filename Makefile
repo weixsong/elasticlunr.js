@@ -10,6 +10,7 @@ SRC = lib/elasticlunr.js \
 	lib/stop_word_filter.js \
 	lib/trimmer.js \
 	lib/inverted_index.js \
+	lib/configuration.js
 
 YEAR = $(shell date +%Y)
 VERSION = $(shell cat VERSION)

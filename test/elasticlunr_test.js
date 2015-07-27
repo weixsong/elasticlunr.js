@@ -1,37 +1,37 @@
-module('elasticlunr')
+module('elasticlunr');
 
 test('returns a new instance of elasticlunr.Index', function () {
-  var index = elasticlunr()
+  var index = elasticlunr();
 
-  equal(index.constructor, elasticlunr.Index)
-})
+  equal(index.constructor, elasticlunr.Index);
+});
 
 test('should set up the pipeline', function () {
   var index = elasticlunr(),
-      stack = index.pipeline._stack
+      queue = index.pipeline._queue;
 
-  equal(stack.length, 3)
-  equal(stack.indexOf(elasticlunr.trimmer), 0)
-  equal(stack.indexOf(elasticlunr.stopWordFilter), 1)
-  equal(stack.indexOf(elasticlunr.stemmer), 2)
+  equal(queue.length, 3);
+  equal(queue.indexOf(elasticlunr.trimmer), 0);
+  equal(queue.indexOf(elasticlunr.stopWordFilter), 1);
+  equal(queue.indexOf(elasticlunr.stemmer), 2);
 })
 
 test('passing a config fn which is called with the new index', function () {
-  var configCtx, configArg
+  var configCtx, configArg;
 
   var index = elasticlunr(function (idx) {
-    configCtx = this
-    configArg = idx
+    configCtx = this;
+    configArg = idx;
 
-    this.ref('cid')
+    this.setRef('cid');
 
-    this.field('title', 10)
-    this.field('body')
-  })
+    this.addField('title');
+    this.addField('body');
+  });
 
-  equal(configCtx, index)
-  equal(configArg, index)
+  equal(configCtx, index);
+  equal(configArg, index);
 
-  equal(index._ref, 'cid')
-  equal(index._fields.length, 2)
-})
+  equal(index._ref, 'cid');
+  equal(index._fields.length, 2);
+});
