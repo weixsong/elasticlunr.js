@@ -14,7 +14,7 @@ Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also 
  * 4. **Boolean Model**, you could set which field to search and the boolean model for each query token, such as "OR", "AND".
  * 5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, make the results ranking more reliable.
  * 6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improve the search speed significantly.
- * 7. **Small index file**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlurn.js is used as offline search.
+ * 7. **Small index file**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlunr.js is used as offline search.
 
 ## Example
 
