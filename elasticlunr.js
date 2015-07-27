@@ -103,16 +103,19 @@ elasticlunr.utils.warn = (function (global) {
 /*!
  * elasticlunr.EventEmitter
  * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
  */
 
 /**
  * elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.
  *
+ * Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.
+ * 
  * @constructor
  */
 elasticlunr.EventEmitter = function () {
-  this.events = {}
-}
+  this.events = {};
+};
 
 /**
  * Binds a handler function to a specific event(s).
@@ -128,13 +131,13 @@ elasticlunr.EventEmitter.prototype.addListener = function () {
       fn = args.pop(),
       names = args;
 
-  if (typeof fn !== "function") throw new TypeError ("last argument must be a function")
+  if (typeof fn !== "function") throw new TypeError ("last argument must be a function");
 
   names.forEach(function (name) {
-    if (!this.hasHandler(name)) this.events[name] = []
-    this.events[name].push(fn)
-  }, this)
-}
+    if (!this.hasHandler(name)) this.events[name] = [];
+    this.events[name].push(fn);
+  }, this);
+};
 
 /**
  * Removes a handler function from a specific event.
@@ -144,13 +147,15 @@ elasticlunr.EventEmitter.prototype.addListener = function () {
  * @memberOf EventEmitter
  */
 elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
-  if (!this.hasHandler(name)) return
+  if (!this.hasHandler(name)) return;
 
-  var fnIndex = this.events[name].indexOf(fn)
-  this.events[name].splice(fnIndex, 1)
+  var fnIndex = this.events[name].indexOf(fn);
+  if (fnIndex == -1) return;
 
-  if (!this.events[name].length) delete this.events[name]
-}
+  this.events[name].splice(fnIndex, 1);
+
+  if (this.events[name].length == 0) delete this.events[name];
+};
 
 /**
  * Calls all functions bound to the given event.
@@ -169,7 +174,7 @@ elasticlunr.EventEmitter.prototype.emit = function (name) {
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
   });
-}
+};
 
 /**
  * Checks whether a handler has ever been stored against an event.
@@ -179,9 +184,8 @@ elasticlunr.EventEmitter.prototype.emit = function (name) {
  * @memberOf EventEmitter
  */
 elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
-  return name in this.events
-}
-
+  return name in this.events;
+};
 /*!
  * elasticlunr.tokenizer
  * Copyright (C) 2015 Oliver Nightingale
@@ -1523,7 +1527,7 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
 };
 
 /**
- * Retrieve the documents for a node for the given token.
+ * Retrieve the documents for a given token.
  * If token not found, return {}.
  *
  *
@@ -1541,7 +1545,7 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token) {
 };
 
 /**
- * Retrieve the term frequency of given token in given docRef.
+ * Retrieve term frequency of given token in given docRef.
  * If token or docRef not found, return 0.
  *
  *
@@ -1593,12 +1597,9 @@ elasticlunr.InvertedIndex.prototype.getDocFreq = function (token) {
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
   if (!token) return;
-  var node = this.root;
+  var node = this.getNode(token);
 
-  for (var i = 0; i < token.length; i++) {
-    if (!(token[i] in node)) return;
-    node = node[token[i]];
-  }
+  if (node == null) return;
 
   if (ref in node.docs) {
     delete node.docs[ref];

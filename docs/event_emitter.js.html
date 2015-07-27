@@ -105,10 +105,10 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.EventEmitter()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p> </div>
+          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p><p>Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter = function () {
-  this.events = {}
-}</code></pre>
+  this.events = {};
+};</code></pre>
           <section id="addListener">
             <h1>addListener</h1>
             <h5 class="subheader"></h5>
@@ -143,13 +143,13 @@
       fn = args.pop(),
       names = args;
 
-  if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;)
+  if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;);
 
   names.forEach(function (name) {
-    if (!this.hasHandler(name)) this.events[name] = []
-    this.events[name].push(fn)
-  }, this)
-}</code></pre>
+    if (!this.hasHandler(name)) this.events[name] = [];
+    this.events[name].push(fn);
+  }, this);
+};</code></pre>
           <section id="removeListener">
             <h1>removeListener</h1>
             <h5 class="subheader"></h5>
@@ -180,13 +180,15 @@
           </table>
           <div class="description"><p>Removes a handler function from a specific event.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
-  if (!this.hasHandler(name)) return
+  if (!this.hasHandler(name)) return;
 
-  var fnIndex = this.events[name].indexOf(fn)
-  this.events[name].splice(fnIndex, 1)
+  var fnIndex = this.events[name].indexOf(fn);
+  if (fnIndex == -1) return;
 
-  if (!this.events[name].length) delete this.events[name]
-}</code></pre>
+  this.events[name].splice(fnIndex, 1);
+
+  if (this.events[name].length == 0) delete this.events[name];
+};</code></pre>
           <section id="emit">
             <h1>emit</h1>
             <h5 class="subheader"></h5>
@@ -219,7 +221,7 @@
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
   });
-}</code></pre>
+};</code></pre>
         </div>
       </div>
     </div>
