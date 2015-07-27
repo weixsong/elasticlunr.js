@@ -89,9 +89,44 @@ test('removing a document from the index', function () {
   idx.addDoc(doc);
   equal(idx.documentStore.length, 1);
 
-  idx.removeDoc(doc);
+  idx.removeDoc(doc['id']);
   equal(idx.documentStore.length, 0);
+  
+  equal(idx.index['body'].hasToken('this'), true);
+  equal(idx.index['body'].hasToken('test'), true);
+  equal(idx.index['body'].getNode('this').df, 0);
+  deepEqual(idx.index['body'].getNode('test').docs, {});
 })
+
+test('removing a document from the index with more than one documents', function () {
+  var idx = new elasticlunr.Index,
+      doc1 = {id: 1, body: 'this is a test'},
+      doc2 = {id: 2, body: 'this is an apple'};
+      
+  var docs = {1: {tf: 1},
+              2: {tf: 1}};
+
+  idx.addField('body');
+  equal(idx.documentStore.length, 0);
+
+  idx.addDoc(doc1);
+  equal(idx.documentStore.length, 1);
+  
+  idx.addDoc(doc2);
+  equal(idx.documentStore.length, 2);
+  
+  deepEqual(idx.index['body'].getNode('this').docs, docs);
+
+  idx.removeDoc(doc1['id']);
+  equal(idx.documentStore.length, 1);
+
+  equal(idx.index['body'].hasToken('this'), true);
+  equal(idx.index['body'].hasToken('test'), true);
+  equal(idx.index['body'].hasToken('apple'), true);
+  equal(idx.index['body'].getNode('this').df, 1);
+  deepEqual(idx.index['body'].getNode('apple').docs, {2: {tf: 1}});
+  deepEqual(idx.index['body'].getNode('this').docs, {2: {tf: 1}});
+});
 
 test('triggering remove events', function () {
   var idx = new elasticlunr.Index,
@@ -106,7 +141,7 @@ test('triggering remove events', function () {
 
   idx.addField('body');
   idx.addDoc(doc);
-  idx.removeDoc(doc);
+  idx.removeDoc(doc['id']);
 
   ok(callbackCalled);
   equal(callbackArgs.length, 2);
