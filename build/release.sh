@@ -13,7 +13,6 @@ file_has_changed () {
 }
 
 version_is_unique () {
-  echo $1
   for v in `git tag -l`; do
     [[ "$v" == "v$1" ]] && return 1
   done
