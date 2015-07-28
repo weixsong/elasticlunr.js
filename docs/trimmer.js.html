@@ -72,13 +72,13 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
             <li><a href="index.js.html">index.js</a></li>
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li><a href="pipeline.js.html">pipeline.js</a></li>
-            <li><a href="sorted_set.js.html">sorted_set.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
@@ -125,10 +125,10 @@
           <pre><code class="language-javascript">elasticlunr.trimmer = function (token) {
   return token
     .replace(/^\W+/, '')
-    .replace(/\W+$/, '')
-}
+    .replace(/\W+$/, '');
+};
 
-elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer')</code></pre>
+elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');</code></pre>
         </div>
       </div>
     </div>

@@ -72,13 +72,13 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
             <li><a href="index.js.html">index.js</a></li>
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li class="active"><a href="pipeline.js.html">pipeline.js</a></li>
-            <li><a href="sorted_set.js.html">sorted_set.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
@@ -118,12 +118,12 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.Pipeline()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.Pipelines maintain an ordered list of functions to be applied to all<br />tokens in documents entering the search index and queries being ran against<br />the index.</p><p>An instance of elasticlunr.Index created with the lunr shortcut will contain a<br />pipeline with a stop word filter and an English language stemmer. Extra<br />functions can be added before or after either of these functions or these<br />default functions can be removed.</p><p>When run the pipeline will call each function in turn, passing a token, the<br />index of that token in the original list of all tokens and finally a list of<br />all the original tokens.</p><p>The output of functions in the pipeline will be passed to the next function<br />in the pipeline. To exclude a token from entering the index the function<br />should return undefined, the rest of the pipeline will not be called with<br />this token.</p><p>For serialisation of pipelines to work, all functions used in an instance of<br />a pipeline should be registered with elasticlunr.Pipeline. Registered functions can<br />then be loaded. If trying to load a serialised pipeline that uses functions<br />that are not registered an error will be thrown.</p><p>If not planning on serialising the pipeline then registering pipeline functions<br />is not necessary.</p> </div>
+          <div class="description"><p>elasticlunr.Pipelines maintain an ordered list of functions to be applied to<br />both documents tokens and query tokens.</p><p>An instance of elasticlunr.Index created with the elasticlunr shortcut will contain a<br />pipeline with a trimmer, a stop word filter, an English language stemmer. Extra<br />functions can be added before or after either of these functions or these<br />default functions can be removed.</p><p>When run the pipeline will call each function in turn, passing a token, the<br />index of that token in the original list of all tokens and finally a list of<br />all the original tokens.</p><p>The output of functions in the pipeline will be passed to the next function<br />in the pipeline. To exclude a token from entering the index the function<br />should return undefined, the rest of the pipeline will not be called with<br />this token.</p><p>For serialisation of pipelines to work, all functions used in an instance of<br />a pipeline should be registered with elasticlunr.Pipeline. Registered functions can<br />then be loaded. If trying to load a serialised pipeline that uses functions<br />that are not registered an error will be thrown.</p><p>If not planning on serialising the pipeline then registering pipeline functions<br />is not necessary.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline = function () {
-  this._stack = []
-}
+  this._queue = [];
+};
 
-elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
+elasticlunr.Pipeline.registeredFunctions = {};</code></pre>
           <section id="registerFunction">
             <h1>registerFunction</h1>
             <h5 class="subheader"></h5>
@@ -155,12 +155,12 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           <div class="description"><p>Register a function with the pipeline.</p><p>Functions that are used in the pipeline should be registered if the pipeline<br />needs to be serialised, or a serialised pipeline needs to be loaded.</p><p>Registering a function does not add it to a pipeline, functions must still be<br />added to instances of the pipeline for them to be used when running a pipeline.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.registerFunction = function (fn, label) {
   if (label in this.registeredFunctions) {
-    elasticlunr.utils.warn('Overwriting existing registered function: ' + label)
+    elasticlunr.utils.warn('Overwriting existing registered function: ' + label);
   }
 
-  fn.label = label
-  elasticlunr.Pipeline.registeredFunctions[fn.label] = fn
-}</code></pre>
+  fn.label = label;
+  elasticlunr.Pipeline.registeredFunctions[label] = fn;
+};</code></pre>
           <section id="load">
             <h1>load</h1>
             <h5 class="subheader"></h5>
@@ -191,20 +191,20 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           </table>
           <div class="description"><p>Loads a previously serialised pipeline.</p><p>All functions to be loaded must already be registered with elasticlunr.Pipeline.<br />If any function from the serialised data has not been registered then an<br />error will be thrown.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.load = function (serialised) {
-  var pipeline = new elasticlunr.Pipeline
+  var pipeline = new elasticlunr.Pipeline;
 
   serialised.forEach(function (fnName) {
-    var fn = elasticlunr.Pipeline.registeredFunctions[fnName]
+    var fn = elasticlunr.Pipeline.registeredFunctions[fnName];
 
     if (fn) {
-      pipeline.add(fn)
+      pipeline.add(fn);
     } else {
-      throw new Error('Cannot load un-registered function: ' + fnName)
+      throw new Error('Cannot load un-registered function: ' + fnName);
     }
-  })
+  });
 
-  return pipeline
-}</code></pre>
+  return pipeline;
+};</code></pre>
           <section id="add">
             <h1>add</h1>
             <h5 class="subheader"></h5>
@@ -230,13 +230,13 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           </table>
           <div class="description"><p>Adds new functions to the end of the pipeline.</p><p>Logs a warning if the function has not been registered.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.add = function () {
-  var fns = Array.prototype.slice.call(arguments)
+  var fns = Array.prototype.slice.call(arguments);
 
   fns.forEach(function (fn) {
-    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
-    this._stack.push(fn)
-  }, this)
-}</code></pre>
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn);
+    this._queue.push(fn);
+  }, this);
+};</code></pre>
           <section id="after">
             <h1>after</h1>
             <h5 class="subheader"></h5>
@@ -265,18 +265,18 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds a single function after a function that already exists in the<br />pipeline.</p><p>Logs a warning if the function has not been registered.</p> </div>
+          <div class="description"><p>Adds a single function after a function that already exists in the<br />pipeline.</p><p>Logs a warning if the function has not been registered.<br />If existingFn is not found, throw an Exception.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.after = function (existingFn, newFn) {
-  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
-  var pos = this._stack.indexOf(existingFn)
+  var pos = this._queue.indexOf(existingFn);
   if (pos == -1) {
-    throw new Error('Cannot find existingFn')
+    throw new Error('Cannot find existingFn');
   }
 
-  pos = pos + 1
-  this._stack.splice(pos, 0, newFn)
-}</code></pre>
+  pos = pos + 1;
+  this._queue.splice(pos, 0, newFn);
+};</code></pre>
           <section id="before">
             <h1>before</h1>
             <h5 class="subheader"></h5>
@@ -305,17 +305,17 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds a single function before a function that already exists in the<br />pipeline.</p><p>Logs a warning if the function has not been registered.</p> </div>
+          <div class="description"><p>Adds a single function before a function that already exists in the<br />pipeline.</p><p>Logs a warning if the function has not been registered.<br />If existingFn is not found, throw an Exception.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
-  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn)
+  elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
-  var pos = this._stack.indexOf(existingFn)
+  var pos = this._queue.indexOf(existingFn);
   if (pos == -1) {
-    throw new Error('Cannot find existingFn')
+    throw new Error('Cannot find existingFn');
   }
 
-  this._stack.splice(pos, 0, newFn)
-}</code></pre>
+  this._queue.splice(pos, 0, newFn);
+};</code></pre>
           <section id="remove">
             <h1>remove</h1>
             <h5 class="subheader"></h5>
@@ -341,13 +341,13 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           </table>
           <div class="description"><p>Removes a function from the pipeline.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.remove = function (fn) {
-  var pos = this._stack.indexOf(fn)
+  var pos = this._queue.indexOf(fn);
   if (pos == -1) {
-    return
+    return;
   }
 
-  this._stack.splice(pos, 1)
-}</code></pre>
+  this._queue.splice(pos, 1);
+};</code></pre>
           <section id="run">
             <h1>run</h1>
             <h5 class="subheader"></h5>
@@ -376,25 +376,25 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Runs the current list of functions that make up the pipeline against the<br />passed tokens.</p> </div>
+          <div class="description"><p>Runs the current list of functions that make up the pipeline against the<br />input tokens.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.run = function (tokens) {
   var out = [],
       tokenLength = tokens.length,
-      stackLength = this._stack.length
+      pipelineLength = this._queue.length;
 
   for (var i = 0; i &lt; tokenLength; i++) {
-    var token = tokens[i]
+    var token = tokens[i];
 
-    for (var j = 0; j &lt; stackLength; j++) {
-      token = this._stack[j](token, i, tokens)
-      if (token === void 0) break
+    for (var j = 0; j &lt; pipelineLength; j++) {
+      token = this._queue[j](token, i, tokens);
+      if (token === void 0) break;
     };
 
-    if (token !== void 0) out.push(token)
+    if (token !== void 0) out.push(token);
   };
 
-  return out
-}</code></pre>
+  return out;
+};</code></pre>
           <section id="reset">
             <h1>reset</h1>
             <h5 class="subheader"></h5>
@@ -404,8 +404,8 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           </section>
           <div class="description"><p>Resets the pipeline by removing any existing processors.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.reset = function () {
-  this._stack = []
-}</code></pre>
+  this._queue = [];
+};</code></pre>
           <section id="toJSON">
             <h1>toJSON</h1>
             <h5 class="subheader"></h5>
@@ -415,12 +415,11 @@ elasticlunr.Pipeline.registeredFunctions = {}</code></pre>
           </section>
           <div class="description"><p>Returns a representation of the pipeline ready for serialisation.</p><p>Logs a warning if the function has not been registered.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.prototype.toJSON = function () {
-  return this._stack.map(function (fn) {
-    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn)
-
-    return fn.label
-  })
-}</code></pre>
+  return this._queue.map(function (fn) {
+    elasticlunr.Pipeline.warnIfFunctionNotRegistered(fn);
+    return fn.label;
+  });
+};</code></pre>
         </div>
       </div>
     </div>

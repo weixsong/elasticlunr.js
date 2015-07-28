@@ -72,13 +72,13 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li class="active"><a href="event_emitter.js.html">event_emitter.js</a></li>
             <li><a href="index.js.html">index.js</a></li>
             <li><a href="inverted_index.js.html">inverted_index.js</a></li>
             <li><a href="pipeline.js.html">pipeline.js</a></li>
-            <li><a href="sorted_set.js.html">sorted_set.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
             <li><a href="tokenizer.js.html">tokenizer.js</a></li>
@@ -106,10 +106,10 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.EventEmitter()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p> </div>
+          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p><p>Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter = function () {
-  this.events = {}
-}</code></pre>
+  this.events = {};
+};</code></pre>
           <section id="addListener">
             <h1>addListener</h1>
             <h5 class="subheader"></h5>
@@ -144,13 +144,13 @@
       fn = args.pop(),
       names = args;
 
-  if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;)
+  if (typeof fn !== &quot;function&quot;) throw new TypeError (&quot;last argument must be a function&quot;);
 
   names.forEach(function (name) {
-    if (!this.hasHandler(name)) this.events[name] = []
-    this.events[name].push(fn)
-  }, this)
-}</code></pre>
+    if (!this.hasHandler(name)) this.events[name] = [];
+    this.events[name].push(fn);
+  }, this);
+};</code></pre>
           <section id="removeListener">
             <h1>removeListener</h1>
             <h5 class="subheader"></h5>
@@ -181,13 +181,15 @@
           </table>
           <div class="description"><p>Removes a handler function from a specific event.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
-  if (!this.hasHandler(name)) return
+  if (!this.hasHandler(name)) return;
 
-  var fnIndex = this.events[name].indexOf(fn)
-  this.events[name].splice(fnIndex, 1)
+  var fnIndex = this.events[name].indexOf(fn);
+  if (fnIndex == -1) return;
 
-  if (!this.events[name].length) delete this.events[name]
-}</code></pre>
+  this.events[name].splice(fnIndex, 1);
+
+  if (this.events[name].length == 0) delete this.events[name];
+};</code></pre>
           <section id="emit">
             <h1>emit</h1>
             <h5 class="subheader"></h5>
@@ -220,7 +222,7 @@
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
   });
-}</code></pre>
+};</code></pre>
         </div>
       </div>
     </div>

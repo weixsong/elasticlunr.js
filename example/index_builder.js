@@ -1,18 +1,18 @@
-var lunr = require('./../elasticlunr.js'),
-    fs = require('fs')
+var elasticlunr = require('./../elasticlunr.js'),
+    fs = require('fs');
 
-var idx = lunr(function () {
-  this.setRef('id')
+var idx = elasticlunr(function () {
+  this.setRef('id');
 
-  this.addField('title', { boost: 10 })
-  this.addField('tags', { boost: 100 })
-  this.addField('body')
-})
+  this.addField('title');
+  this.addField('tags');
+  this.addField('body');
+});
 
 fs.readFile('./example/example_data.json', function (err, data) {
-  if (err) throw err
+  if (err) throw err;
 
-  var raw = JSON.parse(data)
+  var raw = JSON.parse(data);
 
   var questions = raw.questions.map(function (q) {
     return {
@@ -20,15 +20,15 @@ fs.readFile('./example/example_data.json', function (err, data) {
       title: q.title,
       body: q.body,
       tags: q.tags.join(' ')
-    }
-  })
+    };
+  });
 
   questions.forEach(function (question) {
-    idx.addDoc(question)
-  })
+    idx.addDoc(question);
+  });
 
   fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {
-    if (err) throw err
-    console.log('done')
-  })
-})
+    if (err) throw err;
+    console.log('done');
+  });
+});

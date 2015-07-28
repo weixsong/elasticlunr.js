@@ -6,7 +6,7 @@ require([
   'text!templates/question_list.mustache',
   'text!example_data.json',
   'text!example_index.json'
-], function (_, Mustache, lunr, questionView, questionList, data, indexDump) {
+], function (_, Mustache, elasticlunr, questionView, questionList, data, indexDump) {
 
   var renderQuestionList = function (qs) {
     $("#question-list-container")
@@ -34,7 +34,7 @@ require([
 
   var indexDump = JSON.parse(indexDump)
   console.time('load')
-  window.idx = lunr.Index.load(indexDump)
+  window.idx = elasticlunr.Index.load(indexDump)
   console.timeEnd('load')
 
   var questions = JSON.parse(data).questions.map(function (raw) {
@@ -73,7 +73,7 @@ require([
     config.trim();
     var json_config = null;
     if (config != '') {
-        json_config = JSON.parse(config);
+        json_config = new elasticlunr.Configuration(config, idx.getFields()).get();
     }
 
     var query = $(this).val()
