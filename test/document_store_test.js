@@ -8,6 +8,83 @@ test('adding document tokens to the document store', function () {
   deepEqual(docStore.getDoc(1), doc);
 });
 
+test('create a document store not storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc = {title: 'eggs bread'};
+
+  docStore.addDoc(1, doc);
+  equal(docStore.length, 1);
+  equal(docStore._save, false);
+  equal(docStore.hasDoc(1), true);
+});
+
+test('add doc test without storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc1 = {title: 'eggs bread'},
+      doc2 = {title: 'hello world'};
+
+  docStore.addDoc(1, doc1);
+  docStore.addDoc(2, doc2);
+  equal(docStore.length, 2);
+  equal(docStore._save, false);
+  equal(docStore.hasDoc(1), true);
+  equal(docStore.hasDoc(2), true);
+});
+
+test('get doc test without storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc1 = {title: 'eggs bread'},
+      doc2 = {title: 'hello world'};
+
+  docStore.addDoc(1, doc1);
+  docStore.addDoc(2, doc2);
+  equal(docStore.length, 2);
+  equal(docStore._save, false);
+  equal(docStore.getDoc(1), null);
+  equal(docStore.getDoc(2), null);
+});
+
+test('get non-exist doc test without storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc1 = {title: 'eggs bread'},
+      doc2 = {title: 'hello world'};
+
+  docStore.addDoc(1, doc1);
+  docStore.addDoc(2, doc2);
+  equal(docStore.length, 2);
+  equal(docStore._save, false);
+  equal(docStore.getDoc(6), null);
+  equal(docStore.getDoc(2), null);
+});
+
+test('remove doc test without storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc1 = {title: 'eggs bread'},
+      doc2 = {title: 'hello world'};
+
+  docStore.addDoc(1, doc1);
+  docStore.addDoc(2, doc2);
+  docStore.removeDoc(1);
+  equal(docStore.length, 1);
+  equal(docStore._save, false);
+  equal(docStore.getDoc(2), null);
+  equal(docStore.getDoc(1), null);
+});
+
+test('remove non-exist doc test without storing the doc', function () {
+  var docStore = new elasticlunr.DocumentStore(false),
+      doc1 = {title: 'eggs bread'},
+      doc2 = {title: 'hello world'};
+
+  docStore.addDoc(1, doc1);
+  docStore.addDoc(2, doc2);
+  docStore.removeDoc(8);
+  equal(docStore.length, 2);
+  equal(docStore._save, false);
+  equal(docStore.getDoc(2), null);
+  equal(docStore.getDoc(1), null);
+});
+
 test('getting the number of docs in the document store', function () {
   var docStore = new elasticlunr.DocumentStore;
 
@@ -80,11 +157,22 @@ test('removing a non-exist doc from the store', function () {
 test('serialising', function () {
   var store = new elasticlunr.DocumentStore;
 
-  deepEqual(store.toJSON(), { docs: {}, length: 0 });
+  deepEqual(store.toJSON(), { docs: {}, length: 0, save: true });
 
   store.addDoc('foo', {title: 'eggs bread'});
+  deepEqual(store.toJSON(), { docs: { foo: {title: 'eggs bread'} }, length: 1, save: true });
+});
 
-  deepEqual(store.toJSON(), { docs: { 1: {title: 'eggs bread'} }, length: 1 });
+test('serialising without storing', function () {
+  var store = new elasticlunr.DocumentStore(false);
+
+  deepEqual(store.toJSON(), { docs: {}, length: 0, save: false });
+
+  store.addDoc('foo', {title: 'eggs bread'});
+  deepEqual(store.toJSON(), { docs: { foo: null }, length: 1, save: false });
+  
+  store.addDoc('bar', {title: 'bar bread'});
+  deepEqual(store.toJSON(), { docs: { foo: null, bar: null }, length: 2, save: false });
 });
 
 test('loading serialised data', function () {
@@ -92,11 +180,33 @@ test('loading serialised data', function () {
     length: 1,
     docs: {
       1: {title: 'eggs bread'}
-    }
+    },
+    save: true
   };
 
   var store = elasticlunr.DocumentStore.load(serialisedData);
 
   equal(store.length, 1);
+  equal(store._save, true);
   deepEqual(store.getDoc(1), {title: 'eggs bread'});
+});
+
+test('loading serialised data without storing documents', function () {
+  var serialisedData = {
+    length: 2,
+    docs: {
+      1: null,
+      2: null
+    },
+    save: false
+  };
+
+  var store = elasticlunr.DocumentStore.load(serialisedData);
+
+  equal(store.length, 2);
+  equal(store._save, false);
+  equal(store.hasDoc(1), true);
+  equal(store.hasDoc(2), true);
+  deepEqual(store.getDoc(1), null);
+  deepEqual(store.getDoc(2), null);
 });

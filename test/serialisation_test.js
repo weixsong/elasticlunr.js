@@ -22,7 +22,9 @@ test('dumping and loading an index', function () {
   idx.addField('title');
   idx.addField('body');
 
-  this.corpus.forEach(function (doc) { idx.addDoc(doc) });
+  this.corpus.forEach(function (doc) { 
+    idx.addDoc(doc);
+  }, this);
 
   var dumpedIdx = JSON.stringify(idx),
       clonedIdx = elasticlunr.Index.load(JSON.parse(dumpedIdx));
