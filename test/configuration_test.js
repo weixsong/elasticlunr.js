@@ -7,8 +7,7 @@ test('constructor test', function () {
   var target = {
     title: {
       boost: 2,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -23,13 +22,11 @@ test('constructor test 2', function () {
   var target = {
     title: {
       boost: 3,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     },
     body: {
       boost: 2,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -44,13 +41,11 @@ test('construct without user config', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     },
     body: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -58,20 +53,18 @@ test('construct without user config', function () {
   deepEqual(config.get(), target);
 });
 
-test('construct with user config for bool and expand, but no field configured', function () {
+test('construct with user config for bool, but no field configured', function () {
   var fields = ['title', 'body'],
-      userConfig = '{"bool": "OR", "expand": false}';
+      userConfig = '{"bool": "OR"';
 
   var target = {
     title: {
       boost: 1,
-      bool: "OR",
-      expand: false
+      bool: "OR"
     },
     body: {
       boost: 1,
-      bool: "OR",
-      expand: false
+      bool: "OR"
     }
   };
 
@@ -79,20 +72,18 @@ test('construct with user config for bool and expand, but no field configured', 
   deepEqual(config.get(), target);
 });
 
-test('construct with user config for bool and expand overwrited by field config', function () {
+test('construct with user config for bool overwrited by field config', function () {
   var fields = ['title', 'body'],
       userConfig = '{"fields": {"title": {"boost": 3, "bool": "AND"},"body": {"boost": 2}},"bool": "OR"}';
 
   var target = {
     title: {
       boost: 3,
-      bool: "AND",
-      expand: true
+      bool: "AND"
     },
     body: {
       boost: 2,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -107,13 +98,11 @@ test('construct with user config without field boost', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "AND",
-      expand: true
+      bool: "AND"
     },
     body: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -121,20 +110,18 @@ test('construct with user config without field boost', function () {
   deepEqual(config.get(), target);
 });
 
-test('construct with user config without bool and expand setting', function () {
+test('construct with user config without bool setting', function () {
   var fields = ['title', 'body'],
       userConfig = '{"fields": {"title": {"boost": 2},"body": {}}}';
 
   var target = {
     title: {
       boost: 2,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     },
     body: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -149,8 +136,7 @@ test('construct with user config, search field not in idx._fields', function () 
   var target = {
     body: {
       boost: 2,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
@@ -174,13 +160,11 @@ test('construct with user config, json parse failed', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     },
     body: {
       boost: 1,
-      bool: "OR",
-      expand: true
+      bool: "OR"
     }
   };
 
