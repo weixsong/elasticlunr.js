@@ -72,6 +72,7 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -98,7 +99,9 @@
               </li>
               <li><a href="#getDocs"><i class="alert alert-info"></i><span>getDocs</span></a>
               </li>
-              <li><a href="#getTF"><i class="alert alert-info"></i><span>getTF</span></a>
+              <li><a href="#getTermFrequency"><i class="alert alert-info"></i><span>getTermFrequency</span></a>
+              </li>
+              <li><a href="#getFieldLength"><i class="alert alert-info"></i><span>getFieldLength</span></a>
               </li>
               <li><a href="#getDocFreq"><i class="alert alert-info"></i><span>getDocFreq</span></a>
               </li>
@@ -185,7 +188,7 @@
               <tr>
                 <td>tokenInfo</td>
                 <td>Object</td>
-                <td><p>format: { ref: 1, tf: 2 }</p></td>
+                <td><p>format: { ref: 1, tf: 2, fieldLength: 15}</p></td>
               </tr>
               <tr>
                 <td>root</td>
@@ -210,12 +213,12 @@
   var docRef = tokenInfo.ref;
   if (!root.docs[docRef]) {
     // if this doc not exist, then add this doc
-    root.docs[docRef] = {tf: tokenInfo.tf};
+    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
     root.df += 1;
     this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
-    root.docs[docRef] = {tf: tokenInfo.tf};
+    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
   }
 };</code></pre>
           <section id="hasToken">
@@ -337,11 +340,11 @@
 
   return node.docs;
 };</code></pre>
-          <section id="getTF">
-            <h1>getTF</h1>
+          <section id="getTermFrequency">
+            <h1>getTermFrequency</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.InvertedIndex.prototype.getTF()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.InvertedIndex.prototype.getTermFrequency()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -365,13 +368,13 @@
               </tr>
               <tr>
                 <td>return</td>
-                <td>Object</td>
+                <td>Integer</td>
                 <td></td>
               </tr>
             </tbody>
           </table>
           <div class="description"><p>Retrieve term frequency of given token in given docRef.<br />If token or docRef not found, return 0.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getTF = function (token, docRef) {
+          <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getTermFrequency = function (token, docRef) {
   var node = this.getNode(token);
 
   if (node == null) {
@@ -383,6 +386,53 @@
   }
 
   return node.docs[docRef].tf;
+};</code></pre>
+          <section id="getFieldLength">
+            <h1>getFieldLength</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.InvertedIndex.prototype.getFieldLength()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>token</td>
+                <td>String</td>
+                <td><p>The token to get the documents for.</p></td>
+              </tr>
+              <tr>
+                <td>docRef</td>
+                <td>String,Integer</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Integer</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Retrieve field length of given token in given docRef.<br />If token or docRef not found, return 0.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.getFieldLength = function (token, docRef) {
+  var node = this.getNode(token);
+
+  if (node == null) {
+    return 0;
+  }
+
+  if (!(docRef in node.docs)) {
+    return 0;
+  }
+
+  return node.docs[docRef].fieldLength;
 };</code></pre>
           <section id="getDocFreq">
             <h1>getDocFreq</h1>

@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.1
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.2
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -10,32 +10,38 @@
 
 (function(){
 
+/*!
+ * elasticlunr.js
+ * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2015 Wei Song
+ */
+
 /**
  * Convenience function for instantiating a new elasticlunr index and configuring it
  * with the default pipeline functions and the passed config function.
  *
  * When using this convenience function a new index will be created with the
  * following functions already in the pipeline:
- *
- * elasticlunr.StopWordFilter - filters out any stop words before they enter the
+ * 
+ * 1. elasticlunr.trimmer - trim non-word character
+ * 2. elasticlunr.StopWordFilter - filters out any stop words before they enter the
  * index
+ * 3. elasticlunr.stemmer - stems the tokens before entering the index.
  *
- * elasticlunr.stemmer - stems the tokens before entering the index.
  *
  * Example:
  *
  *     var idx = elasticlunr(function () {
- *       this.addField('id')
- *       this.addField('title')
- *       this.addField('body')
+ *       this.addField('id');
+ *       this.addField('title');
+ *       this.addField('body');
  *       
- *       //this.setRef('cid') // default ref is 'id'
+ *       //this.setRef('id'); // default ref is 'id'
  *       
  *       this.pipeline.add(function () {
  *         // some custom pipeline function
- *       })
- *       
- *     })
+ *       });
+ *     });
  * 
  *    idx.addDoc({
  *      id: 1, 
@@ -49,8 +55,11 @@
  *      body: 'Yestaday, Oracle has released their annual profit report of 2015, total profit is 12.5 Billion.'
  *    });
  * 
+ *    # simple search
+ *    idx.search('oracle database');
+ * 
  *    # search with query-time boosting
- *    idx.search('oracle database', {fields: {title: {boost: 2}, body: {boost: 1}}})
+ *    idx.search('oracle database', {fields: {title: {boost: 2}, body: {boost: 1}}});
  *
  * @param {Function} config A function that will be called with the new instance
  * of the elasticlunr.Index as both its context and first parameter. It can be used to
@@ -74,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.6.1";
+elasticlunr.version = "0.6.2";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
@@ -457,8 +466,7 @@ elasticlunr.Index = function () {
   this.pipeline = new elasticlunr.Pipeline;
   this.documentStore = new elasticlunr.DocumentStore;
   this.index = {};
-  this.eventEmitter =  new elasticlunr.EventEmitter;
-
+  this.eventEmitter = new elasticlunr.EventEmitter;
   this._idfCache = {};
 
   this.on('add', 'remove', 'update', (function () {
@@ -559,6 +567,21 @@ elasticlunr.Index.prototype.setRef = function (refName) {
 };
 
 /**
+ * 
+ * Set if the JSON format original documents are save into elasticlunr.DocumentStore
+ * 
+ * Defaultly save all the original JSON documents.
+ *
+ * @param {Boolean} save Whether to save the original JSON documents.
+ * @return {elasticlunr.Index}
+ * @memberOf Index
+ */
+elasticlunr.Index.prototype.saveDocument = function (save) {
+  this.documentStore = new elasticlunr.DocumentStore(save);
+  return this;
+};
+
+/**
  * Add a JSON format document to the index.
  *
  * This is the way new documents enter the index, this function will run the
@@ -578,9 +601,11 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
   var docRef = doc[this._ref];
+
   this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
     var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+
     var tokenCount = {};
     fieldTokens.forEach(function (token) {
       if (token in tokenCount) tokenCount[token] += 1;
@@ -588,9 +613,9 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
     }, this);
 
     for (var token in tokenCount) {
-      var tf = tokenCount[token];
-      tf = Math.sqrt(tf);
-      this.index[field].addToken(token, { ref: docRef, tf: tf });
+      var termFrequency = tokenCount[token];
+      termFrequency = Math.sqrt(termFrequency);
+      this.index[field].addToken(token, { ref: docRef, tf: termFrequency, fieldLength: fieldTokens.length });
     }
   }, this);
 
@@ -598,7 +623,7 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
 };
 
 /**
- * Removes a document from the index.
+ * Removes a document from the index by doc ref.
  *
  * To make sure documents no longer show up in search results they can be
  * removed from the index using this method.
@@ -606,13 +631,44 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
  * A 'remove' event is emitted with the document that has been removed and the index
  * the document has been removed from. This event can be silenced by passing false
  * as the second argument to remove.
+ * 
+ * If user setting DocumentStore not storing the documents, then remove doc by docRef is not allowed.
  *
- * @param {Object} docRef The document to remove from the index.
+ * @param {String|Integer} docRef The document ref to remove from the index.
+ * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
+ * @memberOf Index
+ */
+elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
+  if (!docRef) return;
+  if (this.documentStore.isSave() == false) {
+    elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
+    return;
+  }
+  
+  if (!this.documentStore.hasDoc(docRef)) return;
+  var doc = this.documentStore.getDoc(docRef);
+  this.removeDoc(doc);
+};
+
+/**
+ * Removes a document from the index.
+ * This remove operation could work even the original doc is not store in the DocumentStore.
+ *
+ * To make sure documents no longer show up in search results they can be
+ * removed from the index using this method.
+ *
+ * A 'remove' event is emitted with the document that has been removed and the index
+ * the document has been removed from. This event can be silenced by passing false
+ * as the second argument to remove.
+ * 
+ *
+ * @param {Object} doc The document ref to remove from the index.
  * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
  * @memberOf Index
  */
 elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
   if (!doc) return;
+
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
   var docRef = doc[this._ref];
@@ -622,9 +678,9 @@ elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
 
   this._fields.forEach(function (field) {
     var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
-    for (var token in fieldTokens) {
-      this.index[field].removeToken(token);
-    }
+    fieldTokens.forEach(function (token) {
+      this.index[field].removeToken(token, docRef);
+    }, this);
   }, this);
 
   if (emitEvent) this.eventEmitter.emit('remove', doc, this);
@@ -653,7 +709,7 @@ elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
 elasticlunr.Index.prototype.update = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.removeDoc(doc[this._ref], false);
+  this.removeDoc(doc, false);
   this.addDoc(doc, false);
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
@@ -683,7 +739,7 @@ elasticlunr.Index.prototype.idf = function (term, field) {
  * Searches the index using the passed query.
  * Queries should be a string, multiple words are allowed.
  * 
- * If config is null, will search all fields defaultly, and lead to AND based query.
+ * If config is null, will search all fields defaultly, and lead to OR based query.
  * If config is specified, will search specified with query time boosting.
  *
  * All query tokens are passed through the same pipeline that document tokens
@@ -698,46 +754,36 @@ elasticlunr.Index.prototype.idf = function (term, field) {
  * for this document against the query.
  *
  * @param {String} query The query to search the index with.
- * @param {Object} config The query config, JSON format.
+ * @param {JSON} jsonConfig The user query config, JSON format.
  * @return {Object}
  * @see Index.prototype.idf
  * @see Index.prototype.documentVector
  * @memberOf Index
  */
-elasticlunr.Index.prototype.search = function (query, config) {
+elasticlunr.Index.prototype.search = function (query, jsonConfig) {
   if (!query) return [];
+  var config = jsonConfig || new elasticlunr.Configuration(null, this._fields.slice()).get();
+
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
-  var searchFields = {};
-  if (config == null || config['fields'] == null) {
-    this._fields.forEach(function (field) {
-      searchFields[field] = {boost: 1};
-    }, this);
-  } else {
-    searchFields = config['fields'];
-  }
-
   var queryResults = {};
-  var squaredWeight = this.computeSquaredWeight(queryTokens, searchFields);
+  var squaredWeight = this.computeSquaredWeight(queryTokens, config);
 
-  for (var field in searchFields) {
+  for (var field in config) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
-    var fieldSearchScores = {};
-    var fieldBoost = searchFields[field].boost || 1;
+    var fieldBoost = config[field].boost;
     var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
     console.log('queryNorm: ' + queryNorm +' in field:' + field);
 
     for (var docRef in fieldSearchResults) {
-      var score = this.computeScore(queryTokens, docRef, field);
-      score = queryNorm * score;
-      fieldSearchScores[docRef] = score;
+      fieldSearchResults[docRef] = fieldSearchResults[docRef] * queryNorm;
     }
 
-    for (var docRef in fieldSearchScores) {
+    for (var docRef in fieldSearchResults) {
       if (docRef in queryResults) {
-        queryResults[docRef] += fieldSearchScores[docRef];
+        queryResults[docRef] += fieldSearchResults[docRef];
       } else {
-        queryResults[docRef] = fieldSearchScores[docRef];
+        queryResults[docRef] = fieldSearchResults[docRef];
       }
     }
   }
@@ -747,11 +793,71 @@ elasticlunr.Index.prototype.search = function (query, config) {
     results.push({ref: docRef, score: queryResults[docRef]});
   }
 
-  results.sort(function (a, b) { return b.score - a.score });
+  results.sort(function (a, b) { return b.score - a.score; });
   return results;
 };
 
 /**
+ * search queryTokens in specified field.
+ *
+ * @param {Array} queryTokens The query tokens to query in this field.
+ * @param {String} field Field to query in.
+ * @param {elasticlunr.Configuration} config The user query config, JSON format.
+ * @return {Object}
+ */
+elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
+  var booleanType = config[fieldName].bool;
+  var scores = {};
+  var docTokens = {};
+
+  queryTokens.forEach(function (token) {
+    var docs = this.index[fieldName].getDocs(token);
+    var idf = this.idf(token, fieldName);
+    for (var doc in docs) {
+      var tf = docs[doc].tf;
+      var norm = 1 / Math.sqrt(docs[doc].fieldLength);
+      var score = tf * idf * norm;
+
+      if (doc in scores) {
+        scores[doc] += score;
+      } else {
+        scores[doc] = score;
+      }
+    }
+
+    this.fieldSearchStats(docTokens, token, docs);
+  }, this);
+
+  if (booleanType == 'AND') {
+    scores = this.intersect(scores, docTokens, queryTokens.length);
+  }
+
+  scores = this.coordNorm(scores, docTokens, queryTokens.length);
+
+  return scores;
+};
+
+/**
+ * Record the occuring query token of retrieved doc specified by doc field.
+ * Only for inner user.
+ * 
+ * @param {Object} docTokens a data structure stores which token appears in the retrieved doc.
+ * @param {String} token query token
+ * @param {Object} docs the retrieved documents of the query token
+ * 
+ */
+elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs) {
+  for (var doc in docs) {
+    if (doc in docTokens) {
+      docTokens[doc].push(token);
+    } else {
+      docTokens[doc] = [token];
+    }
+  }
+};
+
+/**
+ * Deprecated function.
  * compute the score of a documents in given field.
  * 
  * @param {Array} queryTokens
@@ -785,15 +891,15 @@ elasticlunr.Index.prototype.computeScore = function (queryTokens, docRef, field)
  * compute squared weight of query tokens.
  *
  * @param {Array} queryTokens query tokens.
- * @param {Object} searchFields fields to search.
+ * @param {elasticlunr.Configuration} config The user query config, JSON format.
  * @return {Float}
  */
-elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, searchFields) {
+elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, config) {
   var weight = 0.0;
   queryTokens.forEach(function (token) {
     var fieldWeight = 0.0;
-    for (var field in searchFields) {
-      var fieldBoost = searchFields[field].boost || 1;
+    for (var field in config) {
+      var fieldBoost = config[field].boost;
       var idf = this.idf(token, field);
       fieldWeight += idf * idf * fieldBoost * fieldBoost;
     }
@@ -804,72 +910,45 @@ elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, search
 };
 
 /**
- * search queryTokens in specified field.
- *
- * @param {Array} queryTokens The query tokens to query in this field.
- * @param {String} field Field to query in.
- * @param {Object} config search config.
- * @return {Object}
- */
-elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
-  var booleanType = (config == null || config['boolean'] == null) ? 'OR' : config['boolean'];
-  var tokenResults = {};
-
-  queryTokens.forEach(function (token) {
-    var docs = this.index[fieldName].getDocs(token);
-    tokenResults[token] = docs; 
-  }, this);
-
-  var res = {};
-  if (booleanType == 'OR') {
-    res = this.union(tokenResults);
-  } else if (booleanType == 'AND') {
-    res = this.intersect(tokenResults, queryTokens);
-  }
-  
-  return res;
-};
-
-/**
- * union tokenResults among each token results.
- * @param {Object} tokenResults results of all query tokens
- * @return {Object}
- */
-elasticlunr.Index.prototype.union = function (tokenResults) {
-  var res = {};
-  for (var token in tokenResults) {
-    for (var docRef in tokenResults[token]) {
-      res[docRef] = true;
-    }
-  }
-
-  return res;
-};
-
-/**
- * intersect the two results
+ * find documents contain all the query tokens.
+ * only for inner use.
+ * 
  * @param {Object} results first results
  * @param {Object} docs field search results of a token
+ * @param {Integer} n query token number
  * @return {Object}
  */
-elasticlunr.Index.prototype.intersect = function (tokenResults, queryTokens) {
+elasticlunr.Index.prototype.intersect = function (scores, docTokens, n) {
   var res = {};
-  var token = queryTokens[0];
-  for (var docRef in tokenResults[token]) {
-    var flag = true;
-    for (var key in tokenResults) {
-      if (!(docRef in tokenResults[key])) {
-        flag = false;
-        break;
-      }
-    }
 
-    if (flag == true) {
-      res[docRef] = true;
+  for (var doc in scores) {
+    if (docTokens[doc].length == n) {
+      res[doc] = scores[doc];
     }
   }
 
   return res;
+};
+
+/**
+ * coord norm the score of a doc.
+ * if a doc contain more query tokens, then the score will larger than the doc
+ * contains less query tokens.
+ * 
+ * only for inner use.
+ * 
+ * @param {Object} results first results
+ * @param {Object} docs field search results of a token
+ * @param {Integer} n query token number
+ * @return {Object}
+ */
+elasticlunr.Index.prototype.coordNorm = function (scores, docTokens, n) {
+  for (var doc in scores) {
+    var tokens = docTokens[doc].length;
+    scores[doc] = scores[doc] * tokens / n;
+  }
+
+  return scores;
 };
 
 /**
@@ -880,10 +959,9 @@ elasticlunr.Index.prototype.intersect = function (tokenResults, queryTokens) {
  */
 elasticlunr.Index.prototype.toJSON = function () {
   var indexJson = {};
-  for (var idx in this._fields) {
-    var fieldName = this._fields[idx];
-    indexJson[fieldName] = this.index[fieldName].toJSON();
-  }
+  this._fields.forEach(function (field) {
+    indexJson[field] = this.index[field].toJSON();
+  }, this);
 
   return {
     version: elasticlunr.version,
@@ -914,7 +992,7 @@ elasticlunr.Index.prototype.toJSON = function () {
  *       // apply any extensions etc here.
  *     }
  *
- *     var idx = lunr(function () {
+ *     var idx = elasticlunr(function () {
  *       this.use(myPlugin, 'arg1', 'arg2')
  *     })
  *
@@ -922,10 +1000,10 @@ elasticlunr.Index.prototype.toJSON = function () {
  * @memberOf Index
  */
 elasticlunr.Index.prototype.use = function (plugin) {
-  var args = Array.prototype.slice.call(arguments, 1)
-  args.unshift(this)
-  plugin.apply(this, args)
-}
+  var args = Array.prototype.slice.call(arguments, 1);
+  args.unshift(this);
+  plugin.apply(this, args);
+};
 /*!
  * elasticlunr.DocumentStore
  * Copyright (C) 2015 Oliver Nightingale
@@ -936,10 +1014,19 @@ elasticlunr.Index.prototype.use = function (plugin) {
  * elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for
  * documents stored in index.
  *
+ * elasticlunr.DocumentStore store original JSON format documents that you could build search snippet by this original JSON document.
+ *
+ * @param {Boolean} save If the original JSON document should be stored.
  * @constructor
  * @module
  */
-elasticlunr.DocumentStore = function () {
+elasticlunr.DocumentStore = function (save) {
+  if (save == null || save == undefined) {
+    this._save = true;
+  } else {
+    this._save = save;
+  }
+
   this.docs = {};
   this.length = 0;
 };
@@ -955,30 +1042,50 @@ elasticlunr.DocumentStore.load = function (serialisedData) {
 
   store.length = serialisedData.length;
   store.docs = serialisedData.docs;
+  store._save = serialisedData.save;
 
   return store;
 };
 
 /**
+ * check if current instance store the original doc
+ *
+ * @return {Boolean}
+ */
+elasticlunr.DocumentStore.isSave = function () {
+  return this._save;
+};
+
+/**
  * Stores the given doc in the document store against the given id.
  * If docRef already exist, then update doc.
+ * 
+ * Document is store by original JSON format, then you could use original document to generate search snippets.
  *
  * @param {Object} docRef The key used to store the JSON format doc.
  * @param {Object} doc The JSON format doc.
  */
 elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
   if (!this.hasDoc(docRef)) this.length++;
-  this.docs[docRef] = doc;
+
+  if (this._save == true) {
+    this.docs[docRef] = doc;
+  } else {
+    this.docs[docRef] = null;
+  }
 };
 
 /**
  * Retrieves the JSON doc from the document store for a given key.
+ * 
+ * If docRef not found, return null.
  *
  * @param {Object} docRef, The key to lookup and retrieve from the document store.
  * @return {Object}
  * @memberOf Store
  */
 elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
+  if (this.hasDoc(docRef) == false) return null;
   return this.docs[docRef];
 };
 
@@ -1015,7 +1122,8 @@ elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
 elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {
     docs: this.docs,
-    length: this.length
+    length: this.length,
+    save: this._save
   };
 };
 /*!
@@ -1452,7 +1560,7 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
  * it can start at any node of the inverted index if required.
  *
  * @param {String} token 
- * @param {Object} tokenInfo format: { ref: 1, tf: 2 }
+ * @param {Object} tokenInfo format: { ref: 1, tf: 2, fieldLength: 15}
  * @param {Object} root An optional node at which to start looking for the
  * correct place to enter the doc, by default the root of this elasticlunr.InvertedIndex
  * is used.
@@ -1473,12 +1581,12 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
   var docRef = tokenInfo.ref;
   if (!root.docs[docRef]) {
     // if this doc not exist, then add this doc
-    root.docs[docRef] = {tf: tokenInfo.tf};
+    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
     root.df += 1;
     this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
-    root.docs[docRef] = {tf: tokenInfo.tf};
+    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
   }
 };
 
@@ -1551,10 +1659,10 @@ elasticlunr.InvertedIndex.prototype.getDocs = function (token) {
  *
  * @param {String} token The token to get the documents for.
  * @param {String|Integer} docRef
- * @return {Object}
+ * @return {Integer}
  * @memberOf InvertedIndex
  */
-elasticlunr.InvertedIndex.prototype.getTF = function (token, docRef) {
+elasticlunr.InvertedIndex.prototype.getTermFrequency = function (token, docRef) {
   var node = this.getNode(token);
 
   if (node == null) {
@@ -1566,6 +1674,30 @@ elasticlunr.InvertedIndex.prototype.getTF = function (token, docRef) {
   }
 
   return node.docs[docRef].tf;
+};
+
+/**
+ * Retrieve field length of given token in given docRef.
+ * If token or docRef not found, return 0.
+ *
+ *
+ * @param {String} token The token to get the documents for.
+ * @param {String|Integer} docRef
+ * @return {Integer}
+ * @memberOf InvertedIndex
+ */
+elasticlunr.InvertedIndex.prototype.getFieldLength = function (token, docRef) {
+  var node = this.getNode(token);
+
+  if (node == null) {
+    return 0;
+  }
+
+  if (!(docRef in node.docs)) {
+    return 0;
+  }
+
+  return node.docs[docRef].fieldLength;
 };
 
 /**
@@ -1648,6 +1780,145 @@ elasticlunr.InvertedIndex.prototype.toJSON = function () {
   };
 };
 
+/*!
+ * elasticlunr.Configuration
+ * Copyright (C) 2015 Wei Song
+ */
+ 
+ /** 
+  * elasticlunr.Configuration is used to analyze the user search configuration.
+  * 
+  * By elasticlunr.Configuration user could set query-time boosting, boolean model in each field.
+  * 
+  * Currently configuration supports:
+  * 1. query-time boosting, user could set how to boost each field.
+  * 2. boolean model chosing, user could choose which boolean model to use for each field.
+  * 
+  * query time boosting infor must be configured by field category, "boolean" model could be configured 
+  * by both field category or globally as the following example. Field configuration for "boolean"
+  * will overwrite global configuration.
+  * 
+  * configuration example:
+  * {
+  *   fields:{ 
+  *     title: {boost: 2},
+  *     body: {boost: 1}
+  *   },
+  *   bool: "OR"
+  * }
+  * 
+  * "bool" field configuation overwrite global configuation example:
+  * {
+  *   fields:{ 
+  *     title: {boost: 2, bool: "AND"},
+  *     body: {boost: 1}
+  *   },
+  *   bool: "OR"
+  * }
+  * 
+  * then, user could search with configuration to do query-time boosting.
+  * idx.search('oracle database', {fields: {title: {boost: 2}, body: {boost: 1}}});
+  * 
+  * 
+  * @constructor
+  * 
+  * @param {String} config user configuration
+  * @param {Array} fields fields of index instance
+  * @module
+  */
+elasticlunr.Configuration = function (config, fields) {
+  var config = config || '';
+
+  if (fields == undefined || fields == null) {
+    throw new Error('fields should not be null'); 
+  }
+
+  this.config = {};
+
+  var userConfig;
+  try {
+    userConfig = JSON.parse(config);
+    this.buildUserConfig(userConfig, fields);
+  } catch (error) {
+    elasticlunr.utils.warn('user configuration parse failed, will use default configuration');
+    this.buildDefaultConfig(fields);
+  }
+};
+
+/**
+ * Build default search configuration.
+ * 
+ * @param {Array} fields fields of index instance
+ */
+elasticlunr.Configuration.prototype.buildDefaultConfig = function (fields) {
+  this.reset();
+  fields.forEach(function (field) {
+    this.config[field] = {
+      boost: 1,
+      bool: "OR"
+    };
+  }, this);
+};
+
+/**
+ * Build user configuration.
+ * 
+ * @param {JSON} config User JSON configuratoin
+ * @param {Array} fields fields of index instance
+ */
+elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) {
+  var bool = "OR";
+      
+  this.reset();
+  if ('bool' in config) {
+    bool = config['bool'];
+  }
+
+  if ('fields' in config) {
+    for (var field in config['fields']) {
+      if (fields.indexOf(field) > -1) {
+        var field_config = config['fields'][field];
+        this.config[field] = {
+          boost: field_config.boost || 1,
+          bool: field_config.bool || bool
+        };
+      } else {
+        elasticlunr.utils.warn('field name in user configuration not found in index instance fields');
+      }
+    }
+  } else {
+    this.addAllFields2UserConfig(bool, fields);
+  }
+};
+
+/**
+ * Add all fields to user search configuration.
+ * 
+ * @param {String} bool Boolean model
+ * @param {Array} fields fields of index instance
+ */
+elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, fields) {
+  fields.forEach(function (field) {
+    this.config[field] = {
+      boost: 1,
+      bool: bool
+    };
+  }, this);
+};
+
+/**
+ * get current user configuration
+ */
+elasticlunr.Configuration.prototype.get = function () {
+  return this.config;
+};
+
+/**
+ * reset user search configuration.
+ */
+elasticlunr.Configuration.prototype.reset = function () {
+  this.config = {};
+};
 
   /**
    * export the module via AMD, CommonJS or as a browser global

@@ -72,7 +72,7 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
-            <li><a href="configuration.js.html">configuration.js</a></li>
+            <li class="active"><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -81,23 +81,33 @@
             <li><a href="pipeline.js.html">pipeline.js</a></li>
             <li><a href="stemmer.js.html">stemmer.js</a></li>
             <li><a href="stop_word_filter.js.html">stop_word_filter.js</a></li>
-            <li class="active"><a href="tokenizer.js.html">tokenizer.js</a></li>
+            <li><a href="tokenizer.js.html">tokenizer.js</a></li>
             <li><a href="trimmer.js.html">trimmer.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
-              <li><a href="#tokenizer"><i class="alert alert-info"></i><span>tokenizer</span></a>
+              <li><a href="#Configuration"><i class="alert alert-success"></i><span>Configuration</span></a>
+              </li>
+              <li><a href="#buildDefaultConfig"><i class="alert alert-info"></i><span>buildDefaultConfig</span></a>
+              </li>
+              <li><a href="#buildUserConfig"><i class="alert alert-info"></i><span>buildUserConfig</span></a>
+              </li>
+              <li><a href="#addAllFields2UserConfig"><i class="alert alert-info"></i><span>addAllFields2UserConfig</span></a>
+              </li>
+              <li><a href="#get"><i class="alert alert-info"></i><span>get</span></a>
+              </li>
+              <li><a href="#reset"><i class="alert alert-info"></i><span>reset</span></a>
               </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="tokenizer">
-            <h1>tokenizer</h1>
+          <section id="Configuration">
+            <h1>Configuration</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.tokenizer()</span>
+              <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.Configuration()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -110,23 +120,184 @@
             </thead>
             <tbody>
               <tr>
-                <td>str</td>
+                <td>config</td>
                 <td>String</td>
-                <td><p>The string that you want to tokenize.</p></td>
+                <td><p>user configuration</p></td>
               </tr>
               <tr>
-                <td>return</td>
+                <td>fields</td>
                 <td>Array</td>
-                <td></td>
+                <td><p>fields of index instance</p></td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>A function for splitting a string into tokens.<br />Currently English is support as default.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.tokenizer = function (obj) {
-  if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase(); });
+          <div class="description"><p>elasticlunr.Configuration is used to analyze the user search configuration.</p><p>By elasticlunr.Configuration user could set query-time boosting, boolean model in each field.</p><p>Currently configuration supports:</p><ol>
+<li>query-time boosting, user could set how to boost each field.</li>
+<li>boolean model chosing, user could choose which boolean model to use for each field.</li>
+</ol>
+<p>query time boosting infor must be configured by field category, &quot;boolean&quot; model could be configured<br />by both field category or globally as the following example. Field configuration for &quot;boolean&quot;<br />will overwrite global configuration.</p><p>configuration example:<br />{<br />  fields:{<br />    title: {boost: 2},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;bool&quot; field configuation overwrite global configuation example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>then, user could search with configuration to do query-time boosting.<br />idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration = function (config, fields) {
+  var config = config || '';
 
-  return obj.toString().trim().toLowerCase().split(/[\s\-]+/);
+  if (fields == undefined || fields == null) {
+    throw new Error('fields should not be null'); 
+  }
+
+  this.config = {};
+
+  var userConfig;
+  try {
+    userConfig = JSON.parse(config);
+    this.buildUserConfig(userConfig, fields);
+  } catch (error) {
+    elasticlunr.utils.warn('user configuration parse failed, will use default configuration');
+    this.buildDefaultConfig(fields);
+  }
+};</code></pre>
+          <section id="buildDefaultConfig">
+            <h1>buildDefaultConfig</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Configuration.prototype.buildDefaultConfig()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>fields</td>
+                <td>Array</td>
+                <td><p>fields of index instance</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Build default search configuration.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.buildDefaultConfig = function (fields) {
+  this.reset();
+  fields.forEach(function (field) {
+    this.config[field] = {
+      boost: 1,
+      bool: &quot;OR&quot;
+    };
+  }, this);
+};</code></pre>
+          <section id="buildUserConfig">
+            <h1>buildUserConfig</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Configuration.prototype.buildUserConfig()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>config</td>
+                <td>JSON</td>
+                <td><p>User JSON configuratoin</p></td>
+              </tr>
+              <tr>
+                <td>fields</td>
+                <td>Array</td>
+                <td><p>fields of index instance</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Build user configuration.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) {
+  var bool = &quot;OR&quot;;
+      
+  this.reset();
+  if ('bool' in config) {
+    bool = config['bool'];
+  }
+
+  if ('fields' in config) {
+    for (var field in config['fields']) {
+      if (fields.indexOf(field) &gt; -1) {
+        var field_config = config['fields'][field];
+        this.config[field] = {
+          boost: field_config.boost || 1,
+          bool: field_config.bool || bool
+        };
+      } else {
+        elasticlunr.utils.warn('field name in user configuration not found in index instance fields');
+      }
+    }
+  } else {
+    this.addAllFields2UserConfig(bool, fields);
+  }
+};</code></pre>
+          <section id="addAllFields2UserConfig">
+            <h1>addAllFields2UserConfig</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Configuration.prototype.addAllFields2UserConfig()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>bool</td>
+                <td>String</td>
+                <td><p>Boolean model</p></td>
+              </tr>
+              <tr>
+                <td>fields</td>
+                <td>Array</td>
+                <td><p>fields of index instance</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Add all fields to user search configuration.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, fields) {
+  fields.forEach(function (field) {
+    this.config[field] = {
+      boost: 1,
+      bool: bool
+    };
+  }, this);
+};</code></pre>
+          <section id="get">
+            <h1>get</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Configuration.prototype.get()</span>
+            </p>
+          </section>
+          <div class="description"><p>get current user configuration</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.get = function () {
+  return this.config;
+};</code></pre>
+          <section id="reset">
+            <h1>reset</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Configuration.prototype.reset()</span>
+            </p>
+          </section>
+          <div class="description"><p>reset user search configuration.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.reset = function () {
+  this.config = {};
 };</code></pre>
         </div>
       </div>

@@ -72,6 +72,7 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li class="active"><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -120,20 +121,25 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Convenience function for instantiating a new elasticlunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><p>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</p><p>elasticlunr.stemmer - stems the tokens before entering the index.</p><p>Example:</p><pre><code>var idx = elasticlunr(function () {
-  this.addField(&#39;id&#39;)
-  this.addField(&#39;title&#39;)
-  this.addField(&#39;body&#39;)
+          <div class="description"><p>Convenience function for instantiating a new elasticlunr index and configuring it<br />with the default pipeline functions and the passed config function.</p><p>When using this convenience function a new index will be created with the<br />following functions already in the pipeline:</p><ol>
+<li>elasticlunr.trimmer - trim non-word character</li>
+<li>elasticlunr.StopWordFilter - filters out any stop words before they enter the<br />index</li>
+<li>elasticlunr.stemmer - stems the tokens before entering the index.</li>
+</ol>
+<p>Example:</p><pre><code>var idx = elasticlunr(function () {
+  this.addField(&#39;id&#39;);
+  this.addField(&#39;title&#39;);
+  this.addField(&#39;body&#39;);
 
-  //this.setRef(&#39;cid&#39;) // default ref is &#39;id&#39;
+  //this.setRef(&#39;id&#39;); // default ref is &#39;id&#39;
 
   this.pipeline.add(function () {
     // some custom pipeline function
-  })
-
-})
-</code></pre><p>   idx.addDoc({<br />     id: 1,<br />     title: &#39;Oracle released database 12g&#39;,<br />     body: &#39;Yestaday, Oracle has released their latest database, named 12g, more robust. this product will increase Oracle profit.&#39;<br />   });</p><p>   idx.addDoc({<br />     id: 2,<br />     title: &#39;Oracle released annual profit report&#39;,<br />     body: &#39;Yestaday, Oracle has released their annual profit report of 2015, total profit is 12.5 Billion.&#39;<br />   });</p><h1>search with query-time boosting</h1>
-<p>   idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}})</p> </div>
+  });
+});
+</code></pre><p>   idx.addDoc({<br />     id: 1,<br />     title: &#39;Oracle released database 12g&#39;,<br />     body: &#39;Yestaday, Oracle has released their latest database, named 12g, more robust. this product will increase Oracle profit.&#39;<br />   });</p><p>   idx.addDoc({<br />     id: 2,<br />     title: &#39;Oracle released annual profit report&#39;,<br />     body: &#39;Yestaday, Oracle has released their annual profit report of 2015, total profit is 12.5 Billion.&#39;<br />   });</p><h1>simple search</h1>
+<p>   idx.search(&#39;oracle database&#39;);</p><h1>search with query-time boosting</h1>
+<p>   idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
           <pre><code class="language-javascript">var elasticlunr = function (config) {
   var idx = new elasticlunr.Index;
 

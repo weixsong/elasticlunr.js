@@ -72,6 +72,7 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li class="active"><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -89,6 +90,8 @@
               <li><a href="#DocumentStore"><i class="alert alert-success"></i><span>DocumentStore</span></a>
               </li>
               <li><a href="#load"><i class="alert alert-info"></i><span>load</span></a>
+              </li>
+              <li><a href="#isSave"><i class="alert alert-info"></i><span>isSave</span></a>
               </li>
               <li><a href="#addDoc"><i class="alert alert-info"></i><span>addDoc</span></a>
               </li>
@@ -111,8 +114,30 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.DocumentStore()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for<br />documents stored in index.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore = function () {
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>save</td>
+                <td>Boolean</td>
+                <td><p>If the original JSON document should be stored.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for<br />documents stored in index.</p><p>elasticlunr.DocumentStore store original JSON format documents that you could build search snippet by this original JSON document.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore = function (save) {
+  if (save == null || save == undefined) {
+    this._save = true;
+  } else {
+    this._save = save;
+  }
+
   this.docs = {};
   this.length = 0;
 };</code></pre>
@@ -150,8 +175,20 @@
 
   store.length = serialisedData.length;
   store.docs = serialisedData.docs;
+  store._save = serialisedData.save;
 
   return store;
+};</code></pre>
+          <section id="isSave">
+            <h1>isSave</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.isSave()</span>
+            </p>
+          </section>
+          <div class="description"><p>check if current instance store the original doc</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.isSave = function () {
+  return this._save;
 };</code></pre>
           <section id="addDoc">
             <h1>addDoc</h1>
@@ -181,10 +218,15 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Stores the given doc in the document store against the given id.<br />If docRef already exist, then update doc.</p> </div>
+          <div class="description"><p>Stores the given doc in the document store against the given id.<br />If docRef already exist, then update doc.</p><p>Document is store by original JSON format, then you could use original document to generate search snippets.</p> </div>
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
   if (!this.hasDoc(docRef)) this.length++;
-  this.docs[docRef] = doc;
+
+  if (this._save == true) {
+    this.docs[docRef] = doc;
+  } else {
+    this.docs[docRef] = null;
+  }
 };</code></pre>
           <section id="getDoc">
             <h1>getDoc</h1>
@@ -214,8 +256,9 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Retrieves the JSON doc from the document store for a given key.</p> </div>
+          <div class="description"><p>Retrieves the JSON doc from the document store for a given key.</p><p>If docRef not found, return null.</p> </div>
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
+  if (this.hasDoc(docRef) == false) return null;
   return this.docs[docRef];
 };</code></pre>
           <section id="hasDoc">
@@ -291,7 +334,8 @@
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {
     docs: this.docs,
-    length: this.length
+    length: this.length,
+    save: this._save
   };
 };</code></pre>
         </div>
