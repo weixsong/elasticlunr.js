@@ -109,6 +109,8 @@
               </li>
               <li><a href="#update"><i class="alert alert-info"></i><span>update</span></a>
               </li>
+              <li><a href="#getFields"><i class="alert alert-info"></i><span>getFields</span></a>
+              </li>
               <li><a href="#search"><i class="alert alert-info"></i><span>search</span></a>
               </li>
               <li><a href="#fieldSearch"><i class="alert alert-info"></i><span>fieldSearch</span></a>
@@ -549,6 +551,17 @@
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
 };</code></pre>
+          <section id="getFields">
+            <h1>getFields</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.getFields()</span>
+            </p>
+          </section>
+          <div class="description"><p>get fields of current index instance </p> </div>
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.getFields = function () {
+  return this._fields.slice();
+}</code></pre>
           <section id="search">
             <h1>search</h1>
             <h5 class="subheader"></h5>
@@ -585,7 +598,7 @@
           <div class="description"><p>Searches the index using the passed query.<br />Queries should be a string, multiple words are allowed.</p><p>If config is null, will search all fields defaultly, and lead to OR based query.<br />If config is specified, will search specified with query time boosting.</p><p>All query tokens are passed through the same pipeline that document tokens<br />are passed through, so any language processing involved will be run on every<br />query term.</p><p>Each query term is expanded, so that the term &#39;he&#39; might be expanded to<br />&#39;hello&#39; and &#39;help&#39; if those terms were already included in the index.</p><p>Matching documents are returned as an array of objects, each object contains<br />the matching document ref, as set for this index, and the similarity score<br />for this document against the query.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.search = function (query, jsonConfig) {
   if (!query) return [];
-  var config = jsonConfig || new elasticlunr.Configuration(null, this._fields.slice()).get();
+  var config = jsonConfig || new elasticlunr.Configuration(null, this.getFields()).get();
 
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
