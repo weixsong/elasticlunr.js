@@ -119,7 +119,7 @@
 </ol>
 </li>
 <li><ol>
-<li><strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, this is especially helpful when elasticlunr.js is used as offline search.</li>
+<li><strong>Small index file</strong>, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, and also user could choose if they need to store the origianl JSON doc, if user care more about the index size, they could choose not store the original JSON doc, this could reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search.</li>
 </ol>
 </li>
 </ul>
@@ -185,16 +185,22 @@ index.addField(&#39;title&#39;);
 index.addField(&#39;body&#39;);
 index.setRef(&#39;id&#39;);
 </code></pre>
-<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var lunr = require(&#39;./lib/lunr.js&#39;);
+<p>Also you could choose not store the original JSON document to reduce the index size by:</p><pre><code class="lang-javascript">var index = elasticlunr();
+index.addField(&#39;title&#39;);
+index.addField(&#39;body&#39;);
+index.setRef(&#39;id&#39;);
+index.saveDocument(false);
+</code></pre>
+<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var elasticlunr = require(&#39;./lib/elasticlunr.js&#39;);
 require(&#39;./lunr.stemmer.support.js&#39;)(lunr);
 require(&#39;./lunr.de.js&#39;)(lunr);
 
-var idx = lunr(function () {
+var idx = elasticlunr(function () {
     // use the language (de)
     this.use(lunr.de);
     // then, the normal lunr index initialization
-    this.field(&#39;title&#39;)
-    this.field(&#39;body&#39;)
+    this.addField(&#39;title&#39;)
+    this.addField(&#39;body&#39;)
 });
 </code></pre>
 <p>For more details, please go to <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.</p><h2>2. Add document to index</h2>

@@ -3,7 +3,7 @@
   "description": "Lightweight full-text search engine in Javascript for browser search and offline search.",
   "version": "@VERSION",
   "author": "Wei Song",
-  "keywords": ["search"],
+  "keywords": ["search", "text retrieval", "offline search"],
   "homepage": "http://weixsong.github.io",
   "bugs": "https://github.com/weixsong/elasticlunr.js/issues",
   "main": "elasticlunr.js",

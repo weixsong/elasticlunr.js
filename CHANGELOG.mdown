@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.3
+
+ * 1. release 0.6.3
+
+## 0.6.2
+
+ * 1. add fieldLength to documentStore
+ * 2. support not store JSON document
+ * 3. add Configuration parser.
+ * 4. refactor scoring methodology.
+
 ## 0.6.1
 
  * 1. Support field search, each field of document has a separted index.
