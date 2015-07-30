@@ -1,9 +1,9 @@
 {
   "name": "elasticlunr",
   "description": "Lightweight full-text search engine in Javascript for browser search and offline search.",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "author": "Wei Song",
-  "keywords": ["search", "text retrieval", "offline search"],
+  "keywords": ["search", "text retrieval", "offline search", "full text search"],
   "homepage": "http://weixsong.github.io",
   "bugs": "https://github.com/weixsong/elasticlunr.js/issues",
   "main": "elasticlunr.js",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "doxx": "1.4.0",
-    "phantomjs": "1.8.1-3",
+    "phantomjs": "1.9.8",
     "uglify-js": "2.4.13"
   },
   "scripts": {

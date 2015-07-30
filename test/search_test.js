@@ -11,7 +11,7 @@ module('search', {
       wordCount: 19
     },{
       id: 'b',
-      title: 'Plumb waters plant',
+      title: 'Plumb waters green plant ',
       body: 'Professor Plumb has a green plant in his study',
       wordCount: 9
     },{
@@ -27,7 +27,7 @@ module('search', {
       id: 'e',
       title: 'title abc',
       body: 'hand',
-    }]).forEach(function (doc) { idx.addDoc(doc) })
+    }]).forEach(function (doc) { idx.addDoc(doc); });
 
     this.idx = idx;
   }

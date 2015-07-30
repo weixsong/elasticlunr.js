@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.5
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.6
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.6.5";
+elasticlunr.version = "0.6.6";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
@@ -616,7 +616,7 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
     for (var token in tokenCount) {
       var termFrequency = tokenCount[token];
       termFrequency = Math.sqrt(termFrequency);
-      this.index[field].addToken(token, { ref: docRef, tf: termFrequency, fieldLength: fieldTokens.length });
+      this.index[field].addToken(token, { ref: docRef, tf: termFrequency });
     }
   }, this);
 
@@ -783,7 +783,6 @@ elasticlunr.Index.prototype.search = function (query, jsonConfig) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
     var fieldBoost = config[field].boost;
     var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
-    console.log('queryNorm: ' + queryNorm +' in field:' + field);
 
     for (var docRef in fieldSearchResults) {
       fieldSearchResults[docRef] = fieldSearchResults[docRef] * queryNorm;
@@ -823,15 +822,19 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
   queryTokens.forEach(function (token) {
     var docs = this.index[fieldName].getDocs(token);
     var idf = this.idf(token, fieldName);
-    for (var doc in docs) {
-      var tf = docs[doc].tf;
-      var norm = 1 / Math.sqrt(docs[doc].fieldLength);
+    for (var docRef in docs) {
+      var tf = docs[docRef].tf;
+      var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
+      var norm = 1;
+      if (fieldLength != 0) {
+        norm = 1 / Math.sqrt(fieldLength);
+      }
       var score = tf * idf * norm;
 
-      if (doc in scores) {
-        scores[doc] += score;
+      if (docRef in scores) {
+        scores[docRef] += score;
       } else {
-        scores[doc] = score;
+        scores[docRef] = score;
       }
     }
 
@@ -1586,7 +1589,6 @@ elasticlunr.trimmer = function (token) {
 elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');
 /*!
  * elasticlunr.InvertedIndex
- * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
@@ -1624,7 +1626,7 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
  * it can start at any node of the inverted index if required.
  *
  * @param {String} token 
- * @param {Object} tokenInfo format: { ref: 1, tf: 2, fieldLength: 15}
+ * @param {Object} tokenInfo format: { ref: 1, tf: 2}
  * @param {Object} root An optional node at which to start looking for the
  * correct place to enter the doc, by default the root of this elasticlunr.InvertedIndex
  * is used.
@@ -1645,12 +1647,12 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
   var docRef = tokenInfo.ref;
   if (!root.docs[docRef]) {
     // if this doc not exist, then add this doc
-    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
+    root.docs[docRef] = {tf: tokenInfo.tf};
     root.df += 1;
     this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
-    root.docs[docRef] = {tf: tokenInfo.tf, fieldLength: tokenInfo.fieldLength};
+    root.docs[docRef] = {tf: tokenInfo.tf};
   }
 };
 
@@ -1738,30 +1740,6 @@ elasticlunr.InvertedIndex.prototype.getTermFrequency = function (token, docRef) 
   }
 
   return node.docs[docRef].tf;
-};
-
-/**
- * Retrieve field length of given token in given docRef.
- * If token or docRef not found, return 0.
- *
- *
- * @param {String} token The token to get the documents for.
- * @param {String|Integer} docRef
- * @return {Integer}
- * @memberOf InvertedIndex
- */
-elasticlunr.InvertedIndex.prototype.getFieldLength = function (token, docRef) {
-  var node = this.getNode(token);
-
-  if (node == null) {
-    return 0;
-  }
-
-  if (!(docRef in node.docs)) {
-    return 0;
-  }
-
-  return node.docs[docRef].fieldLength;
 };
 
 /**

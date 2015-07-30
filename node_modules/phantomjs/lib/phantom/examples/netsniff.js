@@ -25,6 +25,12 @@ function createHAR(address, title, startTime, resources)
             return;
         }
 
+        // Exclude Data URI from HAR file because
+        // they aren't included in specification
+        if (request.url.match(/(^data:image\/.*)/i)) {
+            return;
+	}
+
         entries.push({
             startedDateTime: request.time.toISOString(),
             time: endReply.time - request.time,
@@ -123,6 +129,7 @@ if (system.args.length === 1) {
         var har;
         if (status !== 'success') {
             console.log('FAIL to load the address');
+            phantom.exit(1);
         } else {
             page.endTime = new Date();
             page.title = page.evaluate(function () {
@@ -130,7 +137,7 @@ if (system.args.length === 1) {
             });
             har = createHAR(page.address, page.title, page.startTime, page.resources);
             console.log(JSON.stringify(har, undefined, 4));
+            phantom.exit();
         }
-        phantom.exit();
     });
 }

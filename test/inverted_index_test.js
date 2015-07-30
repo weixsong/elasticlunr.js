@@ -10,40 +10,37 @@ test('create empty inverted index', function () {
 
 test('adding a token to the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 },
+      doc = { ref: 123, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc);
 
-  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1, fieldLength: 2});
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1});
   equal(invertedIndex.getDocFreq('foo'), 1);
   equal(invertedIndex.getTermFrequency('foo', 123), 1);
-  equal(invertedIndex.getFieldLength('foo', 123), 2);
   equal(invertedIndex.length, 1);
 });
 
 test('adding another document to the token', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 1, fieldLength: 2  },
-      doc2 = { ref: 456, tf: 1, fieldLength: 3  },
+      doc1 = { ref: 123, tf: 1},
+      doc2 = { ref: 456, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
   invertedIndex.addToken(token, doc2);
 
-  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1, fieldLength: 2});
-  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 1, fieldLength: 3});
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1});
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 1});
   equal(invertedIndex.getTermFrequency('foo', 123), 1);
   equal(invertedIndex.getTermFrequency('foo', 456), 1);
-  equal(invertedIndex.getFieldLength('foo', 123), 2);
-  equal(invertedIndex.getFieldLength('foo', 456), 3);
   equal(invertedIndex.getDocFreq('foo'), 2);
 });
 
 test('test df of none-existing token', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 1, fieldLength: 2 },
-      doc2 = { ref: 456, tf: 1, fieldLength: 2 },
+      doc1 = { ref: 123, tf: 1},
+      doc2 = { ref: 456, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
@@ -55,23 +52,22 @@ test('test df of none-existing token', function () {
 
 test('adding existing doc', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 1, fieldLength: 2 },
-      doc2 = { ref: 456, tf: 1, fieldLength: 2 },
+      doc1 = { ref: 123, tf: 1},
+      doc2 = { ref: 456, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
   invertedIndex.addToken(token, doc2);
-  invertedIndex.addToken(token, { ref: 456, tf: 100, fieldLength: 200 });
+  invertedIndex.addToken(token, { ref: 456, tf: 100});
 
-  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 100, fieldLength: 200 });
+  deepEqual(invertedIndex.root['f']['o']['o']['docs'][456], {tf: 100});
   equal(invertedIndex.getTermFrequency('foo', 456), 100);
-  equal(invertedIndex.getFieldLength('foo', 456), 200);
   equal(invertedIndex.getDocFreq('foo'), 2);
 });
 
 test('checking if a token exists in the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 },
+      doc = { ref: 123, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc);
@@ -81,7 +77,7 @@ test('checking if a token exists in the invertedIndex', function () {
 
 test('checking if a token does not exist in the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 },
+      doc = { ref: 123, tf: 1},
       token = 'foo';
 
   ok(!invertedIndex.hasToken('bar'));
@@ -91,12 +87,12 @@ test('checking if a token does not exist in the invertedIndex', function () {
 
 test('retrieving items from the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 },
+      doc = { ref: 123, tf: 1},
       token = 'foo';
 
   invertedIndex.addToken(token, doc);
   deepEqual(invertedIndex.getDocs(token), {
-    '123': {tf: 1, fieldLength: 2}
+    '123': {tf: 1}
   });
 
   deepEqual(invertedIndex.getDocs(''), {});
@@ -111,9 +107,9 @@ test('retrieving items that do not exist in the invertedIndex', function () {
 
 test('test df of items in the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 1, fieldLength: 2 },
-      doc2 = { ref: 456, tf: 1, fieldLength: 2 },
-      doc3 = { ref: 789, tf: 1, fieldLength: 2 };
+      doc1 = { ref: 123, tf: 1},
+      doc2 = { ref: 456, tf: 1},
+      doc3 = { ref: 789, tf: 1};
 
   invertedIndex.addToken('foo', doc1);
   invertedIndex.addToken('foo', doc2);
@@ -126,13 +122,13 @@ test('test df of items in the invertedIndex', function () {
 
 test('removing a document from the token invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 };
+      doc = { ref: 123, tf: 1};
 
   deepEqual(invertedIndex.getDocs('foo'), {});
 
   invertedIndex.addToken('foo', doc);
   deepEqual(invertedIndex.getDocs('foo'), {
-    '123': {tf: 1, fieldLength: 2}
+    '123': {tf: 1}
   });
 
   invertedIndex.removeToken('foo', 123);
@@ -142,14 +138,14 @@ test('removing a document from the token invertedIndex', function () {
 
 test('removing a document that is not in the invertedIndex', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 1, fieldLength: 2 },
-      doc2 = { ref: 567, tf: 1, fieldLength: 2 };
+      doc1 = { ref: 123, tf: 1},
+      doc2 = { ref: 567, tf: 1};
 
   invertedIndex.addToken('foo', doc1);
   invertedIndex.addToken('bar', doc2);
   invertedIndex.removeToken('foo', 456);
 
-  deepEqual(invertedIndex.getDocs('foo'), { 123: {tf: 1, fieldLength: 2} });
+  deepEqual(invertedIndex.getDocs('foo'), { 123: {tf: 1} });
   equal(invertedIndex.getDocFreq('foo'), 1);
 });
 
@@ -163,7 +159,7 @@ test('removing a document from a key that does not exist', function () {
 
 test('expand a token into all descendent tokens', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 };
+      doc = { ref: 123, tf: 1};
 
   invertedIndex.addToken('hell', doc);
   invertedIndex.addToken('hello', doc);
@@ -178,7 +174,7 @@ test('expand a token into all descendent tokens', function () {
 
 test('expand a non existing token', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc = { ref: 123, tf: 1, fieldLength: 2 };
+      doc = { ref: 123, tf: 1};
 
   invertedIndex.addToken('hell', doc);
   invertedIndex.addToken('hello', doc);
@@ -193,8 +189,8 @@ test('expand a non existing token', function () {
 
 test('test get term frequency from inverted index', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 3 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 3 },
+      doc1 = { ref: 123, tf: 2},
+      doc2 = { ref: 456, tf: 3},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
@@ -206,8 +202,8 @@ test('test get term frequency from inverted index', function () {
 
 test('test get term frequency from inverted index by non-exist token', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 3 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 3 },
+      doc1 = { ref: 123, tf: 2},
+      doc2 = { ref: 456, tf: 3},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
@@ -219,8 +215,8 @@ test('test get term frequency from inverted index by non-exist token', function 
 
 test('test get term frequency from inverted index by non-exist docRef', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 2 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 3 },
+      doc1 = { ref: 123, tf: 2},
+      doc2 = { ref: 456, tf: 3},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
@@ -232,8 +228,8 @@ test('test get term frequency from inverted index by non-exist docRef', function
 
 test('test get term frequency from inverted index by non-exist token and non-exist docRef', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 2 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 3 },
+      doc1 = { ref: 123, tf: 2},
+      doc2 = { ref: 456, tf: 3},
       token = 'foo';
 
   invertedIndex.addToken(token, doc1);
@@ -243,66 +239,12 @@ test('test get term frequency from inverted index by non-exist token and non-exi
   equal(invertedIndex.getTermFrequency('abc', 2), 0);
 });
 
-test('test get field length', function () {
-  var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 200 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 300 },
-      token = 'foo';
-
-  invertedIndex.addToken(token, doc1);
-  invertedIndex.addToken(token, doc2);
-
-  equal(invertedIndex.getFieldLength('foo', 123), 200);
-  equal(invertedIndex.getFieldLength('foo', 456), 300);
-});
-
-test('test get field length with non-exist docRef', function () {
-  var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 200 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 300 },
-      token = 'foo';
-
-  invertedIndex.addToken(token, doc1);
-  invertedIndex.addToken(token, doc2);
-
-  equal(invertedIndex.getFieldLength('foo', 111), 0);
-  equal(invertedIndex.getFieldLength('foo', 456), 300);
-});
-
-test('test get field length with non-exist token', function () {
-  var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 200 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 300 },
-      token = 'foo';
-
-  invertedIndex.addToken(token, doc1);
-  invertedIndex.addToken(token, doc2);
-
-  equal(invertedIndex.getFieldLength('abc', 111), 0);
-  equal(invertedIndex.getFieldLength('foo', 456), 300);
-});
-
-test('test get field length with doc update', function () {
-  var invertedIndex = new elasticlunr.InvertedIndex,
-      doc1 = { ref: 123, tf: 2, fieldLength: 200 },
-      doc2 = { ref: 456, tf: 3, fieldLength: 300 },
-      token = 'foo';
-
-  invertedIndex.addToken(token, doc1);
-  invertedIndex.addToken(token, doc2);
-  
-  invertedIndex.addToken(token, { ref: 456, tf: 4, fieldLength: 400 });
-
-  equal(invertedIndex.getFieldLength('abc', 111), 0);
-  equal(invertedIndex.getFieldLength('foo', 456), 400);
-});
-
 test('serialisation', function () {
   var invertedIndex = new elasticlunr.InvertedIndex;
 
   deepEqual(invertedIndex.toJSON(), { root: { docs: {}, df: 0 }, length: 0 });
 
-  invertedIndex.addToken('foo', { ref: 123, tf: 1, fieldLength: 2 });
+  invertedIndex.addToken('foo', { ref: 123, tf: 1});
 
   deepEqual(invertedIndex.toJSON(),
     {
@@ -317,7 +259,7 @@ test('serialisation', function () {
             docs: {},
             o: {
               df: 1,
-              docs: { 123: { tf: 1, fieldLength: 2 } }
+              docs: { 123: { tf: 1} }
             }
           }
         }
@@ -340,7 +282,7 @@ test('loading a serialised story', function () {
             docs: {},
             o: {
               df: 1,
-              docs: { 123: { tf: 1, fieldLength: 2 } }
+              docs: { 123: { tf: 1} }
             }
           }
         }
@@ -352,5 +294,5 @@ test('loading a serialised story', function () {
       documents = invertedIndex.getDocs('foo');
 
   equal(invertedIndex.length, 1);
-  deepEqual(documents, { 123: {tf: 1, fieldLength: 2 }});
+  deepEqual(documents, { 123: {tf: 1}});
 });

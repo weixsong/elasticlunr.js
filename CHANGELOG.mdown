@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.6
+
+* remove fieldLength of each token in inverted index, this will reduce the index size significantly, because previous index store too much redundant infomation.
+* using DocumentStore to record the field length of each document.
+
 ## 0.6.5
 
 * add field length info in DocumentStore

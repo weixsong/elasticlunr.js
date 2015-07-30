@@ -89,7 +89,7 @@ test('removing a document from the index', function () {
   idx.addDoc(doc);
   equal(idx.documentStore.length, 1);
 
-  idx.removeDoc(doc['id']);
+  idx.removeDoc(doc);
   equal(idx.documentStore.length, 0);
   
   equal(idx.index['body'].hasToken('this'), true);
@@ -117,7 +117,7 @@ test('removing a document from the index with more than one documents', function
   
   deepEqual(idx.index['body'].getNode('this').docs, docs);
 
-  idx.removeDoc(doc1['id']);
+  idx.removeDoc(doc1);
   equal(idx.documentStore.length, 1);
 
   equal(idx.index['body'].hasToken('this'), true);
@@ -141,7 +141,7 @@ test('triggering remove events', function () {
 
   idx.addField('body');
   idx.addDoc(doc);
-  idx.removeDoc(doc['id']);
+  idx.removeDoc(doc);
 
   ok(callbackCalled);
   equal(callbackArgs.length, 2);
