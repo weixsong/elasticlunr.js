@@ -91,7 +91,7 @@
               </li>
               <li><a href="#load"><i class="alert alert-info"></i><span>load</span></a>
               </li>
-              <li><a href="#isSave"><i class="alert alert-info"></i><span>isSave</span></a>
+              <li><a href="#isDocStored"><i class="alert alert-info"></i><span>isDocStored</span></a>
               </li>
               <li><a href="#addDoc"><i class="alert alert-info"></i><span>addDoc</span></a>
               </li>
@@ -100,6 +100,12 @@
               <li><a href="#hasDoc"><i class="alert alert-info"></i><span>hasDoc</span></a>
               </li>
               <li><a href="#removeDoc"><i class="alert alert-info"></i><span>removeDoc</span></a>
+              </li>
+              <li><a href="#addFieldLength"><i class="alert alert-info"></i><span>addFieldLength</span></a>
+              </li>
+              <li><a href="#updateFieldLength"><i class="alert alert-info"></i><span>updateFieldLength</span></a>
+              </li>
+              <li><a href="#getFieldLength"><i class="alert alert-info"></i><span>getFieldLength</span></a>
               </li>
               <li><a href="#toJSON"><i class="alert alert-info"></i><span>toJSON</span></a>
               </li>
@@ -130,15 +136,16 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for<br />documents stored in index.</p><p>elasticlunr.DocumentStore store original JSON format documents that you could build search snippet by this original JSON document.</p> </div>
+          <div class="description"><p>elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for<br />documents stored in index.</p><p>elasticlunr.DocumentStore store original JSON format documents that you could build search snippet by this original JSON document.</p><p>user could choose whether original JSON format document should be store, if no configuration then document will be stored defaultly.<br />If user care more about the index size, user could select not store JSON documents, then this will has some defects, such as user<br />could not use JSON document to generate snippets of search results.</p> </div>
           <pre><code class="language-javascript">elasticlunr.DocumentStore = function (save) {
-  if (save == null || save == undefined) {
+  if (save === null || save === undefined) {
     this._save = true;
   } else {
     this._save = save;
   }
 
   this.docs = {};
+  this.docInfo = {};
   this.length = 0;
 };</code></pre>
           <section id="load">
@@ -164,7 +171,7 @@
               </tr>
               <tr>
                 <td>return</td>
-                <td>elasticlunr.Store</td>
+                <td>elasticlunr.DocumentStore</td>
                 <td></td>
               </tr>
             </tbody>
@@ -175,19 +182,20 @@
 
   store.length = serialisedData.length;
   store.docs = serialisedData.docs;
+  store.docInfo = serialisedData.docInfo;
   store._save = serialisedData.save;
 
   return store;
 };</code></pre>
-          <section id="isSave">
-            <h1>isSave</h1>
+          <section id="isDocStored">
+            <h1>isDocStored</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.isSave()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.isDocStored()</span>
             </p>
           </section>
           <div class="description"><p>check if current instance store the original doc</p> </div>
-          <pre><code class="language-javascript">elasticlunr.DocumentStore.isSave = function () {
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.isDocStored = function () {
   return this._save;
 };</code></pre>
           <section id="addDoc">
@@ -208,7 +216,7 @@
             <tbody>
               <tr>
                 <td>docRef</td>
-                <td>Object</td>
+                <td>Integer,String</td>
                 <td><p>The key used to store the JSON format doc.</p></td>
               </tr>
               <tr>
@@ -222,7 +230,7 @@
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
   if (!this.hasDoc(docRef)) this.length++;
 
-  if (this._save == true) {
+  if (this._save === true) {
     this.docs[docRef] = doc;
   } else {
     this.docs[docRef] = null;
@@ -245,8 +253,8 @@
             </thead>
             <tbody>
               <tr>
-                <td>docRef,</td>
-                <td>Object</td>
+                <td>docRef</td>
+                <td>Integer,String</td>
                 <td><p>The key to lookup and retrieve from the document store.</p></td>
               </tr>
               <tr>
@@ -256,9 +264,9 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Retrieves the JSON doc from the document store for a given key.</p><p>If docRef not found, return null.</p> </div>
+          <div class="description"><p>Retrieves the JSON doc from the document store for a given key.</p><p>If docRef not found, return null.<br />If user set not storing the documents, return null.</p> </div>
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
-  if (this.hasDoc(docRef) == false) return null;
+  if (this.hasDoc(docRef) === false) return null;
   return this.docs[docRef];
 };</code></pre>
           <section id="hasDoc">
@@ -279,7 +287,7 @@
             <tbody>
               <tr>
                 <td>docRef</td>
-                <td>Object</td>
+                <td>Integer,String</td>
                 <td><p>The id to look up in the document store.</p></td>
               </tr>
               <tr>
@@ -311,7 +319,7 @@
             <tbody>
               <tr>
                 <td>docRef</td>
-                <td>Object</td>
+                <td>Integer,String</td>
                 <td><p>The id to remove from the document store.</p></td>
               </tr>
             </tbody>
@@ -321,7 +329,130 @@
   if (!this.hasDoc(docRef)) return;
 
   delete this.docs[docRef];
+  delete this.docInfo[docRef];
   this.length--;
+};</code></pre>
+          <section id="addFieldLength">
+            <h1>addFieldLength</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.addFieldLength()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>docRef</td>
+                <td>Integer,String</td>
+                <td><p>document&#39;s id or reference</p></td>
+              </tr>
+              <tr>
+                <td>fieldName</td>
+                <td>String</td>
+                <td><p>field name</p></td>
+              </tr>
+              <tr>
+                <td>length</td>
+                <td>Integer</td>
+                <td><p>field length</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Add field length of a document&#39;s field tokens from pipeline results.<br />The field length of a document is used to do field length normalization even without the original JSON document stored.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.addFieldLength = function (docRef, fieldName, length) {
+  if (docRef === null || docRef === undefined) return;
+  if (this.hasDoc(docRef) == false) return;
+  
+  if (!this.docInfo[docRef]) this.docInfo[docRef] = {};
+  this.docInfo[docRef][fieldName] = length;
+};</code></pre>
+          <section id="updateFieldLength">
+            <h1>updateFieldLength</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.updateFieldLength()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>docRef</td>
+                <td>Integer,String</td>
+                <td><p>document&#39;s id or reference</p></td>
+              </tr>
+              <tr>
+                <td>fieldName</td>
+                <td>String</td>
+                <td><p>field name</p></td>
+              </tr>
+              <tr>
+                <td>length</td>
+                <td>Integer</td>
+                <td><p>field length</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Update field length of a document&#39;s field tokens from pipeline results.<br />The field length of a document is used to do field length normalization even without the original JSON document stored.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.updateFieldLength = function (docRef, fieldName, length) {
+  if (docRef === null || docRef === undefined) return;
+  if (this.hasDoc(docRef) == false) return;
+  
+  this.addFieldLength(docRef, fieldName, length);
+};</code></pre>
+          <section id="getFieldLength">
+            <h1>getFieldLength</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.getFieldLength()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>docRef</td>
+                <td>Integer,String</td>
+                <td><p>document id or reference</p></td>
+              </tr>
+              <tr>
+                <td>fieldName</td>
+                <td>String</td>
+                <td><p>field name</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Integer</td>
+                <td><p>field length</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>get field length of a document by docRef</p> </div>
+          <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.getFieldLength = function (docRef, fieldName) {
+  if (docRef === null || docRef === undefined) return 0;
+
+  if (!(docRef in this.docs)) return 0;
+  if (!(fieldName in this.docInfo[docRef])) return 0;
+  return this.docInfo[docRef][fieldName];
 };</code></pre>
           <section id="toJSON">
             <h1>toJSON</h1>
@@ -330,10 +461,11 @@
               <div class="label label-info radius ctx-type">method</div><span>elasticlunr.DocumentStore.prototype.toJSON()</span>
             </p>
           </section>
-          <div class="description"><p>Returns a representation of the document store ready for serialisation.</p> </div>
+          <div class="description"><p>Returns a JSON representation of the document store used for serialisation.</p> </div>
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {
     docs: this.docs,
+    docInfo: this.docInfo,
     length: this.length,
     save: this._save
   };

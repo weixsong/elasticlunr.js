@@ -410,6 +410,7 @@
   this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
     var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    this.documentStore.addFieldLength(docRef, field, fieldTokens.length);
 
     var tokenCount = {};
     fieldTokens.forEach(function (token) {
@@ -457,7 +458,7 @@
           <div class="description"><p>Removes a document from the index by doc ref.</p><p>To make sure documents no longer show up in search results they can be<br />removed from the index using this method.</p><p>A &#39;remove&#39; event is emitted with the document that has been removed and the index<br />the document has been removed from. This event can be silenced by passing false<br />as the second argument to remove.</p><p>If user setting DocumentStore not storing the documents, then remove doc by docRef is not allowed.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
   if (!docRef) return;
-  if (this.documentStore.isSave() == false) {
+  if (this.documentStore.isDocStored() == false) {
     elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
     return;
   }

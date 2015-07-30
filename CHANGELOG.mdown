@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.5
+
+* add field length info in DocumentStore
+* add test cases for field length operation in DocumentStore
+* change not-strict comparsion to strict comparsion
+* fix function bug in DocumentStore(not contain .prototype.)
+* change isSave() interface in DocumentStore to isDocStored()
+* add test cases for isDocStored()
+* change directly inner variable call of DocumentStore to interface call in DocumentStore test cases.
+* update interface reference in index.js
+
 ## 0.6.4
 
 * fix example issue by using elasticlunr.Configuration
