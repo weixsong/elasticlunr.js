@@ -640,7 +640,7 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
  */
 elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
   if (!docRef) return;
-  if (this.documentStore.isSave() == false) {
+  if (this.documentStore.isDocStored() == false) {
     elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
     return;
   }
@@ -1025,12 +1025,16 @@ elasticlunr.Index.prototype.use = function (plugin) {
  *
  * elasticlunr.DocumentStore store original JSON format documents that you could build search snippet by this original JSON document.
  *
+ * user could choose whether original JSON format document should be store, if no configuration then document will be stored defaultly.
+ * If user care more about the index size, user could select not store JSON documents, then this will has some defects, such as user
+ * could not use JSON document to generate snippets of search results.
+ * 
  * @param {Boolean} save If the original JSON document should be stored.
  * @constructor
  * @module
  */
 elasticlunr.DocumentStore = function (save) {
-  if (save == null || save == undefined) {
+  if (save === null || save === undefined) {
     this._save = true;
   } else {
     this._save = save;
@@ -1044,7 +1048,7 @@ elasticlunr.DocumentStore = function (save) {
  * Loads a previously serialised document store
  *
  * @param {Object} serialisedData The serialised document store to load.
- * @return {elasticlunr.Store}
+ * @return {elasticlunr.DocumentStore}
  */
 elasticlunr.DocumentStore.load = function (serialisedData) {
   var store = new this;
@@ -1061,7 +1065,7 @@ elasticlunr.DocumentStore.load = function (serialisedData) {
  *
  * @return {Boolean}
  */
-elasticlunr.DocumentStore.isSave = function () {
+elasticlunr.DocumentStore.prototype.isDocStored = function () {
   return this._save;
 };
 
@@ -1071,13 +1075,13 @@ elasticlunr.DocumentStore.isSave = function () {
  * 
  * Document is store by original JSON format, then you could use original document to generate search snippets.
  *
- * @param {Object} docRef The key used to store the JSON format doc.
+ * @param {Integer|String} docRef The key used to store the JSON format doc.
  * @param {Object} doc The JSON format doc.
  */
 elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
   if (!this.hasDoc(docRef)) this.length++;
 
-  if (this._save == true) {
+  if (this._save === true) {
     this.docs[docRef] = doc;
   } else {
     this.docs[docRef] = null;
@@ -1088,22 +1092,23 @@ elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
  * Retrieves the JSON doc from the document store for a given key.
  * 
  * If docRef not found, return null.
+ * If user set not storing the documents, return null.
  *
- * @param {Object} docRef, The key to lookup and retrieve from the document store.
+ * @param {Integer|String} docRef The key to lookup and retrieve from the document store.
  * @return {Object}
- * @memberOf Store
+ * @memberOf DocumentStore
  */
 elasticlunr.DocumentStore.prototype.getDoc = function (docRef) {
-  if (this.hasDoc(docRef) == false) return null;
+  if (this.hasDoc(docRef) === false) return null;
   return this.docs[docRef];
 };
 
 /**
  * Checks whether the document store contains a key (docRef).
  *
- * @param {Object} docRef The id to look up in the document store.
+ * @param {Integer|String} docRef The id to look up in the document store.
  * @return {Boolean}
- * @memberOf Store
+ * @memberOf DocumentStore
  */
 elasticlunr.DocumentStore.prototype.hasDoc = function (docRef) {
   return docRef in this.docs;
@@ -1112,8 +1117,8 @@ elasticlunr.DocumentStore.prototype.hasDoc = function (docRef) {
 /**
  * Removes the value for a key in the document store.
  *
- * @param {Object} docRef The id to remove from the document store.
- * @memberOf Store
+ * @param {Integer|String} docRef The id to remove from the document store.
+ * @memberOf DocumentStore
  */
 elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
   if (!this.hasDoc(docRef)) return;
@@ -1123,10 +1128,10 @@ elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
 };
 
 /**
- * Returns a representation of the document store ready for serialisation.
+ * Returns a JSON representation of the document store used for serialisation.
  *
- * @return {Object}
- * @memberOf Store
+ * @return {Object} JSON format
+ * @memberOf DocumentStore
  */
 elasticlunr.DocumentStore.prototype.toJSON = function () {
   return {

@@ -14,7 +14,7 @@ test('create a document store not storing the doc', function () {
 
   docStore.addDoc(1, doc);
   equal(docStore.length, 1);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.hasDoc(1), true);
 });
 
@@ -26,9 +26,24 @@ test('add doc test without storing the doc', function () {
   docStore.addDoc(1, doc1);
   docStore.addDoc(2, doc2);
   equal(docStore.length, 2);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.hasDoc(1), true);
   equal(docStore.hasDoc(2), true);
+});
+
+test('test isDocStored() function when created DocumentStore without arguments', function () {
+  var docStore = new elasticlunr.DocumentStore();
+  equal(docStore.isDocStored(), true);
+});
+
+test('test isDocStored() function when created DocumentStore with true input', function () {
+  var docStore = new elasticlunr.DocumentStore(true);
+  equal(docStore.isDocStored(), true);
+});
+
+test('test isDocStored() function when created DocumentStore with false input', function () {
+  var docStore = new elasticlunr.DocumentStore(false);
+  equal(docStore.isDocStored(), false);
 });
 
 test('get doc test without storing the doc', function () {
@@ -39,7 +54,7 @@ test('get doc test without storing the doc', function () {
   docStore.addDoc(1, doc1);
   docStore.addDoc(2, doc2);
   equal(docStore.length, 2);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.getDoc(1), null);
   equal(docStore.getDoc(2), null);
 });
@@ -52,7 +67,7 @@ test('get non-exist doc test without storing the doc', function () {
   docStore.addDoc(1, doc1);
   docStore.addDoc(2, doc2);
   equal(docStore.length, 2);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.getDoc(6), null);
   equal(docStore.getDoc(2), null);
 });
@@ -66,7 +81,7 @@ test('remove doc test without storing the doc', function () {
   docStore.addDoc(2, doc2);
   docStore.removeDoc(1);
   equal(docStore.length, 1);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.getDoc(2), null);
   equal(docStore.getDoc(1), null);
 });
@@ -80,7 +95,7 @@ test('remove non-exist doc test without storing the doc', function () {
   docStore.addDoc(2, doc2);
   docStore.removeDoc(8);
   equal(docStore.length, 2);
-  equal(docStore._save, false);
+  equal(docStore.isDocStored(), false);
   equal(docStore.getDoc(2), null);
   equal(docStore.getDoc(1), null);
 });
@@ -187,7 +202,7 @@ test('loading serialised data', function () {
   var store = elasticlunr.DocumentStore.load(serialisedData);
 
   equal(store.length, 1);
-  equal(store._save, true);
+  equal(store.isDocStored(), true);
   deepEqual(store.getDoc(1), {title: 'eggs bread'});
 });
 
@@ -204,7 +219,7 @@ test('loading serialised data without storing documents', function () {
   var store = elasticlunr.DocumentStore.load(serialisedData);
 
   equal(store.length, 2);
-  equal(store._save, false);
+  equal(store.isDocStored(), false);
   equal(store.hasDoc(1), true);
   equal(store.hasDoc(2), true);
   deepEqual(store.getDoc(1), null);
