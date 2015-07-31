@@ -8,13 +8,13 @@ Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also 
 
 # Key Features Comparing with Lunr.js
 
-* 1. **Query-Time boosting**, you don't need to setup boosting weight in index building procedure, this make it more flexible that you could try different boosting scheme.
-* 2. **More rational scoring mechanism**, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.
-* 3. **Field-search**, you could choose which field to index and which field to search.
-* 4. **Boolean Model**, you could set which field to search and the boolean model for each query token, such as "OR", "AND".
-* 5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, make the results ranking more reliable.
-* 6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improve the search speed significantly.
-* 7. **Small index file**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is very small, and also user could choose if they need to store the origianl JSON doc, if user care more about the index size, they could choose not store the original JSON doc, this could reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search.
+1. **Query-Time Boosting**, you don't need to setup boosting weight in index building procedure, Query-Time Boosting make it more flexible that you could try different boosting scheme.
+2. **More Rational Scoring Mechanism**, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene. 
+3. **Field-Search**, you could choose which field to index and which field to search.
+4. **Boolean Model**, you could set which field to search and the boolean model for each query token, such as "OR", "AND".
+5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, make the results ranking more reliable.
+6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improve the search speed significantly.
+7. **Small Index Size**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is small, and also user could choose if they need to store the origianl JSON doc, if user care more about the index size, they could choose not store the original JSON doc, this could reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search. The index size is about half size of lunr.js index file.
 
 ## Example
 
@@ -77,12 +77,24 @@ This returns a list of matching documents with a score of how closely they match
 }]
 ```
 
+If user do not want to store the original JSON documents, they could use the following setting:
+```javascript
+var index = elasticlunr(function () {
+    this.addField('title');
+    this.addField('body');
+    this.setRef('id');
+    this.saveDocument(false);
+});
+```
+
+Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not udpate or delete a document from index. 
+
 [API documentation](http://weixsong.github.io/assets/elasticlunr/docs/index.html) is available, as well as a [full working example](http://weixsong.github.io/assets/elasticlunr/docs/index.html).
 
 ## Description
 
-Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search.
-A bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.
+Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time Boosting, Field Search, more rational scoring/ranking methodology, flexible configuration and so on.
+A bit like Solr, but much smaller and not as bright, but also provide flexible configuration, query-time boosting, field search, etc.
 
 ## Why
 
@@ -137,8 +149,8 @@ Assume you're using lunr-language in Node.js envrionment, you could import lunr-
 
 ```javascript
 var elasticlunr = require('./lib/elasticlunr.js');
-require('./lunr.stemmer.support.js')(lunr);
-require('./lunr.de.js')(lunr);
+require('./lunr.stemmer.support.js')(elasticlunr);
+require('./lunr.de.js')(elasticlunr);
 
 var idx = elasticlunr(function () {
     // use the language (de)
@@ -253,11 +265,22 @@ index.search("Oracle database profit", {
         title: {boost: 2},
         body: {boost: 1}
     },
-    boolean: "OR"
+    bool: "OR"
 });
 ```
 
-Boolean operation is performed based on field. This means that if you choose "AND" logic, documents with all the query tokens in the query field will be returned as a field results. If you query in multiple fields, different field results will be merged together to give a final query results.
+Boolean model could be setted by global level such as the above setting or it could be setted by field level, if both global and field level contains a "bool" setting, field level setting will overwrite the global setting.
+```javascript
+index.search("Oracle database profit", {
+    fields: {
+        title: {boost: 2, bool: "AND"},
+        body: {boost: 1}
+    },
+    bool: "OR"
+});
+```
+The above setting will search <code>title</code> field by **AND** model and other fields by "OR" model.
+Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
 
 
 # Contributing
