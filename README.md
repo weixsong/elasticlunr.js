@@ -282,6 +282,20 @@ index.search("Oracle database profit", {
 The above setting will search <code>title</code> field by **AND** model and other fields by "OR" model.
 Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
 
+#### 5.2.3 **Token Expandation**
+Sometimes user want to expand a query token to increase **RECALL**, then user could set expand model to **true** by configuration, default is **false**.
+For example, user query token is "micro", and assume "microwave" and "microscope" are in the index, then is user choose expand the query token "micro" to increase **RECALL**, both "microwave" and "microscope" will be returned and search in the index.
+The query results from expanded tokens are penalized because they are not exactly the same as the query token.
+```javascript
+index.search("micro", {
+    fields: {
+        title: {boost: 2, bool: "AND"},
+        body: {boost: 1}
+    },
+    bool: "OR",
+    expand: true
+});
+```
 
 # Contributing
 
