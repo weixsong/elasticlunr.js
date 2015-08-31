@@ -823,7 +823,7 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
     var docs = this.index[fieldName].getDocs(token);
     var idf = this.idf(token, fieldName);
     for (var docRef in docs) {
-      var tf = docs[docRef].tf;
+      var tf = this.index[fieldName].getTermFrequency(token, docRef);
       var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
       var norm = 1;
       if (fieldLength != 0) {
@@ -867,37 +867,6 @@ elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs)
       docTokens[doc] = [token];
     }
   }
-};
-
-/**
- * Deprecated function.
- * compute the score of a documents in given field.
- * 
- * @param {Array} queryTokens
- * @param {String|Integer} docRef
- * @param {String} field
- */
-elasticlunr.Index.prototype.computeScore = function (queryTokens, docRef, field) {
-  var doc = this.documentStore.getDoc(docRef);
-
-  var coord = 0;
-  var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
-  queryTokens.forEach(function (token) {
-    if (fieldTokens.indexOf(token) != -1) coord += 1;
-  }, this);
-
-  coord = coord / queryTokens.length;
-
-  var score = 0.0;
-  queryTokens.forEach(function name(token) {
-    var tf = this.index[field].getTF(token, docRef);
-    var idf = this.idf(token, field);
-    var norm = 1 / Math.sqrt(fieldTokens.length);
-    score += tf * idf * norm;
-  }, this);
-
-  score *= coord;
-  return score;
 };
 
 /**

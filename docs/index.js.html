@@ -117,8 +117,6 @@
               </li>
               <li><a href="#fieldSearchStats"><i class="alert alert-info"></i><span>fieldSearchStats</span></a>
               </li>
-              <li><a href="#computeScore"><i class="alert alert-info"></i><span>computeScore</span></a>
-              </li>
               <li><a href="#computeSquaredWeight"><i class="alert alert-info"></i><span>computeSquaredWeight</span></a>
               </li>
               <li><a href="#intersect"><i class="alert alert-info"></i><span>intersect</span></a>
@@ -680,7 +678,7 @@
     var docs = this.index[fieldName].getDocs(token);
     var idf = this.idf(token, fieldName);
     for (var docRef in docs) {
-      var tf = docs[docRef].tf;
+      var tf = this.index[fieldName].getTermFrequency(token, docRef);
       var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
       var norm = 1;
       if (fieldLength != 0) {
@@ -748,62 +746,6 @@
       docTokens[doc] = [token];
     }
   }
-};</code></pre>
-          <section id="computeScore">
-            <h1>computeScore</h1>
-            <h5 class="subheader"></h5>
-            <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.computeScore()</span>
-            </p>
-          </section>
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th style="width:20%">Option name</th>
-                <th style="width:20%">Type</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>queryTokens</td>
-                <td>Array</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>docRef</td>
-                <td>String,Integer</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>field</td>
-                <td>String</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="description"><p>Deprecated function.<br />compute the score of a documents in given field.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.computeScore = function (queryTokens, docRef, field) {
-  var doc = this.documentStore.getDoc(docRef);
-
-  var coord = 0;
-  var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
-  queryTokens.forEach(function (token) {
-    if (fieldTokens.indexOf(token) != -1) coord += 1;
-  }, this);
-
-  coord = coord / queryTokens.length;
-
-  var score = 0.0;
-  queryTokens.forEach(function name(token) {
-    var tf = this.index[field].getTF(token, docRef);
-    var idf = this.idf(token, field);
-    var norm = 1 / Math.sqrt(fieldTokens.length);
-    score += tf * idf * norm;
-  }, this);
-
-  score *= coord;
-  return score;
 };</code></pre>
           <section id="computeSquaredWeight">
             <h1>computeSquaredWeight</h1>

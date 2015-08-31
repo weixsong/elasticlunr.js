@@ -1,5 +1,9 @@
 # 
 
+## 0.6.8
+
+* change use tf directly to function call.
+
 ## 0.6.7
 
 * update README.md
