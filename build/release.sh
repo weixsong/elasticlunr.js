@@ -79,7 +79,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   git checkout master example docs README.md elasticlunr.js elasticlunr.min.js
   git commit -a -m "Build version $version"
   git push origin gh-pages
-  
+
   git checkout master
 else
   echo -e "\033[0;31mCancelling...\033[0m"
