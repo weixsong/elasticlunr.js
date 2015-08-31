@@ -3,6 +3,11 @@
 ## 0.6.8
 
 * change use tf directly to function call.
+* remove necessary memo.concat() for token expand.
+* make token expand effecient, no need to call getNode() for each expanded token, use context node information to get df. If using getNode() for each expand token, need to traverse the trie tree from root again and again.
+* add token expand configuration.
+* add token expand for search function, the expanded token's weight is penalized.
+* add test case for configuration.js for token expand config.
 
 ## 0.6.7
 

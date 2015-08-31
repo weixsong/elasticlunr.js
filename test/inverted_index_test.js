@@ -187,6 +187,25 @@ test('expand a non existing token', function () {
   deepEqual(tokens, []);
 });
 
+test('expand a existing token without descendent tokens', function () {
+  var invertedIndex = new elasticlunr.InvertedIndex,
+      doc = { ref: 123, tf: 1};
+
+  invertedIndex.addToken('hello', doc);
+  invertedIndex.addToken('hellp', doc);
+  invertedIndex.addToken('helld', doc);
+  invertedIndex.addToken('helldd', doc);
+  invertedIndex.addToken('hellddda', doc);
+  invertedIndex.addToken('hell', doc);
+  invertedIndex.addToken('help', doc);
+  invertedIndex.addToken('held', doc);
+  invertedIndex.addToken('foo', doc);
+  invertedIndex.addToken('bar', doc);
+
+  var tokens = invertedIndex.expandToken('hello');
+  deepEqual(tokens, ['hello']);
+});
+
 test('test get term frequency from inverted index', function () {
   var invertedIndex = new elasticlunr.InvertedIndex,
       doc1 = { ref: 123, tf: 2},

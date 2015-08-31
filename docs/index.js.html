@@ -671,29 +671,43 @@
           <div class="description"><p>search queryTokens in specified field.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
   var booleanType = config[fieldName].bool;
+  var expand = config[fieldName].expand;
   var scores = {};
   var docTokens = {};
 
   queryTokens.forEach(function (token) {
-    var docs = this.index[fieldName].getDocs(token);
-    var idf = this.idf(token, fieldName);
-    for (var docRef in docs) {
-      var tf = this.index[fieldName].getTermFrequency(token, docRef);
-      var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
-      var norm = 1;
-      if (fieldLength != 0) {
-        norm = 1 / Math.sqrt(fieldLength);
-      }
-      var score = tf * idf * norm;
-
-      if (docRef in scores) {
-        scores[docRef] += score;
-      } else {
-        scores[docRef] = score;
-      }
+    var tokens = [token];
+    if (expand == true) {
+      tokens = this.index[fieldName].expandToken(token);
     }
+ 
+    tokens.forEach(function (key) {
+      var docs = this.index[fieldName].getDocs(key);
+      var idf = this.idf(key, fieldName);
+      for (var docRef in docs) {
+        var tf = this.index[fieldName].getTermFrequency(key, docRef);
+        var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
+        var norm = 1;
+        if (fieldLength != 0) {
+          norm = 1 / Math.sqrt(fieldLength);
+        }
 
-    this.fieldSearchStats(docTokens, token, docs);
+        var penality = 1;
+        if (key != token) {
+          penality = (1 - (key.length - token.length) / key.length) * 0.5;
+        } else {
+          this.fieldSearchStats(docTokens, key, docs);
+        }
+
+        var score = tf * idf * norm * penality;
+
+        if (docRef in scores) {
+          scores[docRef] += score;
+        } else {
+          scores[docRef] = score;
+        }
+      }
+    }, this);
   }, this);
 
   if (booleanType == 'AND') {

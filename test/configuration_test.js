@@ -7,7 +7,8 @@ test('constructor test', function () {
   var target = {
     title: {
       boost: 2,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -22,11 +23,13 @@ test('constructor test 2', function () {
   var target = {
     title: {
       boost: 3,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     },
     body: {
       boost: 2,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -41,11 +44,13 @@ test('construct without user config', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     },
     body: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -60,11 +65,13 @@ test('construct with user config for bool, but no field configured', function ()
   var target = {
     title: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     },
     body: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -79,11 +86,13 @@ test('construct with user config for bool overwrited by field config', function 
   var target = {
     title: {
       boost: 3,
-      bool: "AND"
+      bool: "AND",
+      expand: false
     },
     body: {
       boost: 2,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -98,11 +107,13 @@ test('construct with user config without field boost', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "AND"
+      bool: "AND",
+      expand: false
     },
     body: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -117,11 +128,13 @@ test('construct with user config without bool setting', function () {
   var target = {
     title: {
       boost: 2,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     },
     body: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -136,7 +149,8 @@ test('construct with user config, search field not in idx._fields', function () 
   var target = {
     body: {
       boost: 2,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     }
   };
 
@@ -160,11 +174,118 @@ test('construct with user config, json parse failed', function () {
   var target = {
     title: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     },
     body: {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});
+
+test('construct with user config, user config is empty string', function () {
+  var fields = ['title', 'body'],
+      userConfig = '';
+
+  var target = {
+    title: {
+      boost: 1,
+      bool: "OR",
+      expand: false
+    },
+    body: {
+      boost: 1,
+      bool: "OR",
+      expand: false
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});
+
+test('construct with user config, global expand config', function () {
+  var fields = ['title', 'body'],
+      userConfig = '{"fields": {"title": {"boost": 3, "bool": "AND"},"body": {"boost": 2}},"bool":"OR", "expand":true}';
+
+  var target = {
+    title: {
+      boost: 3,
+      bool: "AND",
+      expand: true
+    },
+    body: {
+      boost: 2,
+      bool: "OR",
+      expand: true
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});
+
+test('construct with user config, global expand config overwrite by local config', function () {
+  var fields = ['title', 'body'],
+      userConfig = '{"fields": {"title": {"boost": 3, "bool": "AND", "expand":false},"body": {"boost": 2}},"bool":"OR", "expand":true}';
+
+  var target = {
+    title: {
+      boost: 3,
+      bool: "AND",
+      expand: false
+    },
+    body: {
+      boost: 2,
+      bool: "OR",
+      expand: true
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});
+
+test('construct with user config, global expand config overwrite by local config 2', function () {
+  var fields = ['title', 'body'],
+      userConfig = '{"fields": {"title": {"boost": 3, "bool": "AND", "expand":false},"body": {"boost": 2,"expand":true}},"bool":"OR", "expand":false}';
+
+  var target = {
+    title: {
+      boost: 3,
+      bool: "AND",
+      expand: false
+    },
+    body: {
+      boost: 2,
+      bool: "OR",
+      expand: true
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});
+
+test('construct with user config, global expand config overwrite by local config 3', function () {
+  var fields = ['title', 'body'],
+      userConfig = '{"fields": {"title": {"boost": 3, "bool": "AND", "expand":false},"body": {"boost": 2,"expand":false}},"bool":"OR", "expand":false}';
+
+  var target = {
+    title: {
+      boost: 3,
+      bool: "AND",
+      expand: false
+    },
+    body: {
+      boost: 2,
+      bool: "OR",
+      expand: false
     }
   };
 

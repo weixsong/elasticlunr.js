@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.7
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.6.8
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.6.7";
+elasticlunr.version = "0.6.8";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
@@ -816,29 +816,43 @@ elasticlunr.Index.prototype.search = function (query, jsonConfig) {
  */
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
   var booleanType = config[fieldName].bool;
+  var expand = config[fieldName].expand;
   var scores = {};
   var docTokens = {};
 
   queryTokens.forEach(function (token) {
-    var docs = this.index[fieldName].getDocs(token);
-    var idf = this.idf(token, fieldName);
-    for (var docRef in docs) {
-      var tf = this.index[fieldName].getTermFrequency(token, docRef);
-      var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
-      var norm = 1;
-      if (fieldLength != 0) {
-        norm = 1 / Math.sqrt(fieldLength);
-      }
-      var score = tf * idf * norm;
-
-      if (docRef in scores) {
-        scores[docRef] += score;
-      } else {
-        scores[docRef] = score;
-      }
+    var tokens = [token];
+    if (expand == true) {
+      tokens = this.index[fieldName].expandToken(token);
     }
+ 
+    tokens.forEach(function (key) {
+      var docs = this.index[fieldName].getDocs(key);
+      var idf = this.idf(key, fieldName);
+      for (var docRef in docs) {
+        var tf = this.index[fieldName].getTermFrequency(key, docRef);
+        var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
+        var norm = 1;
+        if (fieldLength != 0) {
+          norm = 1 / Math.sqrt(fieldLength);
+        }
 
-    this.fieldSearchStats(docTokens, token, docs);
+        var penality = 1;
+        if (key != token) {
+          penality = (1 - (key.length - token.length) / key.length) * 0.5;
+        } else {
+          this.fieldSearchStats(docTokens, key, docs);
+        }
+
+        var score = tf * idf * norm * penality;
+
+        if (docRef in scores) {
+          scores[docRef] += score;
+        } else {
+          scores[docRef] = score;
+        }
+      }
+    }, this);
   }, this);
 
   if (booleanType == 'AND') {
@@ -1760,19 +1774,19 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
  */
 elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
   if (token == null || token == '') return [];
+  var memo = memo || [];
+
   if (root == void 0) {
     root = this.getNode(token);
-    if (root == null) return [];
+    if (root == null) return memo;
   }
-
-  var memo = memo || [];
 
   if (root.df > 0) memo.push(token);
 
   for (var key in root) {
     if (key === 'docs') continue;
     if (key === 'df') continue;
-    memo.concat(this.expandToken(token + key, memo, root[key]));
+    this.expandToken(token + key, memo, root[key]);
   }
 
   return memo;
@@ -1804,10 +1818,13 @@ elasticlunr.InvertedIndex.prototype.toJSON = function () {
   * Currently configuration supports:
   * 1. query-time boosting, user could set how to boost each field.
   * 2. boolean model chosing, user could choose which boolean model to use for each field.
+  * 3. token expandation, user could set token expand to True to improve Recall. Default is False.
   * 
-  * query time boosting infor must be configured by field category, "boolean" model could be configured 
+  * Query time boosting must be configured by field category, "boolean" model could be configured 
   * by both field category or globally as the following example. Field configuration for "boolean"
   * will overwrite global configuration.
+  * Token expand could be configured both by field category or golbally. Local field configuration will
+  * overwrite global configuration.
   * 
   * configuration example:
   * {
@@ -1822,6 +1839,25 @@ elasticlunr.InvertedIndex.prototype.toJSON = function () {
   * {
   *   fields:{ 
   *     title: {boost: 2, bool: "AND"},
+  *     body: {boost: 1}
+  *   },
+  *   bool: "OR"
+  * }
+  * 
+  * "expand" example:
+  * {
+  *   fields:{ 
+  *     title: {boost: 2, bool: "AND"},
+  *     body: {boost: 1}
+  *   },
+  *   bool: "OR",
+  *   expand: true
+  * }
+  * 
+  * "expand" example for field category:
+  * {
+  *   fields:{ 
+  *     title: {boost: 2, bool: "AND", expand: true},
   *     body: {boost: 1}
   *   },
   *   bool: "OR"
@@ -1866,7 +1902,8 @@ elasticlunr.Configuration.prototype.buildDefaultConfig = function (fields) {
   fields.forEach(function (field) {
     this.config[field] = {
       boost: 1,
-      bool: "OR"
+      bool: "OR",
+      expand: false
     };
   }, this);
 };
@@ -1878,27 +1915,38 @@ elasticlunr.Configuration.prototype.buildDefaultConfig = function (fields) {
  * @param {Array} fields fields of index instance
  */
 elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) {
-  var bool = "OR";
-      
+  var global_bool = "OR";
+  var global_expand = false;
+
   this.reset();
   if ('bool' in config) {
-    bool = config['bool'];
+    global_bool = config['bool'] || global_bool;
+  }
+
+  if ('expand' in config) {
+    global_expand = config['expand'] || global_expand;
   }
 
   if ('fields' in config) {
     for (var field in config['fields']) {
       if (fields.indexOf(field) > -1) {
         var field_config = config['fields'][field];
+        var field_expand = global_expand;
+        if (field_config.expand != undefined) {
+          field_expand = field_config.expand;
+        }
+
         this.config[field] = {
           boost: field_config.boost || 1,
-          bool: field_config.bool || bool
+          bool: field_config.bool || global_bool,
+          expand: field_expand
         };
       } else {
         elasticlunr.utils.warn('field name in user configuration not found in index instance fields');
       }
     }
   } else {
-    this.addAllFields2UserConfig(bool, fields);
+    this.addAllFields2UserConfig(global_bool, global_expand, fields);
   }
 };
 
@@ -1906,13 +1954,15 @@ elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) 
  * Add all fields to user search configuration.
  * 
  * @param {String} bool Boolean model
+ * @param {String} expand Expand model
  * @param {Array} fields fields of index instance
  */
-elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, fields) {
+elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, expand, fields) {
   fields.forEach(function (field) {
     this.config[field] = {
       boost: 1,
-      bool: bool
+      bool: bool,
+      expand: expand
     };
   }, this);
 };
