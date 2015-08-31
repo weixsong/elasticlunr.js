@@ -494,19 +494,19 @@
           <div class="description"><p>Find all the possible suffixes of the passed token using tokens currently in the inverted index.<br />If token not found, return empty Array.</p> </div>
           <pre><code class="language-javascript">elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
   if (token == null || token == '') return [];
+  var memo = memo || [];
+
   if (root == void 0) {
     root = this.getNode(token);
-    if (root == null) return [];
+    if (root == null) return memo;
   }
-
-  var memo = memo || [];
 
   if (root.df &gt; 0) memo.push(token);
 
   for (var key in root) {
     if (key === 'docs') continue;
     if (key === 'df') continue;
-    memo.concat(this.expandToken(token + key, memo, root[key]));
+    this.expandToken(token + key, memo, root[key]);
   }
 
   return memo;

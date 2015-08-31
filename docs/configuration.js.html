@@ -134,8 +134,9 @@
           <div class="description"><p>elasticlunr.Configuration is used to analyze the user search configuration.</p><p>By elasticlunr.Configuration user could set query-time boosting, boolean model in each field.</p><p>Currently configuration supports:</p><ol>
 <li>query-time boosting, user could set how to boost each field.</li>
 <li>boolean model chosing, user could choose which boolean model to use for each field.</li>
+<li>token expandation, user could set token expand to True to improve Recall. Default is False.</li>
 </ol>
-<p>query time boosting infor must be configured by field category, &quot;boolean&quot; model could be configured<br />by both field category or globally as the following example. Field configuration for &quot;boolean&quot;<br />will overwrite global configuration.</p><p>configuration example:<br />{<br />  fields:{<br />    title: {boost: 2},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;bool&quot; field configuation overwrite global configuation example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>then, user could search with configuration to do query-time boosting.<br />idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
+<p>Query time boosting must be configured by field category, &quot;boolean&quot; model could be configured<br />by both field category or globally as the following example. Field configuration for &quot;boolean&quot;<br />will overwrite global configuration.<br />Token expand could be configured both by field category or golbally. Local field configuration will<br />overwrite global configuration.</p><p>configuration example:<br />{<br />  fields:{<br />    title: {boost: 2},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;bool&quot; field configuation overwrite global configuation example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;expand&quot; example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;,<br />  expand: true<br />}</p><p>&quot;expand&quot; example for field category:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;, expand: true},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>then, user could search with configuration to do query-time boosting.<br />idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
           <pre><code class="language-javascript">elasticlunr.Configuration = function (config, fields) {
   var config = config || '';
 
@@ -183,7 +184,8 @@
   fields.forEach(function (field) {
     this.config[field] = {
       boost: 1,
-      bool: &quot;OR&quot;
+      bool: &quot;OR&quot;,
+      expand: false
     };
   }, this);
 };</code></pre>
@@ -217,27 +219,38 @@
           </table>
           <div class="description"><p>Build user configuration.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) {
-  var bool = &quot;OR&quot;;
-      
+  var global_bool = &quot;OR&quot;;
+  var global_expand = false;
+
   this.reset();
   if ('bool' in config) {
-    bool = config['bool'];
+    global_bool = config['bool'] || global_bool;
+  }
+
+  if ('expand' in config) {
+    global_expand = config['expand'] || global_expand;
   }
 
   if ('fields' in config) {
     for (var field in config['fields']) {
       if (fields.indexOf(field) &gt; -1) {
         var field_config = config['fields'][field];
+        var field_expand = global_expand;
+        if (field_config.expand != undefined) {
+          field_expand = field_config.expand;
+        }
+
         this.config[field] = {
           boost: field_config.boost || 1,
-          bool: field_config.bool || bool
+          bool: field_config.bool || global_bool,
+          expand: field_expand
         };
       } else {
         elasticlunr.utils.warn('field name in user configuration not found in index instance fields');
       }
     }
   } else {
-    this.addAllFields2UserConfig(bool, fields);
+    this.addAllFields2UserConfig(global_bool, global_expand, fields);
   }
 };</code></pre>
           <section id="addAllFields2UserConfig">
@@ -262,6 +275,11 @@
                 <td><p>Boolean model</p></td>
               </tr>
               <tr>
+                <td>expand</td>
+                <td>String</td>
+                <td><p>Expand model</p></td>
+              </tr>
+              <tr>
                 <td>fields</td>
                 <td>Array</td>
                 <td><p>fields of index instance</p></td>
@@ -269,11 +287,12 @@
             </tbody>
           </table>
           <div class="description"><p>Add all fields to user search configuration.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, fields) {
+          <pre><code class="language-javascript">elasticlunr.Configuration.prototype.addAllFields2UserConfig = function (bool, expand, fields) {
   fields.forEach(function (field) {
     this.config[field] = {
       boost: 1,
-      bool: bool
+      bool: bool,
+      expand: expand
     };
   }, this);
 };</code></pre>
