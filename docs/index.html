@@ -253,7 +253,30 @@ index.update(doc);
     bool: &quot;OR&quot;
 });
 </code></pre>
-<p>The above setting will search <code>title</code> field by <strong>AND</strong> model and other fields by &quot;OR&quot; model.<br />Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future elasticlunr will support configuration that user could set how to combine the results from each field, such as &quot;most_field&quot; or &quot;top_field&quot;.</p><h1>Contributing</h1>
+<p>The above setting will search <code>title</code> field by <strong>AND</strong> model and other fields by &quot;OR&quot; model.<br />Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future elasticlunr will support configuration that user could set how to combine the results from each field, such as &quot;most_field&quot; or &quot;top_field&quot;.</p><h4>5.2.3 <strong>Token Expandation</strong></h4>
+<p>Sometimes user want to expand a query token to increase <strong>RECALL</strong>, then user could set expand model to <strong>true</strong> by configuration, default is <strong>false</strong>.<br />For example, user query token is &quot;micro&quot;, and assume &quot;microwave&quot; and &quot;microscope&quot; are in the index, then is user choose expand the query token &quot;micro&quot; to increase <strong>RECALL</strong>, both &quot;microwave&quot; and &quot;microscope&quot; will be returned and search in the index.<br />The query results from expanded tokens are penalized because they are not exactly the same as the query token.</p><pre><code class="lang-javascript">index.search(&quot;micro&quot;, {
+    fields: {
+        title: {boost: 2, bool: &quot;AND&quot;},
+        body: {boost: 1}
+    },
+    bool: &quot;OR&quot;,
+    expand: true
+});
+</code></pre>
+<p>Field level expand configuration will overwrite global expand configuration.</p><pre><code class="lang-javascript">index.search(&quot;micro&quot;, {
+    fields: {
+        title: {
+            boost: 2,
+            bool: &quot;AND&quot;,
+            expand: false
+        },
+        body: {boost: 1}
+    },
+    bool: &quot;OR&quot;,
+    expand: true
+});
+</code></pre>
+<h1>Contributing</h1>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p><h1>Donate</h1>
 <p>Alipay: watkinsong@163.com</p></section>
         </div>
