@@ -297,6 +297,22 @@ index.search("micro", {
 });
 ```
 
+Field level expand configuration will overwrite global expand configuration.
+```javascript
+index.search("micro", {
+    fields: {
+        title: {
+            boost: 2,
+            bool: "AND",
+            expand: false
+        },
+        body: {boost: 1}
+    },
+    bool: "OR",
+    expand: true
+});
+```
+
 # Contributing
 
 See the [`CONTRIBUTING.mdown` file](CONTRIBUTING.mdown).
