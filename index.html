@@ -40,7 +40,7 @@
                     <header>
                         <h1>Elasticlunr<span>.js</span></h1>
                         <h2>Lightweight full-text search engine in Javascript for browser search and offline search.</h2>
-                        <p style="margin-top: 30px">Elasticlurn.js is a lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p>
+                        <p style="margin-top: 30px">Elasticlunr.js is a lightweight full-text search engine in Javascript for browser search and offline search. Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting and field search. Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration and query-time boosting.</p>
                         <div class="col-md-12" style="margin-top: 30px; padding-bottom: 35px; border-bottom:1px solid rgba(7,94,115,0.3);">
                             <div class="col-md-4">
                                 <a class="btn btn-primary btn-lg btn-block" href="https://github.com/weixsong/elasticlunr.js" role="button"><i class="fa fa-file-code-o"></i> Get the source</a>
@@ -176,6 +176,25 @@ index.search("Oracle database profit", {
         body: {boost: 1}
     },
     boolean: "OR"
+});</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="box">
+                            <div style="margin-top: 20px; overflow:hidden;">
+                                <i class="fa fa-expand" style="font-size: 2.0em;"></i>
+                                <h2 style="display:inline;">Token Expand</h2>
+                                <p>If user want to increase <strong>RECALL</strong>, user could configure to expand query tokens. For example, user query "micro", assume that "microwave" and "microscope" are both in the index, then documents contain "microwave" or "microscope" also will be returned. Each expanded query token's results are penalized because expanded token is not user query token.</p>
+<pre>
+index.search("micro", {
+    fields: {
+        title: {boost: 2, bool: "AND"},
+        body: {boost: 1}
+    },
+    bool: "OR",
+    expand: true
 });</pre>
                             </div>
                         </div>
