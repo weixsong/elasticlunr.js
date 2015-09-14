@@ -2,8 +2,8 @@
 
 ## 0.7.0
 
-* code review again
-* add TODO list
+* code review again.
+* add TODO list.
 
 ## 0.6.9
 
