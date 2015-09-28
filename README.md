@@ -111,7 +111,7 @@ Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.
 
 # Documentation
 
-This part only contain important apects of elasticlunr.js, for the whole documentation, please go to [API documentation](http://weixsong.github.io/assets/elasticlunr/docs/index.html).
+This part only contain important apects of elasticlunr.js, for the whole documentation, please go to [API documentation](http://elasticlunr.com/docs/index.html).
 
 ## 1. Build Index
 
