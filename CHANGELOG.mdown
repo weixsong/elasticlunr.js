@@ -1,10 +1,13 @@
 # 
 
+## 0.7.4
+
+* Delete node_modules from repo.
+
 ## 0.7.3
 
 * Change Documentation link to [API Documentation](http://elasticlunr.com/docs/index.html)
 * Delete node_modules because different platform need different node_models distribution
-* 
 
 ## 0.7.2
 
