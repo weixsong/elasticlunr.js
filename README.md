@@ -89,7 +89,7 @@ var index = elasticlunr(function () {
 
 Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not udpate or delete a document from index. 
 
-[API documentation](http://weixsong.github.io/assets/elasticlunr/docs/index.html) is available, as well as a [full working example](http://weixsong.github.io/assets/elasticlunr/docs/index.html).
+[API documentation](http://elasticlunr.com/docs/index.html) is available, as well as a [full working example](http://elasticlunr.com/example/index.html).
 
 ## Description
 

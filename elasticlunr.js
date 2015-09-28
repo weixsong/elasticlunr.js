@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.7.1
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.7.2
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.7.1";
+elasticlunr.version = "0.7.2";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
@@ -763,15 +763,21 @@ elasticlunr.Index.prototype.getFields = function () {
  * for this document against the query.
  *
  * @param {String} query The query to search the index with.
- * @param {JSON} jsonConfig The user query config, JSON format.
+ * @param {JSON} userConfig The user query config, JSON format.
  * @return {Object}
  * @see Index.prototype.idf
  * @see Index.prototype.documentVector
  * @memberOf Index
  */
-elasticlunr.Index.prototype.search = function (query, jsonConfig) {
+elasticlunr.Index.prototype.search = function (query, userConfig) {
   if (!query) return [];
-  var config = jsonConfig || new elasticlunr.Configuration(null, this.getFields()).get();
+
+  var configStr = null;
+  if (userConfig != null) {
+    configStr = JSON.stringify(userConfig);
+  }
+
+  var config = new elasticlunr.Configuration(configStr, this.getFields()).get();
 
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
