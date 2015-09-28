@@ -1,5 +1,14 @@
 # 
 
+## 0.7.2
+
+* Merge pull request [Updated Readme.md](https://github.com/weixsong/elasticlunr.js/pull/1), update URL of READEME, thanks to [Darkle](https://github.com/Darkle) for fixing this issue.
+* Fix issue: [Getting an error of TypeError: Cannot call method 'getDocFreq' of undefined](https://github.com/weixsong/elasticlunr.js/issues/2), thanks very much [Darkle](https://github.com/Darkle) for reporting this issue.
+
+## 0.7.1
+
+* nothing
+
 ## 0.7.0
 
 * code review again.

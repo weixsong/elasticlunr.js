@@ -583,7 +583,7 @@
                 <td><p>The query to search the index with.</p></td>
               </tr>
               <tr>
-                <td>jsonConfig</td>
+                <td>userConfig</td>
                 <td>JSON</td>
                 <td><p>The user query config, JSON format.</p></td>
               </tr>
@@ -595,9 +595,15 @@
             </tbody>
           </table>
           <div class="description"><p>Searches the index using the passed query.<br />Queries should be a string, multiple words are allowed.</p><p>If config is null, will search all fields defaultly, and lead to OR based query.<br />If config is specified, will search specified with query time boosting.</p><p>All query tokens are passed through the same pipeline that document tokens<br />are passed through, so any language processing involved will be run on every<br />query term.</p><p>Each query term is expanded, so that the term &#39;he&#39; might be expanded to<br />&#39;hello&#39; and &#39;help&#39; if those terms were already included in the index.</p><p>Matching documents are returned as an array of objects, each object contains<br />the matching document ref, as set for this index, and the similarity score<br />for this document against the query.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.search = function (query, jsonConfig) {
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.search = function (query, userConfig) {
   if (!query) return [];
-  var config = jsonConfig || new elasticlunr.Configuration(null, this.getFields()).get();
+
+  var configStr = null;
+  if (userConfig != null) {
+    configStr = JSON.stringify(userConfig);
+  }
+
+  var config = new elasticlunr.Configuration(configStr, this.getFields()).get();
 
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
