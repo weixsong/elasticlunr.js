@@ -1,5 +1,9 @@
 # 
 
+## 0.7.5
+
+* remove old node version v0.8 from .travis.yml, because old version of npm caused build error when running npm install.
+
 ## 0.7.4
 
 * Delete node_modules from repo.
