@@ -1,7 +1,7 @@
 require([
   './jquery.js',
   './mustache.js',
-  './../elasticlunr.js',
+  './elasticlunr.js',
   'text!templates/question_view.mustache',
   'text!templates/question_list.mustache',
   'text!example_data.json',

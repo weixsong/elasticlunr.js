@@ -1,5 +1,9 @@
 # 
 
+## 0.7.8
+
+* update example code
+
 ## 0.7.7
 
 * update Makefile
