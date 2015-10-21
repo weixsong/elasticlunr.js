@@ -1,5 +1,9 @@
 # 
 
+## 0.7.7
+
+* update Makefile
+
 ## 0.7.6
 
 * fix fieldSearchStats issue, ["Token Expandation" causes JavaScript error ](https://github.com/weixsong/elasticlunr.js/issues/3)

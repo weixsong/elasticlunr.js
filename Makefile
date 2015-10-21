@@ -31,6 +31,7 @@ elasticlunr.js: $(SRC)
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" > $@
 	cp $@ ./release/
+	cp $@ ./example/
 
 elasticlunr.min.js: $(SRC)
 	cat build/wrapper_start $^ build/wrapper_end | \
@@ -38,6 +39,7 @@ elasticlunr.min.js: $(SRC)
 	sed "s/@VERSION/${VERSION}/" | \
 	${UGLIFYJS} --compress --mangle --comments > $@
 	cp $@ ./release/
+	cp $@ ./example/
 
 %.json: build/%.json.template
 	cat $< | sed "s/@VERSION/${VERSION}/" > $@
