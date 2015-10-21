@@ -701,10 +701,18 @@
 
         var penality = 1;
         if (key != token) {
-          penality = (1 - (key.length - token.length) / key.length) * 0.5;
+          // currently I'm not sure if this penality is enough,
+          // need to do verification
+          penality = (1 - (key.length - token.length) / key.length) * 0.15;
+        } else {
+          // only record appeared token for retrieved documents for the 
+          // original token, not for expaned token.
+          // beause for doing coordNorm for a retrieved document, coordNorm only care how many
+          // query token appear in that document.
+          // so expanded token should not be added into docTokens, if added, this will pollute the 
+          // coordNorm
+          this.fieldSearchStats(docTokens, key, docs);
         }
-
-        this.fieldSearchStats(docTokens, key, docs);
 
         var score = tf * idf * norm * penality;
 
@@ -859,6 +867,7 @@
   var res = {};
 
   for (var doc in scores) {
+    if (!(doc in docTokens)) continue;
     if (docTokens[doc].length == n) {
       res[doc] = scores[doc];
     }
@@ -907,6 +916,7 @@
           <div class="description"><p>coord norm the score of a doc.<br />if a doc contain more query tokens, then the score will larger than the doc<br />contains less query tokens.</p><p>only for inner use.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.coordNorm = function (scores, docTokens, n) {
   for (var doc in scores) {
+    if (!(doc in docTokens)) continue;
     var tokens = docTokens[doc].length;
     scores[doc] = scores[doc] * tokens / n;
   }

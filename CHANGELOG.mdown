@@ -1,5 +1,10 @@
 # 
 
+## 0.7.9
+
+** fix fieldSearchStats issue, ["Token Expandation" causes JavaScript error ](https://github.com/weixsong/elasticlunr.js/issues/3), actually fieldSearchStats() should only be called for original token, not for expanded token.
+** when doing coordNorm() computation, docId in scores maybe not in docTokens, because docTokens only record original token, expanded token is not recorded. So in coordNorm() we need to check if docId is in docTokens.
+
 ## 0.7.8
 
 * update example code

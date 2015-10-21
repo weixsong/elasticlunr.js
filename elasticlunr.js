@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.7.8
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.7.9
  *
  * Copyright (C) 2015 Oliver Nightingale
  * Copyright (C) 2015 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.7.8";
+elasticlunr.version = "0.7.9";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2015 Oliver Nightingale
@@ -845,10 +845,18 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
 
         var penality = 1;
         if (key != token) {
-          penality = (1 - (key.length - token.length) / key.length) * 0.5;
+          // currently I'm not sure if this penality is enough,
+          // need to do verification
+          penality = (1 - (key.length - token.length) / key.length) * 0.15;
+        } else {
+          // only record appeared token for retrieved documents for the 
+          // original token, not for expaned token.
+          // beause for doing coordNorm for a retrieved document, coordNorm only care how many
+          // query token appear in that document.
+          // so expanded token should not be added into docTokens, if added, this will pollute the 
+          // coordNorm
+          this.fieldSearchStats(docTokens, key, docs);
         }
-
-        this.fieldSearchStats(docTokens, key, docs);
 
         var score = tf * idf * norm * penality;
 
@@ -924,6 +932,7 @@ elasticlunr.Index.prototype.intersect = function (scores, docTokens, n) {
   var res = {};
 
   for (var doc in scores) {
+    if (!(doc in docTokens)) continue;
     if (docTokens[doc].length == n) {
       res[doc] = scores[doc];
     }
@@ -946,6 +955,7 @@ elasticlunr.Index.prototype.intersect = function (scores, docTokens, n) {
  */
 elasticlunr.Index.prototype.coordNorm = function (scores, docTokens, n) {
   for (var doc in scores) {
+    if (!(doc in docTokens)) continue;
     var tokens = docTokens[doc].length;
     scores[doc] = scores[doc] * tokens / n;
   }
