@@ -1,5 +1,9 @@
 # 
 
+## 0.7.6
+
+* fix fieldSearchStats issue, ["Token Expandation" causes JavaScript error ](https://github.com/weixsong/elasticlunr.js/issues/3)
+
 ## 0.7.5
 
 * remove old node version v0.8 from .travis.yml, because old version of npm caused build error when running npm install.

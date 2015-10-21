@@ -5,3 +5,7 @@
 4. change addFieldLength() in index.js when building index to addDoc() function call.
 5. removeDoc() also need to remove relevant document field length info.
 6. add type configuration for search, such as "most_type", "best_type"
+
+* add PriorityQueue class, defaultly return only top 100 results, that could reduce memory used.
+* support query config: from to, store query results and don't do repeated query.
+* only search top k results, need PriorityQueue support.
