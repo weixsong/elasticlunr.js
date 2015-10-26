@@ -1,5 +1,9 @@
 # 
 
+## 0.8.0
+
+* fix issue [example is broken](https://github.com/weixsong/elasticlunr.js/issues/4).
+
 ## 0.7.9
 
 ** fix fieldSearchStats issue, ["Token Expandation" causes JavaScript error ](https://github.com/weixsong/elasticlunr.js/issues/3), actually fieldSearchStats() should only be called for original token, not for expanded token.
