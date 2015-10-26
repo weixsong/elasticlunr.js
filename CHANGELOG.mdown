@@ -1,5 +1,9 @@
 # 
 
+## 0.8.1
+
+* republish
+
 ## 0.8.0
 
 * fix issue [example is broken](https://github.com/weixsong/elasticlunr.js/issues/4).
