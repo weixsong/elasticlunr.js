@@ -87,50 +87,6 @@
         </footer>
 
         <script>
-            (function(ua) {
-                // some _really_ basic browser sniffing to choose the right dev tools link.
-
-                var consoleSrc,
-                    CHROME = /Chrome/,
-                    CHROMIUM = /Chromium/,
-                    FIREFOX = /Firefox/,
-                    MSIE = /MSIE/
-                OPERA = /(OPR|Opera)/,
-                    SAFARI = /Safari/,
-                    SEAMONKEY = /Seamonkey/
-
-                switch (true) {
-                    case FIREFOX.test(ua) && !SEAMONKEY.test(ua):
-                        // firefox
-                        consoleSrc = "https://developer.mozilla.org/en-US/docs/Tools/Web_Console"
-                        break
-
-                    case CHROME.test(ua):
-                        // chrome
-                        consoleSrc = "https://developer.chrome.com/devtools"
-                        break
-
-                    case SAFARI.test(ua) && !CHROME.test(ua) && !CHROMIUM.test(ua):
-                        // safari
-                        consoleSrc = "https://developer.apple.com/library/safari/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW1"
-                        break
-
-                    case OPERA.test(ua):
-                        // opera
-                        consoleSrc = "http://www.opera.com/dragonfly/"
-                        break
-
-                    case MSIE.test(ua):
-                        // IE
-                        consoleSrc = "http://msdn.microsoft.com/en-us/library/ie/hh673541(v=vs.85).aspx"
-                        break
-                }
-
-                if (consoleSrc) document.getElementById('developer-tools').href = consoleSrc
-            })(navigator.userAgent)
-        </script>
-
-        <script>
             (function(hijs) {
                 //
                 // hijs - JavaScript Syntax Highlighter

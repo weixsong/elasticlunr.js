@@ -1,5 +1,9 @@
 # 
 
+## 0.8.2
+
+** remove useless script code of example HTML page.
+
 ## 0.8.1
 
 * republish
