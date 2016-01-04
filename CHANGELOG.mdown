@@ -1,5 +1,12 @@
 # 
 
+## 0.8.3
+
+**Main Change: Catch up the changes of [lunr.js](https://github.com/olivernn/lunr.js)**
+* remove moot version in bower.json
+* update release.sh mistake about CHANGELOG.mdown(.ms)
+* 
+
 ## 0.8.2
 
 ** remove useless script code of example HTML page.
