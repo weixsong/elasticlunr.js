@@ -121,9 +121,9 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>elasticlunr.stopWordFilter is an English language stop word list filter, any words<br />contained in the list will not be passed through the filter.</p><p>This is intended to be used in the Pipeline. If the token does not pass the<br />filter then undefined will be returned.</p> </div>
+          <div class="description"><p>elasticlunr.stopWordFilter is an English language stop word list filter, any words<br />contained in the list will not be passed through the filter.</p><p>This is intended to be used in the Pipeline. If the token does not pass the<br />filter then undefined will be returned.<br />Currently this StopwordFilter using dictionary to do O(1) stop word filter.</p> </div>
           <pre><code class="language-javascript">elasticlunr.stopWordFilter = function (token) {
-  if ((token in elasticlunr.stopWordFilter.stopWords) == false) {
+  if (token &amp;&amp; elasticlunr.stopWordFilter.stopWords[token] !== token) {
     return token;
   }
 };

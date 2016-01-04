@@ -1,9 +1,9 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.2
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.3
  *
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  * MIT Licensed
  * @license
  */
@@ -12,8 +12,8 @@
 
 /*!
  * elasticlunr.js
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -83,11 +83,11 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.2";
+elasticlunr.version = "0.8.3";
 /*!
  * elasticlunr.utils
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -110,8 +110,8 @@ elasticlunr.utils.warn = (function (global) {
 })(this);
 /*!
  * elasticlunr.EventEmitter
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -196,8 +196,8 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
 };
 /*!
  * elasticlunr.tokenizer
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -217,8 +217,8 @@ elasticlunr.tokenizer = function (obj) {
 
 /*!
  * elasticlunr.Pipeline
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -448,8 +448,8 @@ elasticlunr.Pipeline.prototype.toJSON = function () {
 };
 /*!
  * elasticlunr.Index
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -1018,7 +1018,7 @@ elasticlunr.Index.prototype.use = function (plugin) {
 };
 /*!
  * elasticlunr.DocumentStore
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -1194,8 +1194,8 @@ elasticlunr.DocumentStore.prototype.toJSON = function () {
 };
 /*!
  * elasticlunr.stemmer
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
@@ -1413,8 +1413,8 @@ elasticlunr.stemmer = (function(){
 elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
 /*!
  * elasticlunr.stopWordFilter
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Wei Song
  */
 
 /**
@@ -1423,6 +1423,7 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
  *
  * This is intended to be used in the Pipeline. If the token does not pass the
  * filter then undefined will be returned.
+ * Currently this StopwordFilter using dictionary to do O(1) stop word filter.
  *
  * @module
  * @param {String} token The token to pass through the filter
@@ -1430,7 +1431,7 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
  * @see elasticlunr.Pipeline
  */
 elasticlunr.stopWordFilter = function (token) {
-  if ((token in elasticlunr.stopWordFilter.stopWords) == false) {
+  if (token && elasticlunr.stopWordFilter.stopWords[token] !== token) {
     return token;
   }
 };
@@ -1561,8 +1562,8 @@ elasticlunr.stopWordFilter.stopWords = {
 elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter');
 /*!
  * elasticlunr.trimmer
- * Copyright (C) 2015 Oliver Nightingale
- * Copyright (C) 2015 Oliver Nightingale
+ * Copyright (C) 2016 Oliver Nightingale
+ * Copyright (C) 2016 Oliver Nightingale
  */
 
 /**
@@ -1588,7 +1589,7 @@ elasticlunr.trimmer = function (token) {
 elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');
 /*!
  * elasticlunr.InvertedIndex
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Wei Song
  * Includes code from - http://tartarus.org/~martin/PorterStemmer/js.txt
  */
 
@@ -1823,7 +1824,7 @@ elasticlunr.InvertedIndex.prototype.toJSON = function () {
 
 /*!
  * elasticlunr.Configuration
- * Copyright (C) 2015 Wei Song
+ * Copyright (C) 2016 Wei Song
  */
  
  /** 
@@ -2024,4 +2025,4 @@ elasticlunr.Configuration.prototype.reset = function () {
      */
     return elasticlunr
   }))
-})()
+})();

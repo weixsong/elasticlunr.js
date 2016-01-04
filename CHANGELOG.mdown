@@ -5,7 +5,10 @@
 **Main Change: Catch up the changes of [lunr.js](https://github.com/olivernn/lunr.js)**
 * remove moot version in bower.json
 * update release.sh mistake about CHANGELOG.mdown(.ms)
-* 
+* add latest node version in Travis.yml
+* add semicolon to wrapper_end
+* Use git describe to get the previous tag
+* update stop_word_filter, add test case
 
 ## 0.8.2
 

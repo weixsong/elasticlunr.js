@@ -16,6 +16,14 @@ test('non stop words pass through', function () {
   });
 });
 
+test('should not filter Object.prototype terms', function () {
+  var nonStopWords = ['constructor', 'hasOwnProperty', 'toString', 'valueOf'];
+
+  nonStopWords.forEach(function (word) {
+    equal(elasticlunr.stopWordFilter(word), word);
+  });
+});
+
 test('should be registered with elasticlunr.Pipeline', function () {
   equal(elasticlunr.stopWordFilter.label, 'stopWordFilter');
   deepEqual(elasticlunr.Pipeline.registeredFunctions['stopWordFilter'], elasticlunr.stopWordFilter);
