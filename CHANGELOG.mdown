@@ -1,11 +1,12 @@
 # 
 
-## 
+## 0.8.5
 
 * add trimmer parameter check, throw error if parameter is null or undefined.
 * add toString function to utils.
 * add array check for parameter of elasticlunr.addStopWords.
 * allow tokenize array with null values.
+* support parameter for elasticlunr.tokenizer.
 
 ## 0.8.4
 
