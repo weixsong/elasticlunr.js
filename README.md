@@ -313,6 +313,38 @@ index.search("micro", {
 });
 ```
 
+## 6. Add customized stop words
+
+Elasticlunr.js contains some default stop words of English, such as:
+* a
+* about
+* an
+* all
+* also
+* and
+* any
+* but
+* the
+* ...
+
+Defaultly elasticlunr.js contains **120** stop words, user could decide not use these default stop words or add customized stop words.
+
+### 6.1 Remove default stop words
+
+You could remove default stop words simply as:
+```javascript
+elasticlunr.clearStopWords()
+```
+
+### 6.2 Add customized stop words
+
+User could add a list of customized stop words.
+```javascript
+var customized_stop_words = ['an', 'hello', 'xyzabc'];
+
+elasticlunr.addStopWords(customized_stop_words);
+```
+
 # Contributing
 
 See the [`CONTRIBUTING.mdown` file](CONTRIBUTING.mdown).

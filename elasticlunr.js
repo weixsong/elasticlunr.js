@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.3
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.4
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.3";
+elasticlunr.version = "0.8.4";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -829,7 +829,6 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
     var tokens = [token];
     if (expand == true) {
       tokens = this.index[fieldName].expandToken(token);
-      console.log(tokens);
     }
  
     tokens.forEach(function (key) {
@@ -1431,12 +1430,38 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
  * @see elasticlunr.Pipeline
  */
 elasticlunr.stopWordFilter = function (token) {
-  if (token && elasticlunr.stopWordFilter.stopWords[token] !== token) {
+  if (token && elasticlunr.stopWordFilter.stopWords[token] !== true) {
     return token;
   }
 };
 
-elasticlunr.stopWordFilter.stopWords = {
+/**
+ * remove predefined stop words
+ * if user want to use customized stop words, user could use this function to delete
+ * all predefined stopwords.
+ *
+ * @return {null}
+ */
+elasticlunr.clearStopWords = function () {
+  elasticlunr.stopWordFilter.stopWords = {};
+};
+
+/**
+ * add customized stop words
+ * user could use this function to add customized stop words
+ * 
+ * @params {Array} words customized stop words
+ * @return {null}
+ */
+elasticlunr.addStopWords = function (words) {
+  if (words == null) return;
+
+  words.forEach(function (word) {
+    elasticlunr.stopWordFilter.stopWords[word] = true;
+  }, this);
+};
+
+elasticlunr.defaultStopWords = {
   "": true,
   "a": true,
   "able": true,
@@ -1558,6 +1583,8 @@ elasticlunr.stopWordFilter.stopWords = {
   "you": true,
   "your": true
 };
+
+elasticlunr.stopWordFilter.stopWords = elasticlunr.defaultStopWords;
 
 elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter');
 /*!
