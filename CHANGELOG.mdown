@@ -1,5 +1,9 @@
 # 
 
+## 
+
+* add trimmer parameter check, throw error if parameter is null or undefined
+
 ## 0.8.4
 
 **Main Change: Catch up the changes of [lunr.js](https://github.com/olivernn/lunr.js)**

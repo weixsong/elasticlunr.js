@@ -1608,6 +1608,10 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilte
  * @see elasticlunr.Pipeline
  */
 elasticlunr.trimmer = function (token) {
+  if (token === null || token === undefined) {
+    throw new Error('token should not be undefined');
+  }
+
   return token
     .replace(/^\W+/, '')
     .replace(/\W+$/, '');
