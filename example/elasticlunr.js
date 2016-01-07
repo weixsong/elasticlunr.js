@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.4
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.5
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.4";
+elasticlunr.version = "0.8.5";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -108,6 +108,25 @@ elasticlunr.utils.warn = (function (global) {
     }
   };
 })(this);
+
+/**
+ * Convert an object to string.
+ *
+ * In the case of `null` and `undefined` the function returns
+ * an empty string, in all other cases the result of calling
+ * `toString` on the passed object is returned.
+ *
+ * @param {object} obj The object to convert to a string.
+ * @return {String} string representation of the passed object.
+ * @memberOf Utils
+ */
+elasticlunr.utils.toString = function (obj) {
+  if (obj === void 0 || obj === null) {
+    return "";
+  }
+
+  return obj.toString();
+}
 /*!
  * elasticlunr.EventEmitter
  * Copyright (C) 2016 Oliver Nightingale
@@ -203,18 +222,35 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
 /**
  * A function for splitting a string into tokens.
  * Currently English is support as default.
+ * Uses `elasticlunr.tokenizer.seperator` to split strings, you could change
+ * the value of this property to set how you want strings are split into tokens.
+ * IMPORTANT: use elasticlunr.tokenizer.seperator carefully, if you are not familiar with
+ * text process, then you'd better not change it.
  *
  * @module
  * @param {String} str The string that you want to tokenize.
+ * @see elasticlunr.tokenizer.seperator
  * @return {Array}
  */
 elasticlunr.tokenizer = function (obj) {
   if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase(); });
+  if (Array.isArray(obj)) {
+    return obj.map(function (t) {
+      return elasticlunr.utils.toString(t).toLowerCase();
+    });
+  }
 
-  return obj.toString().trim().toLowerCase().split(/[\s\-]+/);
+  return obj.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
 };
 
+/**
+ * The sperator used to split a string into tokens. Override this property to change the behaviour of
+ * `elasticlunr.tokenizer` behaviour when tokenizing strings. By default this splits on whitespace and hyphens.
+ *
+ * @static
+ * @see elasticlunr.tokenizer
+ */
+elasticlunr.tokenizer.seperator = /[\s\-]+/
 /*!
  * elasticlunr.Pipeline
  * Copyright (C) 2016 Oliver Nightingale
@@ -1454,7 +1490,7 @@ elasticlunr.clearStopWords = function () {
  * @return {null}
  */
 elasticlunr.addStopWords = function (words) {
-  if (words == null) return;
+  if (words == null || Array.isArray(words) === false) return;
 
   words.forEach(function (word) {
     elasticlunr.stopWordFilter.stopWords[word] = true;
@@ -1608,6 +1644,10 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilte
  * @see elasticlunr.Pipeline
  */
 elasticlunr.trimmer = function (token) {
+  if (token === null || token === undefined) {
+    throw new Error('token should not be undefined');
+  }
+
   return token
     .replace(/^\W+/, '')
     .replace(/\W+$/, '');

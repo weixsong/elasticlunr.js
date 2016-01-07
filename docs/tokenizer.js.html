@@ -89,6 +89,8 @@
             <ul class="nav nav-list bs-docs-sidenav affix-top">
               <li><a href="#tokenizer"><i class="alert alert-info"></i><span>tokenizer</span></a>
               </li>
+              <li><a href="#seperator"><i class="alert alert-success"></i><span>seperator</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -121,13 +123,26 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>A function for splitting a string into tokens.<br />Currently English is support as default.</p> </div>
+          <div class="description"><p>A function for splitting a string into tokens.<br />Currently English is support as default.<br />Uses <code>elasticlunr.tokenizer.seperator</code> to split strings, you could change<br />the value of this property to set how you want strings are split into tokens.<br />IMPORTANT: use elasticlunr.tokenizer.seperator carefully, if you are not familiar with<br />text process, then you&#39;d better not change it.</p> </div>
           <pre><code class="language-javascript">elasticlunr.tokenizer = function (obj) {
   if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase(); });
+  if (Array.isArray(obj)) {
+    return obj.map(function (t) {
+      return elasticlunr.utils.toString(t).toLowerCase();
+    });
+  }
 
-  return obj.toString().trim().toLowerCase().split(/[\s\-]+/);
+  return obj.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
 };</code></pre>
+          <section id="seperator">
+            <h1>seperator</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>elasticlunr.tokenizer.seperator</span>
+            </p>
+          </section>
+          <div class="description"><p>The sperator used to split a string into tokens. Override this property to change the behaviour of<br /><code>elasticlunr.tokenizer</code> behaviour when tokenizing strings. By default this splits on whitespace and hyphens.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.seperator = /[\s\-]+/</code></pre>
         </div>
       </div>
     </div>

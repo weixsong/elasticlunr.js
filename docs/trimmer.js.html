@@ -123,6 +123,10 @@
           </table>
           <div class="description"><p>elasticlunr.trimmer is a pipeline function for trimming non word<br />characters from the begining and end of tokens before they<br />enter the index.</p><p>This implementation may not work correctly for non latin<br />characters and should either be removed or adapted for use<br />with languages with non-latin characters.</p> </div>
           <pre><code class="language-javascript">elasticlunr.trimmer = function (token) {
+  if (token === null || token === undefined) {
+    throw new Error('token should not be undefined');
+  }
+
   return token
     .replace(/^\W+/, '')
     .replace(/\W+$/, '');
