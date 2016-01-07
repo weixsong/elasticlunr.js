@@ -333,7 +333,7 @@ Defaultly elasticlunr.js contains **120** stop words, user could decide not use 
 
 You could remove default stop words simply as:
 ```javascript
-elasticlunr.clearStopWords()
+elasticlunr.clearStopWords();
 ```
 
 ### 6.2 Add customized stop words
@@ -341,14 +341,9 @@ elasticlunr.clearStopWords()
 User could add a list of customized stop words.
 ```javascript
 var customized_stop_words = ['an', 'hello', 'xyzabc'];
-
 elasticlunr.addStopWords(customized_stop_words);
 ```
 
 # Contributing
 
 See the [`CONTRIBUTING.mdown` file](CONTRIBUTING.mdown).
-
-# Donate
-Alipay: watkinsong@163.com
-
