@@ -229,7 +229,11 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
  */
 elasticlunr.tokenizer = function (obj) {
   if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) return obj.map(function (t) { return t.toLowerCase(); });
+  if (Array.isArray(obj)) {
+    return obj.map(function (t) {
+      return elasticlunr.utils.toString(t).toLowerCase();
+    });
+  }
 
   return obj.toString().trim().toLowerCase().split(/[\s\-]+/);
 };
@@ -1473,7 +1477,7 @@ elasticlunr.clearStopWords = function () {
  * @return {null}
  */
 elasticlunr.addStopWords = function (words) {
-  if (words == null) return;
+  if (words == null || Array.isArray(words) === false) return;
 
   words.forEach(function (word) {
     elasticlunr.stopWordFilter.stopWords[word] = true;

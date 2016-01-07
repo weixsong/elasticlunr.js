@@ -151,7 +151,7 @@
           </section>
           <div class="description"><p>add customized stop words<br />user could use this function to add customized stop words</p> </div>
           <pre><code class="language-javascript">elasticlunr.addStopWords = function (words) {
-  if (words == null) return;
+  if (words == null || Array.isArray(words) === false) return;
 
   words.forEach(function (word) {
     elasticlunr.stopWordFilter.stopWords[word] = true;

@@ -15,12 +15,19 @@ test('downcasing tokens', function () {
   deepEqual(elasticlunr.tokenizer(tags), ['foo', 'bar'])
 })
 
-test('handling arrays', function () {
+test('handling arrays of strings', function () {
   var tags = ['foo', 'bar'],
       tokens = elasticlunr.tokenizer(tags)
 
   deepEqual(tokens, tags)
-})
+});
+
+test('handling arrays with undefined or null values', function () {
+  var arr = ['foo', undefined, null, 'bar'],
+      tokens = elasticlunr.tokenizer(arr);
+
+  deepEqual(tokens, ['foo', '', '', 'bar']);
+});
 
 test('handling multiple white spaces', function () {
   var testString = '  foo    bar  ',
