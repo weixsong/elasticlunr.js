@@ -3,6 +3,16 @@
 ## 0.8.3
 
 **Main Change: Catch up the changes of [lunr.js](https://github.com/olivernn/lunr.js)**
+
+* support clear stopwords and add customized stop words.
+* add test cases for clearStopWords function of elasticlunr.
+* add test cases for addStopWords function of elasticlunr.
+* update index.html page
+
+## 0.8.3
+
+**Main Change: Catch up the changes of [lunr.js](https://github.com/olivernn/lunr.js)**
+
 * remove moot version in bower.json
 * update release.sh mistake about CHANGELOG.mdown(.ms)
 * add latest node version in Travis.yml

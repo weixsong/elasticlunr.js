@@ -276,6 +276,27 @@ index.update(doc);
     expand: true
 });
 </code></pre>
+<h2>6. Add customized stop words</h2>
+<p>Elasticlunr.js contains some default stop words of English, such as:</p><ul>
+<li>a</li>
+<li>about</li>
+<li>an</li>
+<li>all</li>
+<li>also</li>
+<li>and</li>
+<li>any</li>
+<li>but</li>
+<li>the</li>
+<li>...</li>
+</ul>
+<p>Defaultly elasticlunr.js contains <strong>120</strong> stop words, user could decide not use these default stop words or add customized stop words.</p><h3>6.1 Remove default stop words</h3>
+<p>You could remove default stop words simply as:</p><pre><code class="lang-javascript">elasticlunr.clearStopWords()
+</code></pre>
+<h3>6.2 Add customized stop words</h3>
+<p>User could add a list of customized stop words.</p><pre><code class="lang-javascript">var customized_stop_words = [&#39;an&#39;, &#39;hello&#39;, &#39;xyzabc&#39;];
+
+elasticlunr.addStopWords(customized_stop_words);
+</code></pre>
 <h1>Contributing</h1>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p><h1>Donate</h1>
 <p>Alipay: watkinsong@163.com</p></section>

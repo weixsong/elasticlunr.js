@@ -89,6 +89,10 @@
             <ul class="nav nav-list bs-docs-sidenav affix-top">
               <li><a href="#stopWordFilter"><i class="alert alert-info"></i><span>stopWordFilter</span></a>
               </li>
+              <li><a href="#clearStopWords"><i class="alert alert-info"></i><span>clearStopWords</span></a>
+              </li>
+              <li><a href="#addStopWords"><i class="alert alert-info"></i><span>addStopWords</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -123,12 +127,38 @@
           </table>
           <div class="description"><p>elasticlunr.stopWordFilter is an English language stop word list filter, any words<br />contained in the list will not be passed through the filter.</p><p>This is intended to be used in the Pipeline. If the token does not pass the<br />filter then undefined will be returned.<br />Currently this StopwordFilter using dictionary to do O(1) stop word filter.</p> </div>
           <pre><code class="language-javascript">elasticlunr.stopWordFilter = function (token) {
-  if (token &amp;&amp; elasticlunr.stopWordFilter.stopWords[token] !== token) {
+  if (token &amp;&amp; elasticlunr.stopWordFilter.stopWords[token] !== true) {
     return token;
   }
+};</code></pre>
+          <section id="clearStopWords">
+            <h1>clearStopWords</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.clearStopWords()</span>
+            </p>
+          </section>
+          <div class="description"><p>remove predefined stop words<br />if user want to use customized stop words, user could use this function to delete<br />all predefined stopwords.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.clearStopWords = function () {
+  elasticlunr.stopWordFilter.stopWords = {};
+};</code></pre>
+          <section id="addStopWords">
+            <h1>addStopWords</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.addStopWords()</span>
+            </p>
+          </section>
+          <div class="description"><p>add customized stop words<br />user could use this function to add customized stop words</p> </div>
+          <pre><code class="language-javascript">elasticlunr.addStopWords = function (words) {
+  if (words == null) return;
+
+  words.forEach(function (word) {
+    elasticlunr.stopWordFilter.stopWords[word] = true;
+  }, this);
 };
 
-elasticlunr.stopWordFilter.stopWords = {
+elasticlunr.defaultStopWords = {
   &quot;&quot;: true,
   &quot;a&quot;: true,
   &quot;able&quot;: true,
@@ -250,6 +280,8 @@ elasticlunr.stopWordFilter.stopWords = {
   &quot;you&quot;: true,
   &quot;your&quot;: true
 };
+
+elasticlunr.stopWordFilter.stopWords = elasticlunr.defaultStopWords;
 
 elasticlunr.Pipeline.registerFunction(elasticlunr.stopWordFilter, 'stopWordFilter');</code></pre>
         </div>

@@ -28,3 +28,25 @@ test('should be registered with elasticlunr.Pipeline', function () {
   equal(elasticlunr.stopWordFilter.label, 'stopWordFilter');
   deepEqual(elasticlunr.Pipeline.registeredFunctions['stopWordFilter'], elasticlunr.stopWordFilter);
 });
+
+test('test default stop words', function () {
+  deepEqual(elasticlunr.stopWordFilter.stopWords, elasticlunr.defaultStopWords);
+});
+
+test('test clear stop words by elasticlunr.clearStopWords', function () {
+  elasticlunr.clearStopWords();
+  deepEqual(elasticlunr.stopWordFilter.stopWords, {});
+});
+
+test('test add customized stop words by elasticlunr.addStopWords', function () {
+  var stopWords = ['the', 'and', 'but', 'than', 'when'];
+
+  var tempStopWords = {};
+  stopWords.forEach(function(word) {
+    tempStopWords[word] = true;
+  }, this);
+
+  elasticlunr.clearStopWords();
+  elasticlunr.addStopWords(stopWords);
+  deepEqual(elasticlunr.stopWordFilter.stopWords, tempStopWords);
+});
