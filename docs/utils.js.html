@@ -91,6 +91,8 @@
               </li>
               <li><a href="#warn"><i class="alert alert-success"></i><span>warn</span></a>
               </li>
+              <li><a href="#toString"><i class="alert alert-info"></i><span>toString</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -135,6 +137,42 @@
     }
   };
 })(this);</code></pre>
+          <section id="toString">
+            <h1>toString</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.utils.toString()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>obj</td>
+                <td>object</td>
+                <td><p>The object to convert to a string.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>String</td>
+                <td><p>string representation of the passed object.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Convert an object to string.</p><p>In the case of <code>null</code> and <code>undefined</code> the function returns<br />an empty string, in all other cases the result of calling<br /><code>toString</code> on the passed object is returned.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.utils.toString = function (obj) {
+  if (obj === void 0 || obj === null) {
+    return &quot;&quot;;
+  }
+
+  return obj.toString();
+}</code></pre>
         </div>
       </div>
     </div>

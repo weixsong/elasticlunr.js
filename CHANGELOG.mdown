@@ -3,6 +3,7 @@
 ## 
 
 * add trimmer parameter check, throw error if parameter is null or undefined
+* add toString function to utils
 
 ## 0.8.4
 
