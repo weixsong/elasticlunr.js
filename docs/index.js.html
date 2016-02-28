@@ -117,8 +117,6 @@
               </li>
               <li><a href="#fieldSearchStats"><i class="alert alert-info"></i><span>fieldSearchStats</span></a>
               </li>
-              <li><a href="#computeSquaredWeight"><i class="alert alert-info"></i><span>computeSquaredWeight</span></a>
-              </li>
               <li><a href="#intersect"><i class="alert alert-info"></i><span>intersect</span></a>
               </li>
               <li><a href="#coordNorm"><i class="alert alert-info"></i><span>coordNorm</span></a>
@@ -608,15 +606,13 @@
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
   var queryResults = {};
-  var squaredWeight = this.computeSquaredWeight(queryTokens, config);
 
   for (var field in config) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
     var fieldBoost = config[field].boost;
-    var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
 
     for (var docRef in fieldSearchResults) {
-      fieldSearchResults[docRef] = fieldSearchResults[docRef] * queryNorm;
+      fieldSearchResults[docRef] = fieldSearchResults[docRef] * fieldBoost;
     }
 
     for (var docRef in fieldSearchResults) {
@@ -693,9 +689,9 @@
       for (var docRef in docs) {
         var tf = this.index[fieldName].getTermFrequency(key, docRef);
         var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
-        var norm = 1;
+        var fieldLengthNorm = 1;
         if (fieldLength != 0) {
-          norm = 1 / Math.sqrt(fieldLength);
+          fieldLengthNorm = 1 / Math.sqrt(fieldLength);
         }
 
         var penality = 1;
@@ -713,7 +709,7 @@
           this.fieldSearchStats(docTokens, key, docs);
         }
 
-        var score = tf * idf * norm * penality;
+        var score = tf * idf * fieldLengthNorm * penality;
 
         if (docRef in scores) {
           scores[docRef] += score;
@@ -774,54 +770,6 @@
       docTokens[doc] = [token];
     }
   }
-};</code></pre>
-          <section id="computeSquaredWeight">
-            <h1>computeSquaredWeight</h1>
-            <h5 class="subheader"></h5>
-            <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.computeSquaredWeight()</span>
-            </p>
-          </section>
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th style="width:20%">Option name</th>
-                <th style="width:20%">Type</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>queryTokens</td>
-                <td>Array</td>
-                <td><p>query tokens.</p></td>
-              </tr>
-              <tr>
-                <td>config</td>
-                <td>elasticlunr.Configuration</td>
-                <td><p>The user query config, JSON format.</p></td>
-              </tr>
-              <tr>
-                <td>return</td>
-                <td>Float</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="description"><p>compute squared weight of query tokens.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, config) {
-  var weight = 0.0;
-  queryTokens.forEach(function (token) {
-    var fieldWeight = 0.0;
-    for (var field in config) {
-      var fieldBoost = config[field].boost;
-      var idf = this.idf(token, field);
-      fieldWeight += idf * idf * fieldBoost * fieldBoost;
-    }
-    weight += fieldWeight;
-  }, this);
-
-  return weight;
 };</code></pre>
           <section id="intersect">
             <h1>intersect</h1>

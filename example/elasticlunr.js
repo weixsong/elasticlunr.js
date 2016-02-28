@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.5
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.6
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.5";
+elasticlunr.version = "0.8.6";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -126,7 +126,7 @@ elasticlunr.utils.toString = function (obj) {
   }
 
   return obj.toString();
-}
+};
 /*!
  * elasticlunr.EventEmitter
  * Copyright (C) 2016 Oliver Nightingale
@@ -818,15 +818,13 @@ elasticlunr.Index.prototype.search = function (query, userConfig) {
   var queryTokens = this.pipeline.run(elasticlunr.tokenizer(query));
 
   var queryResults = {};
-  var squaredWeight = this.computeSquaredWeight(queryTokens, config);
 
   for (var field in config) {
     var fieldSearchResults = this.fieldSearch(queryTokens, field, config);
     var fieldBoost = config[field].boost;
-    var queryNorm = 1 / Math.sqrt(1 / (fieldBoost * fieldBoost) * squaredWeight);
 
     for (var docRef in fieldSearchResults) {
-      fieldSearchResults[docRef] = fieldSearchResults[docRef] * queryNorm;
+      fieldSearchResults[docRef] = fieldSearchResults[docRef] * fieldBoost;
     }
 
     for (var docRef in fieldSearchResults) {
@@ -873,9 +871,9 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
       for (var docRef in docs) {
         var tf = this.index[fieldName].getTermFrequency(key, docRef);
         var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
-        var norm = 1;
+        var fieldLengthNorm = 1;
         if (fieldLength != 0) {
-          norm = 1 / Math.sqrt(fieldLength);
+          fieldLengthNorm = 1 / Math.sqrt(fieldLength);
         }
 
         var penality = 1;
@@ -893,7 +891,7 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
           this.fieldSearchStats(docTokens, key, docs);
         }
 
-        var score = tf * idf * norm * penality;
+        var score = tf * idf * fieldLengthNorm * penality;
 
         if (docRef in scores) {
           scores[docRef] += score;
@@ -930,28 +928,6 @@ elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs)
       docTokens[doc] = [token];
     }
   }
-};
-
-/**
- * compute squared weight of query tokens.
- *
- * @param {Array} queryTokens query tokens.
- * @param {elasticlunr.Configuration} config The user query config, JSON format.
- * @return {Float}
- */
-elasticlunr.Index.prototype.computeSquaredWeight = function (queryTokens, config) {
-  var weight = 0.0;
-  queryTokens.forEach(function (token) {
-    var fieldWeight = 0.0;
-    for (var field in config) {
-      var fieldBoost = config[field].boost;
-      var idf = this.idf(token, field);
-      fieldWeight += idf * idf * fieldBoost * fieldBoost;
-    }
-    weight += fieldWeight;
-  }, this);
-
-  return weight;
 };
 
 /**

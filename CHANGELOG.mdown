@@ -1,5 +1,10 @@
 # 
 
+## 0.8.6
+
+* update README
+* remove queryNorm compute, it make the score computation complex and useless.[Elasticsearch queryNorm](https://www.elastic.co/guide/en/elasticsearch/guide/current/practical-scoring-function.html#query-norm)
+
 ## 0.8.5
 
 * add trimmer parameter check, throw error if parameter is null or undefined.
