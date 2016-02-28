@@ -12,7 +12,10 @@ test('removing leading and trailing punctuation', function () {
       exclamationMark = 'stop!',
       comma = 'first,',
       empty = '',
-      brackets = '[tag]';
+      brackets = '[tag]',
+      moreBrackets = '[[[tag]]]',
+      combined1 = '[[!@#@!hello]]]}}}',
+      combined2 = '~!@@@hello***()()()]]';
 
   deepEqual(elasticlunr.trimmer(fullStop), 'hello');
   deepEqual(elasticlunr.trimmer(innerApostrophe), "it's");
@@ -21,6 +24,9 @@ test('removing leading and trailing punctuation', function () {
   deepEqual(elasticlunr.trimmer(comma), 'first');
   deepEqual(elasticlunr.trimmer(empty), '');
   deepEqual(elasticlunr.trimmer(brackets), 'tag');
+  deepEqual(elasticlunr.trimmer(moreBrackets), 'tag');
+  deepEqual(elasticlunr.trimmer(combined1), 'hello');
+  deepEqual(elasticlunr.trimmer(combined2), 'hello');
 });
 
 test('should be registered with elasticlunr.Pipeline', function () {

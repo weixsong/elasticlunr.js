@@ -6,16 +6,14 @@ test('test if elasticlunr.utils.warn is a function', function () {
   deepEqual(typeof(elasticlunr.utils.warn), typeof(f));
 });
 
-test('test toString of null', function () {
+test('test toString of null, undefined, void 0', function () {
   var a = null;
+  var b = undefined;
+  var c = void 0;
 
   equal(elasticlunr.utils.toString(a), '');
-});
-
-test('test toString of undefined', function () {
-  var a = undefined;
-
-  equal(elasticlunr.utils.toString(a), '');
+  equal(elasticlunr.utils.toString(b), '');
+  equal(elasticlunr.utils.toString(c), '');
 });
 
 test('test toString of object', function () {
