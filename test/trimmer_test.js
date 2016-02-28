@@ -31,7 +31,7 @@ test('removing leading and trailing punctuation', function () {
 
 test('should be registered with elasticlunr.Pipeline', function () {
   equal(elasticlunr.trimmer.label, 'trimmer');
-  deepEqual(elasticlunr.Pipeline.registeredFunctions['trimmer'], elasticlunr.trimmer);
+  deepEqual(elasticlunr.Pipeline.getRegisteredFunction('trimmer'), elasticlunr.trimmer);
 });
 
 test('test null input to trimmer', function () {

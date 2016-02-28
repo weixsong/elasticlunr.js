@@ -221,7 +221,7 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
 
 /**
  * A function for splitting a string into tokens.
- * Currently English is support as default.
+ * Currently English is supported as default.
  * Uses `elasticlunr.tokenizer.seperator` to split strings, you could change
  * the value of this property to set how you want strings are split into tokens.
  * IMPORTANT: use elasticlunr.tokenizer.seperator carefully, if you are not familiar with
@@ -232,16 +232,29 @@ elasticlunr.EventEmitter.prototype.hasHandler = function (name) {
  * @see elasticlunr.tokenizer.seperator
  * @return {Array}
  */
-elasticlunr.tokenizer = function (obj) {
-  if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) {
-    return obj.map(function (t) {
+elasticlunr.tokenizer = function (str) {
+  if (!arguments.length || str === null || str === undefined) return [];
+  if (Array.isArray(str)) {
+    var arr = str.filter(function(token) {
+      if (token === null || token === undefined) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return arr.map(function (t) {
       return elasticlunr.utils.toString(t).toLowerCase();
     });
   }
 
-  return obj.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
+  return str.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
 };
+
+/**
+ * Default string seperator.
+ */
+elasticlunr.tokenizer.defaultSeperator = /[\s\-]+/;
 
 /**
  * The sperator used to split a string into tokens. Override this property to change the behaviour of
@@ -250,7 +263,34 @@ elasticlunr.tokenizer = function (obj) {
  * @static
  * @see elasticlunr.tokenizer
  */
-elasticlunr.tokenizer.seperator = /[\s\-]+/
+elasticlunr.tokenizer.seperator = elasticlunr.tokenizer.defaultSeperator;
+
+/**
+ * Set up customized string seperator
+ *
+ * @param {Object} sep The customized seperator that you want to use to tokenize a string.
+ */
+elasticlunr.tokenizer.setSeperator = function(sep) {
+    if (sep !== null && sep !== undefined && typeof(sep) === 'object') {
+        elasticlunr.tokenizer.seperator = sep;
+    }
+}
+
+/**
+ * Reset string seperator
+ *
+ */
+elasticlunr.tokenizer.resetSeperator = function() {
+    elasticlunr.tokenizer.seperator = elasticlunr.tokenizer.defaultSeperator;
+}
+
+/**
+ * Get string seperator
+ *
+ */
+elasticlunr.tokenizer.getSeperator = function() {
+    return elasticlunr.tokenizer.seperator;
+}
 /*!
  * elasticlunr.Pipeline
  * Copyright (C) 2016 Oliver Nightingale
@@ -305,12 +345,27 @@ elasticlunr.Pipeline.registeredFunctions = {};
  * @memberOf Pipeline
  */
 elasticlunr.Pipeline.registerFunction = function (fn, label) {
-  if (label in this.registeredFunctions) {
+  if (label in elasticlunr.Pipeline.registeredFunctions) {
     elasticlunr.utils.warn('Overwriting existing registered function: ' + label);
   }
 
   fn.label = label;
   elasticlunr.Pipeline.registeredFunctions[label] = fn;
+};
+
+/**
+ * Get a registered function in the pipeline.
+ *
+ * @param {String} label The label of registered function.
+ * @return {Function}
+ * @memberOf Pipeline
+ */
+elasticlunr.Pipeline.getRegisteredFunction = function (label) {
+  if ((label in elasticlunr.Pipeline.registeredFunctions) !== true) {
+    return null;
+  }
+
+  return elasticlunr.Pipeline.registeredFunctions[label];
 };
 
 /**

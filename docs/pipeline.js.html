@@ -91,6 +91,8 @@
               </li>
               <li><a href="#registerFunction"><i class="alert alert-info"></i><span>registerFunction</span></a>
               </li>
+              <li><a href="#getRegisteredFunction"><i class="alert alert-info"></i><span>getRegisteredFunction</span></a>
+              </li>
               <li><a href="#load"><i class="alert alert-info"></i><span>load</span></a>
               </li>
               <li><a href="#add"><i class="alert alert-info"></i><span>add</span></a>
@@ -154,12 +156,48 @@ elasticlunr.Pipeline.registeredFunctions = {};</code></pre>
           </table>
           <div class="description"><p>Register a function with the pipeline.</p><p>Functions that are used in the pipeline should be registered if the pipeline<br />needs to be serialised, or a serialised pipeline needs to be loaded.</p><p>Registering a function does not add it to a pipeline, functions must still be<br />added to instances of the pipeline for them to be used when running a pipeline.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Pipeline.registerFunction = function (fn, label) {
-  if (label in this.registeredFunctions) {
+  if (label in elasticlunr.Pipeline.registeredFunctions) {
     elasticlunr.utils.warn('Overwriting existing registered function: ' + label);
   }
 
   fn.label = label;
   elasticlunr.Pipeline.registeredFunctions[label] = fn;
+};</code></pre>
+          <section id="getRegisteredFunction">
+            <h1>getRegisteredFunction</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Pipeline.getRegisteredFunction()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>label</td>
+                <td>String</td>
+                <td><p>The label of registered function.</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Function</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Get a registered function in the pipeline.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.Pipeline.getRegisteredFunction = function (label) {
+  if ((label in elasticlunr.Pipeline.registeredFunctions) !== true) {
+    return null;
+  }
+
+  return elasticlunr.Pipeline.registeredFunctions[label];
 };</code></pre>
           <section id="load">
             <h1>load</h1>

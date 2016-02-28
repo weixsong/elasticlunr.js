@@ -1,5 +1,11 @@
 # 
 
+## 0.8.7
+
+* remove make server
+* remove .DS_Store
+* remove folder perf
+
 ## 0.8.6
 
 * update README
