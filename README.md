@@ -6,6 +6,14 @@ Elasticlunr.js is a lightweight full-text search engine developed in JavaScript 
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting, field search, more rational scoring/ranking methodology, fast computation speed and so on.
 Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration, query-time boosting, field search and other features.
 
+# Why You Need Lightweight Offline Search?
+
+1. In some system, you don't want to deploy any **complex full-text search engine**(such as Lucence, Elasticsearch, Sphinx, etc.), you only want to provide some static web pages and provide search functionality , then you could build index in previous and load index in client side(such as Browser).
+2. Provide offline search functionality. For some documents, user usually download these documents, you could build index and put index in the documents package, then provide offline search functionality.
+3. For some limited or restricted network, such WAN or LAN, offline search is a better choice.
+4. For mobile device, Iphone or Android phone, network traffic maybe very expensive, then provide offline search is a good choice.
+5. If you want to provide search functionality in your Node.js system, and you don't want to use a complex system, or you only need to support thousands of documents, then Elasticlunr.js is what you want to use.
+
 # Key Features Comparing with Lunr.js
 
 1. **Query-Time Boosting**, you don't need to setup boosting weight in index building procedure, Query-Time Boosting make it more flexible that you could try different boosting scheme.
@@ -95,13 +103,6 @@ Then elasticlunr.js will not store the JSON documents, this will reduce the inde
 
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time Boosting, Field Search, more rational scoring/ranking methodology, flexible configuration and so on.
 A bit like Solr, but much smaller and not as bright, but also provide flexible configuration, query-time boosting, field search, etc.
-
-## Why
-
-1. In some system, you don't want to deploy any Web Server(such as Apache, Nginx, etc.), you only provide some static web pages and provide search function in client side. Then you could build index in previous and load index in client side.
-2. Provide offline search functionality. For some documents, user usually download these documents, you could build index and put index in the documents package, then provide offline search functionality.
-3. For some limited or restricted network, such WAN or LAN, offline search is a better choice.
-4. For mobile device, Iphone or Android phone, network traffic maybe very expensive, then provide offline search is a good choice.
 
 ## Installation
 
@@ -333,7 +334,7 @@ Defaultly elasticlunr.js contains **120** stop words, user could decide not use 
 
 You could remove default stop words simply as:
 ```javascript
-elasticlunr.clearStopWords()
+elasticlunr.clearStopWords();
 ```
 
 ### 6.2 Add customized stop words
@@ -341,14 +342,9 @@ elasticlunr.clearStopWords()
 User could add a list of customized stop words.
 ```javascript
 var customized_stop_words = ['an', 'hello', 'xyzabc'];
-
 elasticlunr.addStopWords(customized_stop_words);
 ```
 
 # Contributing
 
 See the [`CONTRIBUTING.mdown` file](CONTRIBUTING.mdown).
-
-# Donate
-Alipay: watkinsong@163.com
-
