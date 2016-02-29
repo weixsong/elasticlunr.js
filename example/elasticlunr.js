@@ -301,16 +301,14 @@ elasticlunr.tokenizer.getSeperator = function() {
  * elasticlunr.Pipelines maintain an ordered list of functions to be applied to 
  * both documents tokens and query tokens.
  *
- * An instance of elasticlunr.Index created with the elasticlunr shortcut will contain a
- * pipeline with a trimmer, a stop word filter, an English language stemmer. Extra
+ * An instance of elasticlunr.Index will contain a pipeline
+ * with a trimmer, a stop word filter, an English stemmer. Extra
  * functions can be added before or after either of these functions or these
  * default functions can be removed.
  *
- * When run the pipeline will call each function in turn, passing a token, the
- * index of that token in the original list of all tokens and finally a list of
- * all the original tokens.
+ * When run the pipeline, it will call each function in turn.
  *
- * The output of functions in the pipeline will be passed to the next function
+ * The output of the functions in the pipeline will be passed to the next function
  * in the pipeline. To exclude a token from entering the index the function
  * should return undefined, the rest of the pipeline will not be called with
  * this token.
@@ -332,7 +330,7 @@ elasticlunr.Pipeline = function () {
 elasticlunr.Pipeline.registeredFunctions = {};
 
 /**
- * Register a function with the pipeline.
+ * Register a function in the pipeline.
  *
  * Functions that are used in the pipeline should be registered if the pipeline
  * needs to be serialised, or a serialised pipeline needs to be loaded.
@@ -340,7 +338,7 @@ elasticlunr.Pipeline.registeredFunctions = {};
  * Registering a function does not add it to a pipeline, functions must still be
  * added to instances of the pipeline for them to be used when running a pipeline.
  *
- * @param {Function} fn The function to check for.
+ * @param {Function} fn The function to register.
  * @param {String} label The label to register this function with
  * @memberOf Pipeline
  */
@@ -398,7 +396,7 @@ elasticlunr.Pipeline.load = function (serialised) {
   var pipeline = new elasticlunr.Pipeline;
 
   serialised.forEach(function (fnName) {
-    var fn = elasticlunr.Pipeline.registeredFunctions[fnName];
+    var fn = elasticlunr.Pipeline.getRegisteredFunction(fnName);
 
     if (fn) {
       pipeline.add(fn);
@@ -442,12 +440,11 @@ elasticlunr.Pipeline.prototype.after = function (existingFn, newFn) {
   elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
   var pos = this._queue.indexOf(existingFn);
-  if (pos == -1) {
+  if (pos === -1) {
     throw new Error('Cannot find existingFn');
   }
 
-  pos = pos + 1;
-  this._queue.splice(pos, 0, newFn);
+  this._queue.splice(pos + 1, 0, newFn);
 };
 
 /**
@@ -465,7 +462,7 @@ elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
   elasticlunr.Pipeline.warnIfFunctionNotRegistered(newFn);
 
   var pos = this._queue.indexOf(existingFn);
-  if (pos == -1) {
+  if (pos === -1) {
     throw new Error('Cannot find existingFn');
   }
 
@@ -480,7 +477,7 @@ elasticlunr.Pipeline.prototype.before = function (existingFn, newFn) {
  */
 elasticlunr.Pipeline.prototype.remove = function (fn) {
   var pos = this._queue.indexOf(fn);
-  if (pos == -1) {
+  if (pos === -1) {
     return;
   }
 
@@ -488,7 +485,7 @@ elasticlunr.Pipeline.prototype.remove = function (fn) {
 };
 
 /**
- * Runs the current list of functions that make up the pipeline against the
+ * Runs the current list of functions that registered in the pipeline against the
  * input tokens.
  *
  * @param {Array} tokens The tokens to run through the pipeline.
@@ -505,10 +502,10 @@ elasticlunr.Pipeline.prototype.run = function (tokens) {
 
     for (var j = 0; j < pipelineLength; j++) {
       token = this._queue[j](token, i, tokens);
-      if (token === void 0) break;
+      if (token === void 0 || token === null) break;
     };
 
-    if (token !== void 0) out.push(token);
+    if (token !== void 0 && token !== null) out.push(token);
   };
 
   return out;
@@ -523,8 +520,20 @@ elasticlunr.Pipeline.prototype.reset = function () {
   this._queue = [];
 };
 
+ /**
+  * Get the pipeline if user want to check the pipeline.
+  *
+  * @memberOf Pipeline
+  */
+ elasticlunr.Pipeline.prototype.get = function () {
+   return this._queue;
+ };
+
 /**
  * Returns a representation of the pipeline ready for serialisation.
+ * Only serialize pipeline function's name. Not storing function, so when
+ * loading the archived JSON index file, corresponding pipeline function is 
+ * added by registered function of elasticlunr.Pipeline.registeredFunctions
  *
  * Logs a warning if the function has not been registered.
  *
@@ -1484,12 +1493,12 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.stemmer, 'stemmer');
  */
 
 /**
- * elasticlunr.stopWordFilter is an English language stop word list filter, any words
- * contained in the list will not be passed through the filter.
+ * elasticlunr.stopWordFilter is an English language stop words filter, any words
+ * contained in the stop word list will not be passed through the filter.
  *
  * This is intended to be used in the Pipeline. If the token does not pass the
  * filter then undefined will be returned.
- * Currently this StopwordFilter using dictionary to do O(1) stop word filter.
+ * Currently this StopwordFilter using dictionary to do O(1) time complexity stop word filtering.
  *
  * @module
  * @param {String} token The token to pass through the filter
@@ -1503,7 +1512,7 @@ elasticlunr.stopWordFilter = function (token) {
 };
 
 /**
- * remove predefined stop words
+ * Remove predefined stop words
  * if user want to use customized stop words, user could use this function to delete
  * all predefined stopwords.
  *
@@ -1514,7 +1523,7 @@ elasticlunr.clearStopWords = function () {
 };
 
 /**
- * add customized stop words
+ * Add customized stop words
  * user could use this function to add customized stop words
  * 
  * @params {Array} words customized stop words
@@ -1526,6 +1535,16 @@ elasticlunr.addStopWords = function (words) {
   words.forEach(function (word) {
     elasticlunr.stopWordFilter.stopWords[word] = true;
   }, this);
+};
+
+/**
+ * Reset to default stop words
+ * user could use this function to restore default stop words
+ *
+ * @return {null}
+ */
+elasticlunr.resetStopWords = function () {
+  elasticlunr.stopWordFilter.stopWords = elasticlunr.defaultStopWords;
 };
 
 elasticlunr.defaultStopWords = {

@@ -50,6 +50,7 @@
 	};
 
 	page.open(url, function(status) {
+		console.log('msg: ' + url)
 		if (status !== 'success') {
 			console.error('Unable to access network: ' + status);
 			phantom.exit(1);

@@ -47,6 +47,9 @@ elasticlunr.min.js: $(SRC)
 size: elasticlunr.min.js
 	@gzip -c elasticlunr.min.js | wc -c
 
+server:
+	${NODE} server.js ${SERVER_PORT}
+
 test: node_modules
 	@./test/runner.sh ${TEST_PORT}
 
