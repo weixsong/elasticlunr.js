@@ -1,4 +1,8 @@
-module('elasticlunr.stopWordFilter');
+module('elasticlunr.stopWordFilter', {
+  teardown: function () {
+    elasticlunr.resetStopWords();
+  }
+});
 
 test('stops stop words', function () {
   var stopWords = ['the', 'and', 'but', 'than', 'when'];
@@ -26,7 +30,7 @@ test('should not filter Object.prototype terms', function () {
 
 test('should be registered with elasticlunr.Pipeline', function () {
   equal(elasticlunr.stopWordFilter.label, 'stopWordFilter');
-  deepEqual(elasticlunr.Pipeline.registeredFunctions['stopWordFilter'], elasticlunr.stopWordFilter);
+  deepEqual(elasticlunr.Pipeline.getRegisteredFunction('stopWordFilter'), elasticlunr.stopWordFilter);
 });
 
 test('test default stop words', function () {
@@ -49,4 +53,29 @@ test('test add customized stop words by elasticlunr.addStopWords', function () {
   elasticlunr.clearStopWords();
   elasticlunr.addStopWords(stopWords);
   deepEqual(elasticlunr.stopWordFilter.stopWords, tempStopWords);
+});
+
+test('test stopping customized stopwords', function () {
+  var stopWords = ['hello', 'world', 'microsoft', 'TTS'];
+
+  elasticlunr.addStopWords(stopWords);
+  stopWords.forEach(function (word) {
+    equal(elasticlunr.stopWordFilter(word), undefined);
+  });
+});
+
+test('test non stopwords pass through', function () {
+  var stopWords = ['hello', 'world', 'microsoft', 'TTS'];
+  var nonStopWords = ['interesting', 'words', 'pass', 'through'];
+
+  elasticlunr.addStopWords(stopWords);
+
+  nonStopWords.forEach(function (word) {
+    equal(elasticlunr.stopWordFilter(word), word);
+  });
+});
+
+test('test undefined', function () {
+  equal(elasticlunr.stopWordFilter(undefined), undefined);
+  equal(elasticlunr.stopWordFilter(null), undefined);
 });
