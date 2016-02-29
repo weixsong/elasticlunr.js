@@ -1,14 +1,14 @@
-module('elasticlunr.stemmer')
+module('elasticlunr.stemmer');
 
 test('should stem words correctly', function () {
-  Object.keys(stemmingFixture).forEach(function (testWord) {
-    var expected = stemmingFixture[testWord]
+  Object.keys(stemmingFixture).forEach(function (word) {
+    var expected = stemmingFixture[word];
 
-    equal(elasticlunr.stemmer(testWord), expected)
-  })
-})
+    equal(elasticlunr.stemmer(word), expected);
+  });
+});
 
 test('should be registered with elasticlunr.Pipeline', function () {
-  equal(elasticlunr.stemmer.label, 'stemmer')
-  deepEqual(elasticlunr.Pipeline.registeredFunctions['stemmer'], elasticlunr.stemmer)
-})
+  equal(elasticlunr.stemmer.label, 'stemmer');
+  deepEqual(elasticlunr.Pipeline.getRegisteredFunction('stemmer'), elasticlunr.stemmer);
+});
