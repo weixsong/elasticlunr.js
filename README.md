@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/weixsong/elasticlunr.js.svg?branch=master)](https://travis-ci.org/weixsong/elasticlunr.js)
 [![npm version](https://badge.fury.io/js/elasticlunr.svg)](https://badge.fury.io/js/elasticlunr)
+[![Coverage Status](https://coveralls.io/repos/github/weixsong/elasticlunr.js/badge.svg?branch=master)](https://coveralls.io/github/weixsong/elasticlunr.js?branch=master)
 
 Elasticlunr.js is a lightweight full-text search engine developed in JavaScript for browser search and offline search.
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting, field search, more rational scoring/ranking methodology, fast computation speed and so on.
