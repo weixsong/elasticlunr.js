@@ -89,7 +89,15 @@
             <ul class="nav nav-list bs-docs-sidenav affix-top">
               <li><a href="#tokenizer"><i class="alert alert-info"></i><span>tokenizer</span></a>
               </li>
+              <li><a href="#defaultSeperator"><i class="alert alert-success"></i><span>defaultSeperator</span></a>
+              </li>
               <li><a href="#seperator"><i class="alert alert-success"></i><span>seperator</span></a>
+              </li>
+              <li><a href="#setSeperator"><i class="alert alert-info"></i><span>setSeperator</span></a>
+              </li>
+              <li><a href="#resetSeperator"><i class="alert alert-info"></i><span>resetSeperator</span></a>
+              </li>
+              <li><a href="#getSeperator"><i class="alert alert-info"></i><span>getSeperator</span></a>
               </li>
             </ul>
           </div>
@@ -123,17 +131,42 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>A function for splitting a string into tokens.<br />Currently English is support as default.<br />Uses <code>elasticlunr.tokenizer.seperator</code> to split strings, you could change<br />the value of this property to set how you want strings are split into tokens.<br />IMPORTANT: use elasticlunr.tokenizer.seperator carefully, if you are not familiar with<br />text process, then you&#39;d better not change it.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.tokenizer = function (obj) {
-  if (!arguments.length || obj == null || obj == undefined) return [];
-  if (Array.isArray(obj)) {
-    return obj.map(function (t) {
+          <div class="description"><p>A function for splitting a string into tokens.<br />Currently English is supported as default.<br />Uses <code>elasticlunr.tokenizer.seperator</code> to split strings, you could change<br />the value of this property to set how you want strings are split into tokens.<br />IMPORTANT: use elasticlunr.tokenizer.seperator carefully, if you are not familiar with<br />text process, then you&#39;d better not change it.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer = function (str) {
+  if (!arguments.length || str === null || str === undefined) return [];
+  if (Array.isArray(str)) {
+    var arr = str.filter(function(token) {
+      if (token === null || token === undefined) {
+        return false;
+      }
+
+      return true;
+    });
+
+    arr = arr.map(function (t) {
       return elasticlunr.utils.toString(t).toLowerCase();
     });
+
+    var out = [];
+    arr.forEach(function(item) {
+      var tokens = item.split(elasticlunr.tokenizer.seperator);
+      out = out.concat(tokens);
+    }, this);
+
+    return out;
   }
 
-  return obj.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
+  return str.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);
 };</code></pre>
+          <section id="defaultSeperator">
+            <h1>defaultSeperator</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>elasticlunr.tokenizer.defaultSeperator</span>
+            </p>
+          </section>
+          <div class="description"><p>Default string seperator.</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.defaultSeperator = /[\s\-]+/;</code></pre>
           <section id="seperator">
             <h1>seperator</h1>
             <h5 class="subheader"></h5>
@@ -142,7 +175,58 @@
             </p>
           </section>
           <div class="description"><p>The sperator used to split a string into tokens. Override this property to change the behaviour of<br /><code>elasticlunr.tokenizer</code> behaviour when tokenizing strings. By default this splits on whitespace and hyphens.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.tokenizer.seperator = /[\s\-]+/</code></pre>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.seperator = elasticlunr.tokenizer.defaultSeperator;</code></pre>
+          <section id="setSeperator">
+            <h1>setSeperator</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.tokenizer.setSeperator()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>sep</td>
+                <td>Object</td>
+                <td><p>The customized seperator that you want to use to tokenize a string.</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Set up customized string seperator</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.setSeperator = function(sep) {
+    if (sep !== null &amp;&amp; sep !== undefined &amp;&amp; typeof(sep) === 'object') {
+        elasticlunr.tokenizer.seperator = sep;
+    }
+}</code></pre>
+          <section id="resetSeperator">
+            <h1>resetSeperator</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.tokenizer.resetSeperator()</span>
+            </p>
+          </section>
+          <div class="description"><p>Reset string seperator</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.resetSeperator = function() {
+    elasticlunr.tokenizer.seperator = elasticlunr.tokenizer.defaultSeperator;
+}</code></pre>
+          <section id="getSeperator">
+            <h1>getSeperator</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.tokenizer.getSeperator()</span>
+            </p>
+          </section>
+          <div class="description"><p>Get string seperator</p> </div>
+          <pre><code class="language-javascript">elasticlunr.tokenizer.getSeperator = function() {
+    return elasticlunr.tokenizer.seperator;
+}</code></pre>
         </div>
       </div>
     </div>
