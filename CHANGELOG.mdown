@@ -6,6 +6,7 @@
 * remove .DS_Store
 * remove folder perf
 * fix issue [#8](https://github.com/weixsong/elasticlunr.js/issues/8), do tokenizenation even if the parameter of tokenizer is array type, because if we do not do segmentation, the whole array item will be used to build index then partial query will not be searchable.
+* but currently exist cross query error, need to fix.
 
 ## 0.8.6
 
