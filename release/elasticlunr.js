@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.6
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.8
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.6";
+elasticlunr.version = "0.8.8";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -243,9 +243,17 @@ elasticlunr.tokenizer = function (str) {
       return true;
     });
 
-    return arr.map(function (t) {
+    arr = arr.map(function (t) {
       return elasticlunr.utils.toString(t).toLowerCase();
     });
+
+    var out = [];
+    arr.forEach(function(item) {
+      var tokens = item.split(elasticlunr.tokenizer.seperator);
+      out = out.concat(tokens);
+    }, this);
+
+    return out;
   }
 
   return str.toString().trim().toLowerCase().split(elasticlunr.tokenizer.seperator);

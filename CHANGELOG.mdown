@@ -1,10 +1,21 @@
 # 
 
+## 0.8.9
+
+* fix issue [#8](https://github.com/weixsong/elasticlunr.js/issues/8#issuecomment-193266856), boolean "AND" error.
+* need to add test cases for issue fix #8
+
+## 0.8.8
+
+* during to the ugly slow network of my family, re-publish this version.
+
 ## 0.8.7
 
 * remove make server
 * remove .DS_Store
 * remove folder perf
+* fix issue [#8](https://github.com/weixsong/elasticlunr.js/issues/8), do tokenizenation even if the parameter of tokenizer is array type, because if we do not do segmentation, the whole array item will be used to build index then partial query will not be searchable.
+* but currently exist cross query error, need to fix.
 
 ## 0.8.6
 
