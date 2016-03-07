@@ -117,3 +117,27 @@ test("test get seperator function", function () {
   elasticlunr.tokenizer.setSeperator(sep2);
   deepEqual(elasticlunr.tokenizer.getSeperator(), sep2);
 });
+
+test("tokenize array", function () {
+  var str = ['hello world', 'glad to see you'];
+  var tokens = elasticlunr.tokenizer(str);
+  deepEqual(tokens, ['hello', 'world', 'glad', 'to', 'see', 'you']);
+});
+
+test("tokenize array 2", function () {
+  var str = ['helloworld', 'glad to see you'];
+  var tokens = elasticlunr.tokenizer(str);
+  deepEqual(tokens, ['helloworld', 'glad', 'to', 'see', 'you']);
+});
+
+test("tokenize array", function () {
+  var str = ['helloworld', null, undefined, 'glad to see you'];
+  var tokens = elasticlunr.tokenizer(str);
+  deepEqual(tokens, ['helloworld', 'glad', 'to', 'see', 'you']);
+});
+
+test("tokenize array", function () {
+  var str = ['helloworld', 'glad to see you', 'hyper-parameters'];
+  var tokens = elasticlunr.tokenizer(str);
+  deepEqual(tokens, ['helloworld', 'glad', 'to', 'see', 'you', 'hyper', 'parameters']);
+});
