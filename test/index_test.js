@@ -91,7 +91,7 @@ test('removing a document from the index', function () {
 
   idx.removeDoc(doc);
   equal(idx.documentStore.length, 0);
-  
+
   equal(idx.index['body'].hasToken('this'), true);
   equal(idx.index['body'].hasToken('test'), true);
   equal(idx.index['body'].getNode('this').df, 0);
@@ -102,7 +102,7 @@ test('removing a document from the index with more than one documents', function
   var idx = new elasticlunr.Index,
       doc1 = {id: 1, body: 'this is a test'},
       doc2 = {id: 2, body: 'this is an apple'};
-      
+
   var docs = {1: {tf: 1},
               2: {tf: 1}};
 
@@ -111,10 +111,10 @@ test('removing a document from the index with more than one documents', function
 
   idx.addDoc(doc1);
   equal(idx.documentStore.length, 1);
-  
+
   idx.addDoc(doc2);
   equal(idx.documentStore.length, 2);
-  
+
   deepEqual(idx.index['body'].getNode('this').docs, docs);
 
   idx.removeDoc(doc1);
@@ -198,11 +198,31 @@ test('updating a document', function () {
   ok(idx.index['body'].hasToken('foo'))
 
   doc.body = 'bar'
-  idx.update(doc)
+  idx.updateDoc(doc)
 
   equal(idx.documentStore.length, 1)
   ok(idx.index['body'].hasToken('bar'))
 })
+
+test('search a document', function () {
+  var idx = new elasticlunr.Index,
+      doc = {id: 1, body: 'foo'};
+
+  idx.addField('body');
+  idx.addDoc(doc);
+
+  var firstFooResult = idx.search('foo');
+  equal(firstFooResult.length, 1)
+
+  doc.body = 'bar';
+  idx.updateDoc(doc);
+
+  var barResult = idx.search('bar');
+  equal(barResult.length, 1);
+
+  var secondFooResult = idx.search('foo');
+  equal(secondFooResult.length, 0);
+});
 
 test('emitting update events', function () {
   var idx = new elasticlunr.Index,
@@ -232,7 +252,7 @@ test('emitting update events', function () {
 
 
   doc.body = 'bar'
-  idx.update(doc)
+  idx.updateDoc(doc)
 
   ok(updateCallbackCalled)
   equal(callbackArgs.length, 2)
@@ -258,7 +278,7 @@ test('silencing update events', function () {
   });
 
   doc.body = 'bar';
-  idx.update(doc, false);
+  idx.updateDoc(doc, false);
 
   ok(!callbackCalled);
 });
@@ -268,7 +288,7 @@ test('serialising', function () {
       mockDocumentStore = { toJSON: function () { return 'documentStore' }},
       mockIndex = {title: { toJSON: function () { return 'index' }},
                    body: { toJSON: function () { return 'index' }}},
-        
+
       mockPipeline = { toJSON: function () { return 'pipeline' }};
 
   idx.setRef('id');
