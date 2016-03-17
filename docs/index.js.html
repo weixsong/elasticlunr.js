@@ -107,7 +107,7 @@
               </li>
               <li><a href="#removeDoc"><i class="alert alert-info"></i><span>removeDoc</span></a>
               </li>
-              <li><a href="#update"><i class="alert alert-info"></i><span>update</span></a>
+              <li><a href="#updateDoc"><i class="alert alert-info"></i><span>updateDoc</span></a>
               </li>
               <li><a href="#getFields"><i class="alert alert-info"></i><span>getFields</span></a>
               </li>
@@ -246,7 +246,7 @@
           <div class="description"><p>Loads a previously serialised index.</p><p>Issues a warning if the index being imported was serialised<br />by a different version of elasticlunr.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.load = function (serialisedData) {
   if (serialisedData.version !== elasticlunr.version) {
-    elasticlunr.utils.warn('version mismatch: current ' 
+    elasticlunr.utils.warn('version mismatch: current '
                     + elasticlunr.version + ' importing ' + serialisedData.version);
   }
 
@@ -454,14 +454,14 @@
           <div class="description"><p>Removes a document from the index by doc ref.</p><p>To make sure documents no longer show up in search results they can be<br />removed from the index using this method.</p><p>A &#39;remove&#39; event is emitted with the document that has been removed and the index<br />the document has been removed from. This event can be silenced by passing false<br />as the second argument to remove.</p><p>If user setting DocumentStore not storing the documents, then remove doc by docRef is not allowed.</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
   if (!docRef) return;
-  if (this.documentStore.isDocStored() == false) {
+  if (this.documentStore.isDocStored() === false) {
     elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
     return;
   }
-  
+
   if (!this.documentStore.hasDoc(docRef)) return;
   var doc = this.documentStore.getDoc(docRef);
-  this.removeDoc(doc);
+  this.removeDoc(doc, false);
 };</code></pre>
           <section id="removeDoc">
             <h1>removeDoc</h1>
@@ -511,11 +511,11 @@
 
   if (emitEvent) this.eventEmitter.emit('remove', doc, this);
 };</code></pre>
-          <section id="update">
-            <h1>update</h1>
+          <section id="updateDoc">
+            <h1>updateDoc</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.update()</span>
+              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.updateDoc()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -540,10 +540,10 @@
             </tbody>
           </table>
           <div class="description"><p>Updates a document in the index.</p><p>When a document contained within the index gets updated, fields changed,<br />added or removed, to make sure it correctly matched against search queries,<br />it should be updated in the index.</p><p>This method is just a wrapper around <code>remove</code> and <code>add</code></p><p>An &#39;update&#39; event is emitted with the document that has been updated and the index.<br />This event can be silenced by passing false as the second argument to update. Only<br />an update event will be fired, the &#39;add&#39; and &#39;remove&#39; events of the underlying calls<br />are silenced.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.Index.prototype.update = function (doc, emitEvent) {
+          <pre><code class="language-javascript">elasticlunr.Index.prototype.updateDoc = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.removeDoc(doc, false);
+  this.removeDocByRef(doc[this._ref], false);
   this.addDoc(doc, false);
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
@@ -555,10 +555,10 @@
               <div class="label label-info radius ctx-type">method</div><span>elasticlunr.Index.prototype.getFields()</span>
             </p>
           </section>
-          <div class="description"><p>get fields of current index instance </p> </div>
+          <div class="description"><p>get fields of current index instance</p> </div>
           <pre><code class="language-javascript">elasticlunr.Index.prototype.getFields = function () {
   return this._fields.slice();
-}</code></pre>
+};</code></pre>
           <section id="search">
             <h1>search</h1>
             <h5 class="subheader"></h5>
@@ -682,10 +682,21 @@
     if (expand == true) {
       tokens = this.index[fieldName].expandToken(token);
     }
- 
+
     tokens.forEach(function (key) {
       var docs = this.index[fieldName].getDocs(key);
       var idf = this.idf(key, fieldName);
+
+      // only record appeared token for retrieved documents for the
+      // original token, not for expaned token.
+      // beause for doing coordNorm for a retrieved document, coordNorm only care how many
+      // query token appear in that document.
+      // so expanded token should not be added into docTokens, if added, this will pollute the
+      // coordNorm
+      if (key == token) {
+        this.fieldSearchStats(docTokens, key, docs);
+      }
+
       for (var docRef in docs) {
         var tf = this.index[fieldName].getTermFrequency(key, docRef);
         var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
@@ -699,14 +710,6 @@
           // currently I'm not sure if this penality is enough,
           // need to do verification
           penality = (1 - (key.length - token.length) / key.length) * 0.15;
-        } else {
-          // only record appeared token for retrieved documents for the 
-          // original token, not for expaned token.
-          // beause for doing coordNorm for a retrieved document, coordNorm only care how many
-          // query token appear in that document.
-          // so expanded token should not be added into docTokens, if added, this will pollute the 
-          // coordNorm
-          this.fieldSearchStats(docTokens, key, docs);
         }
 
         var score = tf * idf * fieldLengthNorm * penality;

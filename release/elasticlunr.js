@@ -618,7 +618,7 @@ elasticlunr.Index.prototype.off = function (name, fn) {
  */
 elasticlunr.Index.load = function (serialisedData) {
   if (serialisedData.version !== elasticlunr.version) {
-    elasticlunr.utils.warn('version mismatch: current ' 
+    elasticlunr.utils.warn('version mismatch: current '
                     + elasticlunr.version + ' importing ' + serialisedData.version);
   }
 
@@ -638,7 +638,7 @@ elasticlunr.Index.load = function (serialisedData) {
 
 /**
  * Adds a field to the list of fields that will be searchable within documents in the index.
- * 
+ *
  * Remember that inner index is build based on field, which means each field has one inverted index.
  *
  * Fields should be added before any documents are added to the index, fields
@@ -674,9 +674,9 @@ elasticlunr.Index.prototype.setRef = function (refName) {
 };
 
 /**
- * 
+ *
  * Set if the JSON format original documents are save into elasticlunr.DocumentStore
- * 
+ *
  * Defaultly save all the original JSON documents.
  *
  * @param {Boolean} save Whether to save the original JSON documents.
@@ -739,7 +739,7 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
  * A 'remove' event is emitted with the document that has been removed and the index
  * the document has been removed from. This event can be silenced by passing false
  * as the second argument to remove.
- * 
+ *
  * If user setting DocumentStore not storing the documents, then remove doc by docRef is not allowed.
  *
  * @param {String|Integer} docRef The document ref to remove from the index.
@@ -748,14 +748,14 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
  */
 elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
   if (!docRef) return;
-  if (this.documentStore.isDocStored() == false) {
+  if (this.documentStore.isDocStored() === false) {
     elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
     return;
   }
-  
+
   if (!this.documentStore.hasDoc(docRef)) return;
   var doc = this.documentStore.getDoc(docRef);
-  this.removeDoc(doc);
+  this.removeDoc(doc, false);
 };
 
 /**
@@ -768,7 +768,7 @@ elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
  * A 'remove' event is emitted with the document that has been removed and the index
  * the document has been removed from. This event can be silenced by passing false
  * as the second argument to remove.
- * 
+ *
  *
  * @param {Object} doc The document ref to remove from the index.
  * @param {Boolean} emitEvent Whether to emit remove events, defaults to true
@@ -814,10 +814,10 @@ elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
  * @see Index.prototype.add
  * @memberOf Index
  */
-elasticlunr.Index.prototype.update = function (doc, emitEvent) {
+elasticlunr.Index.prototype.updateDoc = function (doc, emitEvent) {
   var emitEvent = emitEvent === undefined ? true : emitEvent;
 
-  this.removeDoc(doc, false);
+  this.removeDocByRef(doc[this._ref], false);
   this.addDoc(doc, false);
 
   if (emitEvent) this.eventEmitter.emit('update', doc, this);
@@ -844,18 +844,18 @@ elasticlunr.Index.prototype.idf = function (term, field) {
 };
 
 /**
- * get fields of current index instance 
- * 
+ * get fields of current index instance
+ *
  * @return {Array}
  */
 elasticlunr.Index.prototype.getFields = function () {
   return this._fields.slice();
-}
+};
 
 /**
  * Searches the index using the passed query.
  * Queries should be a string, multiple words are allowed.
- * 
+ *
  * If config is null, will search all fields defaultly, and lead to OR based query.
  * If config is specified, will search specified with query time boosting.
  *
@@ -936,10 +936,21 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
     if (expand == true) {
       tokens = this.index[fieldName].expandToken(token);
     }
- 
+
     tokens.forEach(function (key) {
       var docs = this.index[fieldName].getDocs(key);
       var idf = this.idf(key, fieldName);
+
+      // only record appeared token for retrieved documents for the
+      // original token, not for expaned token.
+      // beause for doing coordNorm for a retrieved document, coordNorm only care how many
+      // query token appear in that document.
+      // so expanded token should not be added into docTokens, if added, this will pollute the
+      // coordNorm
+      if (key == token) {
+        this.fieldSearchStats(docTokens, key, docs);
+      }
+
       for (var docRef in docs) {
         var tf = this.index[fieldName].getTermFrequency(key, docRef);
         var fieldLength = this.documentStore.getFieldLength(docRef, fieldName);
@@ -953,14 +964,6 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
           // currently I'm not sure if this penality is enough,
           // need to do verification
           penality = (1 - (key.length - token.length) / key.length) * 0.15;
-        } else {
-          // only record appeared token for retrieved documents for the 
-          // original token, not for expaned token.
-          // beause for doing coordNorm for a retrieved document, coordNorm only care how many
-          // query token appear in that document.
-          // so expanded token should not be added into docTokens, if added, this will pollute the 
-          // coordNorm
-          this.fieldSearchStats(docTokens, key, docs);
         }
 
         var score = tf * idf * fieldLengthNorm * penality;
@@ -986,11 +989,11 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
 /**
  * Record the occuring query token of retrieved doc specified by doc field.
  * Only for inner user.
- * 
+ *
  * @param {Object} docTokens a data structure stores which token appears in the retrieved doc.
  * @param {String} token query token
  * @param {Object} docs the retrieved documents of the query token
- * 
+ *
  */
 elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs) {
   for (var doc in docs) {
@@ -1005,7 +1008,7 @@ elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs)
 /**
  * find documents contain all the query tokens.
  * only for inner use.
- * 
+ *
  * @param {Object} results first results
  * @param {Object} docs field search results of a token
  * @param {Integer} n query token number
@@ -1028,9 +1031,9 @@ elasticlunr.Index.prototype.intersect = function (scores, docTokens, n) {
  * coord norm the score of a doc.
  * if a doc contain more query tokens, then the score will larger than the doc
  * contains less query tokens.
- * 
+ *
  * only for inner use.
- * 
+ *
  * @param {Object} results first results
  * @param {Object} docs field search results of a token
  * @param {Integer} n query token number
@@ -1113,7 +1116,7 @@ elasticlunr.Index.prototype.use = function (plugin) {
  * user could choose whether original JSON format document should be store, if no configuration then document will be stored defaultly.
  * If user care more about the index size, user could select not store JSON documents, then this will has some defects, such as user
  * could not use JSON document to generate snippets of search results.
- * 
+ *
  * @param {Boolean} save If the original JSON document should be stored.
  * @constructor
  * @module
@@ -1159,7 +1162,7 @@ elasticlunr.DocumentStore.prototype.isDocStored = function () {
 /**
  * Stores the given doc in the document store against the given id.
  * If docRef already exist, then update doc.
- * 
+ *
  * Document is store by original JSON format, then you could use original document to generate search snippets.
  *
  * @param {Integer|String} docRef The key used to store the JSON format doc.
@@ -1169,7 +1172,7 @@ elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
   if (!this.hasDoc(docRef)) this.length++;
 
   if (this._save === true) {
-    this.docs[docRef] = doc;
+    this.docs[docRef] = clone(doc);
   } else {
     this.docs[docRef] = null;
   }
@@ -1177,7 +1180,7 @@ elasticlunr.DocumentStore.prototype.addDoc = function (docRef, doc) {
 
 /**
  * Retrieves the JSON doc from the document store for a given key.
- * 
+ *
  * If docRef not found, return null.
  * If user set not storing the documents, return null.
  *
@@ -1218,7 +1221,7 @@ elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
 /**
  * Add field length of a document's field tokens from pipeline results.
  * The field length of a document is used to do field length normalization even without the original JSON document stored.
- * 
+ *
  * @param {Integer|String} docRef document's id or reference
  * @param {String} fieldName field name
  * @param {Integer} length field length
@@ -1226,7 +1229,7 @@ elasticlunr.DocumentStore.prototype.removeDoc = function (docRef) {
 elasticlunr.DocumentStore.prototype.addFieldLength = function (docRef, fieldName, length) {
   if (docRef === null || docRef === undefined) return;
   if (this.hasDoc(docRef) == false) return;
-  
+
   if (!this.docInfo[docRef]) this.docInfo[docRef] = {};
   this.docInfo[docRef][fieldName] = length;
 };
@@ -1234,7 +1237,7 @@ elasticlunr.DocumentStore.prototype.addFieldLength = function (docRef, fieldName
 /**
  * Update field length of a document's field tokens from pipeline results.
  * The field length of a document is used to do field length normalization even without the original JSON document stored.
- * 
+ *
  * @param {Integer|String} docRef document's id or reference
  * @param {String} fieldName field name
  * @param {Integer} length field length
@@ -1242,13 +1245,13 @@ elasticlunr.DocumentStore.prototype.addFieldLength = function (docRef, fieldName
 elasticlunr.DocumentStore.prototype.updateFieldLength = function (docRef, fieldName, length) {
   if (docRef === null || docRef === undefined) return;
   if (this.hasDoc(docRef) == false) return;
-  
+
   this.addFieldLength(docRef, fieldName, length);
 };
 
 /**
  * get field length of a document by docRef
- * 
+ *
  * @param {Integer|String} docRef document id or reference
  * @param {String} fieldName field name
  * @return {Integer} field length
@@ -1275,6 +1278,24 @@ elasticlunr.DocumentStore.prototype.toJSON = function () {
     save: this._save
   };
 };
+
+/**
+ * Cloning object
+ *
+ * @param {Object} object in JSON format
+ * @return {Object} copied object
+ */
+function clone(obj) {
+  if (null === obj || "object" !== typeof obj) return obj;
+
+  var copy = obj.constructor();
+
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  }
+
+  return copy;
+}
 /*!
  * elasticlunr.stemmer
  * Copyright (C) 2016 Oliver Nightingale
