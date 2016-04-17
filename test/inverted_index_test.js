@@ -4,7 +4,6 @@ test('create empty inverted index', function () {
   var invertedIndex = new elasticlunr.InvertedIndex;
 
   deepEqual(invertedIndex.root, { docs: {}, df: 0 });
-  equal(invertedIndex.length, 0);
   equal(invertedIndex.root.df, 0);
 });
 
@@ -18,7 +17,6 @@ test('adding a token to the invertedIndex', function () {
   deepEqual(invertedIndex.root['f']['o']['o']['docs'][123], {tf: 1});
   equal(invertedIndex.getDocFreq('foo'), 1);
   equal(invertedIndex.getTermFrequency('foo', 123), 1);
-  equal(invertedIndex.length, 1);
 });
 
 test('adding another document to the token', function () {
@@ -261,7 +259,7 @@ test('test get term frequency from inverted index by non-exist token and non-exi
 test('serialisation', function () {
   var invertedIndex = new elasticlunr.InvertedIndex;
 
-  deepEqual(invertedIndex.toJSON(), { root: { docs: {}, df: 0 }, length: 0 });
+  deepEqual(invertedIndex.toJSON(), { root: { docs: {}, df: 0 }});
 
   invertedIndex.addToken('foo', { ref: 123, tf: 1});
 
@@ -282,8 +280,7 @@ test('serialisation', function () {
             }
           }
         }
-      },
-      length: 1
+      }
     }
   );
 });
@@ -305,13 +302,11 @@ test('loading a serialised story', function () {
             }
           }
         }
-      },
-      length: 1
+      }
   };
 
   var invertedIndex = elasticlunr.InvertedIndex.load(serialisedData),
       documents = invertedIndex.getDocs('foo');
 
-  equal(invertedIndex.length, 1);
   deepEqual(documents, { 123: {tf: 1}});
 });

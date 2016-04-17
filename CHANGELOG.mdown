@@ -1,5 +1,9 @@
 # 
 
+## 0.9.0
+
+* remove useless variable length of elasticlunr.InvertedIndex.
+
 ## 0.8.9
 
 * fix issue [#8](https://github.com/weixsong/elasticlunr.js/issues/8#issuecomment-193266856), boolean "AND" error.
