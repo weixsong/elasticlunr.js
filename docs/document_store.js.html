@@ -109,6 +109,8 @@
               </li>
               <li><a href="#toJSON"><i class="alert alert-info"></i><span>toJSON</span></a>
               </li>
+              <li><a href="#clone"><i class="alert alert-info"></i><span>clone</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -231,7 +233,7 @@
   if (!this.hasDoc(docRef)) this.length++;
 
   if (this._save === true) {
-    this.docs[docRef] = doc;
+    this.docs[docRef] = clone(doc);
   } else {
     this.docs[docRef] = null;
   }
@@ -369,7 +371,7 @@
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.addFieldLength = function (docRef, fieldName, length) {
   if (docRef === null || docRef === undefined) return;
   if (this.hasDoc(docRef) == false) return;
-  
+
   if (!this.docInfo[docRef]) this.docInfo[docRef] = {};
   this.docInfo[docRef][fieldName] = length;
 };</code></pre>
@@ -410,7 +412,7 @@
           <pre><code class="language-javascript">elasticlunr.DocumentStore.prototype.updateFieldLength = function (docRef, fieldName, length) {
   if (docRef === null || docRef === undefined) return;
   if (this.hasDoc(docRef) == false) return;
-  
+
   this.addFieldLength(docRef, fieldName, length);
 };</code></pre>
           <section id="getFieldLength">
@@ -470,6 +472,46 @@
     save: this._save
   };
 };</code></pre>
+          <section id="clone">
+            <h1>clone</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>clone()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>object</td>
+                <td>Object</td>
+                <td><p>in JSON format</p></td>
+              </tr>
+              <tr>
+                <td>return</td>
+                <td>Object</td>
+                <td><p>copied object</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Cloning object</p> </div>
+          <pre><code class="language-javascript">function clone(obj) {
+  if (null === obj || &quot;object&quot; !== typeof obj) return obj;
+
+  var copy = obj.constructor();
+
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  }
+
+  return copy;
+}</code></pre>
         </div>
       </div>
     </div>
