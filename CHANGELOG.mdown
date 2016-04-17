@@ -4,6 +4,8 @@
 
 * fix issue [#8](https://github.com/weixsong/elasticlunr.js/issues/8#issuecomment-193266856), boolean "AND" error.
 * need to add test cases for issue fix #8
+* Optimized AND boolean search, merged pull request [#14](https://github.com/weixsong/elasticlunr.js/pull/14), thanks for [mhalle](https://github.com/mhalle), this is really brilliant idea.
+* Fixed documents update issue, merged pull request [#12](https://github.com/weixsong/elasticlunr.js/pull/12), thanks [deerawan](https://github.com/deerawan).
 
 ## 0.8.8
 

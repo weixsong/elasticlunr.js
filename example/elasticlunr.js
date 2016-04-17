@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.8
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.9
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.8";
+elasticlunr.version = "0.8.9";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -749,7 +749,6 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
 elasticlunr.Index.prototype.removeDocByRef = function (docRef, emitEvent) {
   if (!docRef) return;
   if (this.documentStore.isDocStored() === false) {
-    elasticlunr.utils.warn('remove doc by ref is not allowed, because currectly not storing documents in DocumentStore');
     return;
   }
 
@@ -925,10 +924,18 @@ elasticlunr.Index.prototype.search = function (query, userConfig) {
  * @param {elasticlunr.Configuration} config The user query config, JSON format.
  * @return {Object}
  */
+/**
+ * search queryTokens in specified field.
+ *
+ * @param {Array} queryTokens The query tokens to query in this field.
+ * @param {String} field Field to query in.
+ * @param {elasticlunr.Configuration} config The user query config, JSON format.
+ * @return {Object}
+ */
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
   var booleanType = config[fieldName].bool;
   var expand = config[fieldName].expand;
-  var scores = {};
+  var scores = null;
   var docTokens = {};
 
   queryTokens.forEach(function (token) {
@@ -936,11 +943,41 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
     if (expand == true) {
       tokens = this.index[fieldName].expandToken(token);
     }
-
+    // Consider every query token in turn. If expanded, each query token
+    // corresponds to a set of tokens, which is all tokens in the 
+    // index matching the pattern queryToken* .
+    // For the set of tokens corresponding to a query token, find and score
+    // all matching documents. Store those scores in queryTokenScores, 
+    // keyed by docRef.
+    // Then, depending on the value of booleanType, combine the scores
+    // for this query token with previous scores.  If booleanType is OR,
+    // then merge the scores by summing into the accumulated total, adding
+    // new document scores are required (effectively a union operator). 
+    // If booleanType is AND, accumulate scores only if the document 
+    // has previously been scored by another query token (an intersection
+    // operation0. 
+    // Furthermore, since when booleanType is AND, additional 
+    // query tokens can't add new documents to the result set, use the
+    // current document set to limit the processing of each new query 
+    // token for efficiency (i.e., incremental intersection).
+    
+    var queryTokenScores = {};
     tokens.forEach(function (key) {
       var docs = this.index[fieldName].getDocs(key);
       var idf = this.idf(key, fieldName);
-
+      
+      if (scores && booleanType == 'AND') {
+          // special case, we can rule out documents that have been
+          // already been filtered out because they weren't scored
+          // by previous query token passes.
+          var filteredDocs = {};
+          for (var docRef in scores) {
+              if (docRef in docs) {
+                  filteredDocs[docRef] = docs[docRef];
+              }
+          }
+          docs = filteredDocs;
+      }
       // only record appeared token for retrieved documents for the
       // original token, not for expaned token.
       // beause for doing coordNorm for a retrieved document, coordNorm only care how many
@@ -968,23 +1005,57 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
 
         var score = tf * idf * fieldLengthNorm * penality;
 
-        if (docRef in scores) {
-          scores[docRef] += score;
+        if (docRef in queryTokenScores) {
+          queryTokenScores[docRef] += score;
         } else {
-          scores[docRef] = score;
+          queryTokenScores[docRef] = score;
         }
       }
     }, this);
+    
+    scores = this.mergeScores(scores, queryTokenScores, booleanType);
   }, this);
 
-  if (booleanType == 'AND') {
-    scores = this.intersect(scores, docTokens, queryTokens.length);
-  }
-
   scores = this.coordNorm(scores, docTokens, queryTokens.length);
-
   return scores;
 };
+
+/**
+ * Merge the scores from one set of tokens into an accumulated score table.
+ * Exact operation depends on the op parameter. If op is 'AND', then only the
+ * intersection of the two score lists is retained. Otherwise, the union of
+ * the two score lists is returned. For internal use only.
+ *
+ * @param {Object} bool accumulated scores. Should be null on first call.
+ * @param {String} scores new scores to merge into accumScores.
+ * @param {Object} op merge operation (should be 'AND' or 'OR').
+ *
+ */
+
+elasticlunr.Index.prototype.mergeScores = function (accumScores, scores, op) {
+    if (!accumScores) {
+        return scores; 
+    }
+    if (op == 'AND') {
+        var intersection = {};
+        for (var docRef in scores) {
+            if (docRef in accumScores) {
+                intersection[docRef] = accumScores[docRef] + scores[docRef];
+            }
+        }
+        return intersection;
+    } else {
+        for (var docRef in scores) {
+            if (docRef in accumScores) {
+                accumScores[docRef] += scores[docRef];
+            } else {
+                accumScores[docRef] = scores[docRef];
+            }
+        }
+        return accumScores;
+    }
+};
+
 
 /**
  * Record the occuring query token of retrieved doc specified by doc field.
@@ -1003,28 +1074,6 @@ elasticlunr.Index.prototype.fieldSearchStats = function (docTokens, token, docs)
       docTokens[doc] = [token];
     }
   }
-};
-
-/**
- * find documents contain all the query tokens.
- * only for inner use.
- *
- * @param {Object} results first results
- * @param {Object} docs field search results of a token
- * @param {Integer} n query token number
- * @return {Object}
- */
-elasticlunr.Index.prototype.intersect = function (scores, docTokens, n) {
-  var res = {};
-
-  for (var doc in scores) {
-    if (!(doc in docTokens)) continue;
-    if (docTokens[doc].length == n) {
-      res[doc] = scores[doc];
-    }
-  }
-
-  return res;
 };
 
 /**
