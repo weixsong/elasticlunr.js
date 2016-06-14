@@ -151,14 +151,14 @@ Default supported language of elasticlunr.js is English, if you want to use elas
 Assume you're using lunr-language in Node.js envrionment, you could import lunr-language as followings:
 
 ```javascript
-var elasticlunr = require('./lib/elasticlunr.js');
+var elasticlunr = require('elasticlunr');
 require('./lunr.stemmer.support.js')(elasticlunr);
 require('./lunr.de.js')(elasticlunr);
 
-var idx = elasticlunr(function () {
+var index = elasticlunr(function () {
     // use the language (de)
     this.use(lunr.de);
-    // then, the normal lunr index initialization
+    // then, the normal elasticlunr index initialization
     this.addField('title')
     this.addField('body')
 });
