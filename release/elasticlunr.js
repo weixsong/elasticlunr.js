@@ -134,9 +134,11 @@ elasticlunr.utils.toString = function (obj) {
  */
 
 /**
- * elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.
+ * elasticlunr.EventEmitter is an event emitter for elasticlunr.
+ * It manages adding and removing event handlers and triggering events and their handlers.
  *
- * Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.
+ * Each event could has multiple corresponding functions,
+ * these functions will be called as the sequence that they are added into the event.
  * 
  * @constructor
  */
@@ -177,7 +179,7 @@ elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
   if (!this.hasHandler(name)) return;
 
   var fnIndex = this.events[name].indexOf(fn);
-  if (fnIndex == -1) return;
+  if (fnIndex === -1) return;
 
   this.events[name].splice(fnIndex, 1);
 
@@ -185,7 +187,7 @@ elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
 };
 
 /**
- * Calls all functions bound to the given event.
+ * Call all functions that bounded to the given event.
  *
  * Additional data can be passed to the event handler as arguments to `emit`
  * after the event name.
@@ -200,7 +202,7 @@ elasticlunr.EventEmitter.prototype.emit = function (name) {
 
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
-  });
+  }, this);
 };
 
 /**
@@ -554,6 +556,41 @@ elasticlunr.Pipeline.prototype.toJSON = function () {
     return fn.label;
   });
 };
+elasticlunr.FieldTokenizer = function () {
+  this._tokenizer = {};
+};
+
+elasticlunr.FieldTokenizer.load = function() {
+  return new elasticlunr.FieldTokenizer;
+}
+
+elasticlunr.FieldTokenizer.prototype.tokenizer = function (str, field) {
+  var tokernizer = this.getFieldTokenizer(field);
+  if (tokernizer) {
+    return tokernizer(str);
+  }
+  return elasticlunr.tokenizer(str);
+};
+
+elasticlunr.FieldTokenizer.prototype.getFieldTokenizer = function(field) {
+  var tokernizer = this._tokenizer[field];
+  if (tokernizer && typeof tokernizer === 'function') {
+    return tokernizer;
+  }
+  return undefined;
+}
+
+elasticlunr.FieldTokenizer.prototype.registerFieldTokenizer = function(tokenizer, field) {
+  var tokernizer = this.getFieldTokenizer(field);
+  if (tokernizer) {
+    elasticlunr.utils.warn('Tokenizer for field "' + field +'" is already registered.\n', tokenizer);
+  }
+  this._tokenizer[field] = tokenizer;
+}
+
+elasticlunr.FieldTokenizer.prototype.unregisterFieldTokenizer = function(tokenizer, field) {
+  this._tokenizer[field] = undefined;
+}
 /*!
  * elasticlunr.Index
  * Copyright (C) 2016 Oliver Nightingale
@@ -571,6 +608,7 @@ elasticlunr.Index = function () {
   this._fields = [];
   this._ref = 'id';
   this.pipeline = new elasticlunr.Pipeline;
+  this.fieldTokenizer = new elasticlunr.FieldTokenizer;
   this.documentStore = new elasticlunr.DocumentStore;
   this.index = {};
   this.eventEmitter = new elasticlunr.EventEmitter;
@@ -628,6 +666,7 @@ elasticlunr.Index.load = function (serialisedData) {
   idx._ref = serialisedData.ref;
   idx.documentStore = elasticlunr.DocumentStore.load(serialisedData.documentStore);
   idx.pipeline = elasticlunr.Pipeline.load(serialisedData.pipeline);
+  idx.fieldTokenizer = elasticlunr.FieldTokenizer.load(serialisedData.fieldTokenizer);
   idx.index = {};
   for (var field in serialisedData.index) {
     idx.index[field] = elasticlunr.InvertedIndex.load(serialisedData.index[field]);
@@ -649,9 +688,12 @@ elasticlunr.Index.load = function (serialisedData) {
  * @return {elasticlunr.Index}
  * @memberOf Index
  */
-elasticlunr.Index.prototype.addField = function (fieldName) {
+elasticlunr.Index.prototype.addField = function (fieldName, tokenizer) {
   this._fields.push(fieldName);
   this.index[fieldName] = new elasticlunr.InvertedIndex;
+  if (tokenizer && typeof tokenizer === 'function') {
+    this.fieldTokenizer.registerFieldTokenizer(tokenizer, fieldName);
+  }
   return this;
 };
 
@@ -711,7 +753,7 @@ elasticlunr.Index.prototype.addDoc = function (doc, emitEvent) {
 
   this.documentStore.addDoc(docRef, doc);
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    var fieldTokens = this.pipeline.run(this.fieldTokenizer.tokenizer(doc[field], field));
     this.documentStore.addFieldLength(docRef, field, fieldTokens.length);
 
     var tokenCount = {};
@@ -784,7 +826,7 @@ elasticlunr.Index.prototype.removeDoc = function (doc, emitEvent) {
   this.documentStore.removeDoc(docRef);
 
   this._fields.forEach(function (field) {
-    var fieldTokens = this.pipeline.run(elasticlunr.tokenizer(doc[field]));
+    var fieldTokens = this.pipeline.run(this.fieldTokenizer.tokenizer(doc[field], field));
     fieldTokens.forEach(function (token) {
       this.index[field].removeToken(token, docRef);
     }, this);
@@ -924,14 +966,6 @@ elasticlunr.Index.prototype.search = function (query, userConfig) {
  * @param {elasticlunr.Configuration} config The user query config, JSON format.
  * @return {Object}
  */
-/**
- * search queryTokens in specified field.
- *
- * @param {Array} queryTokens The query tokens to query in this field.
- * @param {String} field Field to query in.
- * @param {elasticlunr.Configuration} config The user query config, JSON format.
- * @return {Object}
- */
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
   var booleanType = config[fieldName].bool;
   var expand = config[fieldName].expand;
@@ -944,28 +978,28 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
       tokens = this.index[fieldName].expandToken(token);
     }
     // Consider every query token in turn. If expanded, each query token
-    // corresponds to a set of tokens, which is all tokens in the 
+    // corresponds to a set of tokens, which is all tokens in the
     // index matching the pattern queryToken* .
     // For the set of tokens corresponding to a query token, find and score
-    // all matching documents. Store those scores in queryTokenScores, 
+    // all matching documents. Store those scores in queryTokenScores,
     // keyed by docRef.
     // Then, depending on the value of booleanType, combine the scores
     // for this query token with previous scores.  If booleanType is OR,
     // then merge the scores by summing into the accumulated total, adding
-    // new document scores are required (effectively a union operator). 
-    // If booleanType is AND, accumulate scores only if the document 
+    // new document scores are required (effectively a union operator).
+    // If booleanType is AND, accumulate scores only if the document
     // has previously been scored by another query token (an intersection
-    // operation0. 
-    // Furthermore, since when booleanType is AND, additional 
+    // operation0.
+    // Furthermore, since when booleanType is AND, additional
     // query tokens can't add new documents to the result set, use the
-    // current document set to limit the processing of each new query 
+    // current document set to limit the processing of each new query
     // token for efficiency (i.e., incremental intersection).
-    
+
     var queryTokenScores = {};
     tokens.forEach(function (key) {
       var docs = this.index[fieldName].getDocs(key);
       var idf = this.idf(key, fieldName);
-      
+
       if (scores && booleanType == 'AND') {
           // special case, we can rule out documents that have been
           // already been filtered out because they weren't scored
@@ -1012,7 +1046,7 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
         }
       }
     }, this);
-    
+
     scores = this.mergeScores(scores, queryTokenScores, booleanType);
   }, this);
 
@@ -1034,7 +1068,7 @@ elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, conf
 
 elasticlunr.Index.prototype.mergeScores = function (accumScores, scores, op) {
     if (!accumScores) {
-        return scores; 
+        return scores;
     }
     if (op == 'AND') {
         var intersection = {};
@@ -1789,13 +1823,13 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');
  */
 
 /**
- * elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index of token to document ref.
+ * elasticlunr.InvertedIndex is used for efficiently storing and
+ * lookup of documents that contain a given token.
  *
  * @constructor
  */
 elasticlunr.InvertedIndex = function () {
   this.root = { docs: {}, df: 0 };
-  this.length = 0;
 };
 
 /**
@@ -1806,9 +1840,7 @@ elasticlunr.InvertedIndex = function () {
  */
 elasticlunr.InvertedIndex.load = function (serialisedData) {
   var idx = new this;
-
   idx.root = serialisedData.root;
-  idx.length = serialisedData.length;
 
   return idx;
 };
@@ -1816,6 +1848,10 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
 /**
  * Adds a {token: tokenInfo} pair to the inverted index.
  * If the token already exist, then update the tokenInfo.
+ *
+ * tokenInfo format: { ref: 1, tf: 2}
+ * tokenInfor should contains the document's ref and the tf(token frequency) of that token in
+ * the document.
  *
  * By default this function starts at the root of the current inverted index, however
  * it can start at any node of the inverted index if required.
@@ -1844,7 +1880,6 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
     // if this doc not exist, then add this doc
     root.docs[docRef] = {tf: tokenInfo.tf};
     root.df += 1;
-    this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
     root.docs[docRef] = {tf: tokenInfo.tf};
@@ -1852,10 +1887,10 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
 };
 
 /**
- * Checks whether this key is in this elasticlunr.InvertedIndex.
+ * Checks whether a token is in this elasticlunr.InvertedIndex.
  * 
  *
- * @param {String} token The token to check
+ * @param {String} token The token to be checked
  * @return {Boolean}
  * @memberOf InvertedIndex
  */
@@ -1896,7 +1931,7 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
 };
 
 /**
- * Retrieve the documents for a given token.
+ * Retrieve the documents of a given token.
  * If token not found, return {}.
  *
  *
@@ -1957,11 +1992,11 @@ elasticlunr.InvertedIndex.prototype.getDocFreq = function (token) {
 };
 
 /**
- * Remove the document identified by ref from the token in the inverted index.
+ * Remove the document identified by document's ref from the token in the inverted index.
  *
  *
- * @param {String} token The token to get the documents for.
- * @param {String} ref The ref of the document to remove from this token.
+ * @param {String} token Remove the document from which token.
+ * @param {String} ref The ref of the document to remove from given token.
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
@@ -1977,7 +2012,7 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
 };
 
 /**
- * Find all the possible suffixes of the passed token using tokens currently in the inverted index.
+ * Find all the possible suffixes of given token using tokens currently in the inverted index.
  * If token not found, return empty Array.
  *
  * @param {String} token The token to expand.
@@ -2012,8 +2047,7 @@ elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
  */
 elasticlunr.InvertedIndex.prototype.toJSON = function () {
   return {
-    root: this.root,
-    length: this.length
+    root: this.root
   };
 };
 
