@@ -106,7 +106,7 @@
               <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.EventEmitter()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.</p><p>Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.</p> </div>
+          <div class="description"><p>elasticlunr.EventEmitter is an event emitter for elasticlunr.<br />It manages adding and removing event handlers and triggering events and their handlers.</p><p>Each event could has multiple corresponding functions,<br />these functions will be called as the sequence that they are added into the event.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter = function () {
   this.events = {};
 };</code></pre>
@@ -184,7 +184,7 @@
   if (!this.hasHandler(name)) return;
 
   var fnIndex = this.events[name].indexOf(fn);
-  if (fnIndex == -1) return;
+  if (fnIndex === -1) return;
 
   this.events[name].splice(fnIndex, 1);
 
@@ -213,7 +213,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Calls all functions bound to the given event.</p><p>Additional data can be passed to the event handler as arguments to <code>emit</code><br />after the event name.</p> </div>
+          <div class="description"><p>Call all functions that bounded to the given event.</p><p>Additional data can be passed to the event handler as arguments to <code>emit</code><br />after the event name.</p> </div>
           <pre><code class="language-javascript">elasticlunr.EventEmitter.prototype.emit = function (name) {
   if (!this.hasHandler(name)) return;
 
@@ -221,7 +221,7 @@
 
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
-  });
+  }, this);
 };</code></pre>
         </div>
       </div>

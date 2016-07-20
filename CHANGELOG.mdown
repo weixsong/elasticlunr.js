@@ -6,6 +6,7 @@
 * remove useless variable length of elasticlunr.InvertedIndex.
 * review code of elasticlunr.EventEmitter.
 * review test cases of elasticlunr.EventEmitter.
+* merge pull request from [BrianRosamilia](https://github.com/weixsong/elasticlunr.js/pull/20)
 
 ## 0.8.9
 

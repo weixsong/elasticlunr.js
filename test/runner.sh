@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NODE=/usr/local/bin/node
+NODE=/usr/bin/node
 PHANTOMJS=./node_modules/.bin/phantomjs
 SERVER_PORT=${1:-54545}
 
