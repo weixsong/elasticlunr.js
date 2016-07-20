@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.8.9
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.9.0
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.8.9";
+elasticlunr.version = "0.9.0";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -134,9 +134,11 @@ elasticlunr.utils.toString = function (obj) {
  */
 
 /**
- * elasticlunr.EventEmitter is an event emitter for elasticlunr. It manages adding and removing event handlers and triggering events and their handlers.
+ * elasticlunr.EventEmitter is an event emitter for elasticlunr.
+ * It manages adding and removing event handlers and triggering events and their handlers.
  *
- * Each event could has multiple corresponding functions, these functions will be called as the sequence that they are added into the event.
+ * Each event could has multiple corresponding functions,
+ * these functions will be called as the sequence that they are added into the event.
  * 
  * @constructor
  */
@@ -177,7 +179,7 @@ elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
   if (!this.hasHandler(name)) return;
 
   var fnIndex = this.events[name].indexOf(fn);
-  if (fnIndex == -1) return;
+  if (fnIndex === -1) return;
 
   this.events[name].splice(fnIndex, 1);
 
@@ -185,7 +187,7 @@ elasticlunr.EventEmitter.prototype.removeListener = function (name, fn) {
 };
 
 /**
- * Calls all functions bound to the given event.
+ * Call all functions that bounded to the given event.
  *
  * Additional data can be passed to the event handler as arguments to `emit`
  * after the event name.
@@ -200,7 +202,7 @@ elasticlunr.EventEmitter.prototype.emit = function (name) {
 
   this.events[name].forEach(function (fn) {
     fn.apply(undefined, args);
-  });
+  }, this);
 };
 
 /**
@@ -916,14 +918,6 @@ elasticlunr.Index.prototype.search = function (query, userConfig) {
   return results;
 };
 
-/**
- * search queryTokens in specified field.
- *
- * @param {Array} queryTokens The query tokens to query in this field.
- * @param {String} field Field to query in.
- * @param {elasticlunr.Configuration} config The user query config, JSON format.
- * @return {Object}
- */
 /**
  * search queryTokens in specified field.
  *
@@ -1789,13 +1783,13 @@ elasticlunr.Pipeline.registerFunction(elasticlunr.trimmer, 'trimmer');
  */
 
 /**
- * elasticlunr.InvertedIndex is used for efficient storing and lookup of the inverted index of token to document ref.
+ * elasticlunr.InvertedIndex is used for efficiently storing and
+ * lookup of documents that contain a given token.
  *
  * @constructor
  */
 elasticlunr.InvertedIndex = function () {
   this.root = { docs: {}, df: 0 };
-  this.length = 0;
 };
 
 /**
@@ -1806,9 +1800,7 @@ elasticlunr.InvertedIndex = function () {
  */
 elasticlunr.InvertedIndex.load = function (serialisedData) {
   var idx = new this;
-
   idx.root = serialisedData.root;
-  idx.length = serialisedData.length;
 
   return idx;
 };
@@ -1816,6 +1808,10 @@ elasticlunr.InvertedIndex.load = function (serialisedData) {
 /**
  * Adds a {token: tokenInfo} pair to the inverted index.
  * If the token already exist, then update the tokenInfo.
+ *
+ * tokenInfo format: { ref: 1, tf: 2}
+ * tokenInfor should contains the document's ref and the tf(token frequency) of that token in
+ * the document.
  *
  * By default this function starts at the root of the current inverted index, however
  * it can start at any node of the inverted index if required.
@@ -1844,7 +1840,6 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
     // if this doc not exist, then add this doc
     root.docs[docRef] = {tf: tokenInfo.tf};
     root.df += 1;
-    this.length += 1;
   } else {
     // if this doc already exist, then update tokenInfo
     root.docs[docRef] = {tf: tokenInfo.tf};
@@ -1852,10 +1847,10 @@ elasticlunr.InvertedIndex.prototype.addToken = function (token, tokenInfo, root)
 };
 
 /**
- * Checks whether this key is in this elasticlunr.InvertedIndex.
+ * Checks whether a token is in this elasticlunr.InvertedIndex.
  * 
  *
- * @param {String} token The token to check
+ * @param {String} token The token to be checked
  * @return {Boolean}
  * @memberOf InvertedIndex
  */
@@ -1896,7 +1891,7 @@ elasticlunr.InvertedIndex.prototype.getNode = function (token) {
 };
 
 /**
- * Retrieve the documents for a given token.
+ * Retrieve the documents of a given token.
  * If token not found, return {}.
  *
  *
@@ -1957,11 +1952,11 @@ elasticlunr.InvertedIndex.prototype.getDocFreq = function (token) {
 };
 
 /**
- * Remove the document identified by ref from the token in the inverted index.
+ * Remove the document identified by document's ref from the token in the inverted index.
  *
  *
- * @param {String} token The token to get the documents for.
- * @param {String} ref The ref of the document to remove from this token.
+ * @param {String} token Remove the document from which token.
+ * @param {String} ref The ref of the document to remove from given token.
  * @memberOf InvertedIndex
  */
 elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
@@ -1977,7 +1972,7 @@ elasticlunr.InvertedIndex.prototype.removeToken = function (token, ref) {
 };
 
 /**
- * Find all the possible suffixes of the passed token using tokens currently in the inverted index.
+ * Find all the possible suffixes of given token using tokens currently in the inverted index.
  * If token not found, return empty Array.
  *
  * @param {String} token The token to expand.
@@ -2012,8 +2007,7 @@ elasticlunr.InvertedIndex.prototype.expandToken = function (token, memo, root) {
  */
 elasticlunr.InvertedIndex.prototype.toJSON = function () {
   return {
-    root: this.root,
-    length: this.length
+    root: this.root
   };
 };
 

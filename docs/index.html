@@ -178,14 +178,14 @@ index.addField(&#39;body&#39;);
 index.setRef(&#39;id&#39;);
 index.saveDocument(false);
 </code></pre>
-<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var elasticlunr = require(&#39;./lib/elasticlunr.js&#39;);
+<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var elasticlunr = require(&#39;elasticlunr&#39;);
 require(&#39;./lunr.stemmer.support.js&#39;)(elasticlunr);
 require(&#39;./lunr.de.js&#39;)(elasticlunr);
 
-var idx = elasticlunr(function () {
+var index = elasticlunr(function () {
     // use the language (de)
     this.use(lunr.de);
-    // then, the normal lunr index initialization
+    // then, the normal elasticlunr index initialization
     this.addField(&#39;title&#39;)
     this.addField(&#39;body&#39;)
 });
@@ -296,6 +296,33 @@ index.update(doc);
 <h3>6.2 Add customized stop words</h3>
 <p>User could add a list of customized stop words.</p><pre><code class="lang-javascript">var customized_stop_words = [&#39;an&#39;, &#39;hello&#39;, &#39;xyzabc&#39;];
 elasticlunr.addStopWords(customized_stop_words);
+</code></pre>
+<h2>7. Use elasticlunr in Node.js</h2>
+<p>Elasticlunr support Node.js, you could use elastilunr in node.js as a node-module.</p><p>Install elasticlunr by:</p><pre><code class="lang-javascript">npm install elasticlunr
+</code></pre>
+<p>then in your node.js project or in node.js console:</p><pre><code class="lang-javascript">var elasticlunr = require(&#39;elasticlunr&#39;);
+
+var index = elasticlunr(function () {
+    this.addField(&#39;title&#39;)
+    this.addField(&#39;body&#39;)
+});
+
+var doc1 = {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
+    &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
+}
+
+var doc2 = {
+    &quot;id&quot;: 2,
+    &quot;title&quot;: &quot;Oracle released its profit report of 2015&quot;,
+    &quot;body&quot;: &quot;As expected, Oracle released its profit report of 2015, during the good sales of database and hardware, Oracle&#39;s profit of 2015 reached 12.5 Billion.&quot;
+}
+
+index.addDoc(doc1);
+index.addDoc(doc2);
+
+index.search(&quot;Oracle database profit&quot;);
 </code></pre>
 <h1>Contributing</h1>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
