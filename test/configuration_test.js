@@ -292,3 +292,24 @@ test('construct with user config, global expand config overwrite by local config
   var config = new elasticlunr.Configuration(userConfig, fields);
   deepEqual(config.get(), target);
 });
+
+test("construct with user config, boost of 0 shouldn't be overwritten", function () {
+  var fields = ['title', 'body'],
+      userConfig = '{"fields": {"title": {"boost": 0},"body": {"boost": 2}}}';
+
+  var target = {
+    title: {
+      boost: 0,
+      bool: "OR",
+      expand: false
+    },
+    body: {
+      boost: 2,
+      bool: "OR",
+      expand: false
+    }
+  };
+
+  var config = new elasticlunr.Configuration(userConfig, fields);
+  deepEqual(config.get(), target);
+});

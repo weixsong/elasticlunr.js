@@ -70,3 +70,10 @@ test('search boosts exact matches', function () {
   equal(results.length, 2);
   equal(results[0].ref, 'd');
 });
+
+test('search skips on 0 boost fields', function () {
+  var results = this.idx.search('plant', {fields: {title: {boost: 1}, body: {boost: 0}}});
+
+  equal(results.length, 1);
+  equal(results[0].ref, 'b');
+});
