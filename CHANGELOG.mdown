@@ -2,7 +2,7 @@
 
 ## 0.9.1
 
-* merged pull request from [Dave Allie](https://github.com/daveallie), allow boost equal 0, and do not search field with 0 boost.
+* merged pull request from [Dave Allie](https://github.com/weixsong/elasticlunr.js/pull/24), allow boost equal 0, and do not search field with 0 boost.
 
 ## 0.9.0
 
