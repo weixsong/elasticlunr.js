@@ -147,7 +147,7 @@ index.setRef('id');
 index.saveDocument(false);
 ```
 
-Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/weixsong/lunr-languages).
+Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
 Assume you're using lunr-language in Node.js envrionment, you could import lunr-language as followings:
 
 ```javascript
@@ -163,7 +163,7 @@ var index = elasticlunr(function () {
     this.addField('body')
 });
 ```
-For more details, please go to [lunr-languages](https://github.com/weixsong/lunr-languages).
+For more details, please go to [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
 
 ## 2. Add document to index
 
