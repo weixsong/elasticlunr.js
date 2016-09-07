@@ -147,23 +147,6 @@ index.setRef('id');
 index.saveDocument(false);
 ```
 
-Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
-Assume you're using lunr-language in Node.js envrionment, you could import lunr-language as followings:
-
-```javascript
-var elasticlunr = require('elasticlunr');
-require('./lunr.stemmer.support.js')(elasticlunr);
-require('./lunr.de.js')(elasticlunr);
-
-var index = elasticlunr(function () {
-    // use the language (de)
-    this.use(lunr.de);
-    // then, the normal elasticlunr index initialization
-    this.addField('title')
-    this.addField('body')
-});
-```
-For more details, please go to [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
 
 ## 2. Add document to index
 
@@ -382,6 +365,11 @@ index.addDoc(doc2);
 
 index.search("Oracle database profit");
 ```
+
+# Other Languages?
+Sorry for the original version documents that I think elasticlunr.js will support [lunr-languages](https://github.com/MihaiValentin/lunr-languages) seamlessly, I was wrong. [lunr-languages](https://github.com/MihaiValentin/lunr-languages) is developed based on [lunr.js](https://github.com/olivernn/lunr.js) and not work in **Elasticlunr.js**.
+I will refactor the code and support all the languages that available in [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
+
 
 # Contributing
 

@@ -1,4 +1,7 @@
 ** TODO:
+
+**support different languages, refactor the desgin, write base class for tokenizer, stemmer, etc. P1**
+
 1. Add support for scoring model choice, such as sum up the field score or just use the max field score.
 2. Code review, make it more efficient.
 3. search configuration format verification, check that user's configuration is correct and legal.

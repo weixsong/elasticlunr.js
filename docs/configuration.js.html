@@ -136,7 +136,7 @@
 <li>boolean model chosing, user could choose which boolean model to use for each field.</li>
 <li>token expandation, user could set token expand to True to improve Recall. Default is False.</li>
 </ol>
-<p>Query time boosting must be configured by field category, &quot;boolean&quot; model could be configured<br />by both field category or globally as the following example. Field configuration for &quot;boolean&quot;<br />will overwrite global configuration.<br />Token expand could be configured both by field category or golbally. Local field configuration will<br />overwrite global configuration.</p><p>configuration example:<br />{<br />  fields:{<br />    title: {boost: 2},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;bool&quot; field configuation overwrite global configuation example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;expand&quot; example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;,<br />  expand: true<br />}</p><p>&quot;expand&quot; example for field category:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;, expand: true},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>then, user could search with configuration to do query-time boosting.<br />idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
+<p>Query time boosting must be configured by field category, &quot;boolean&quot; model could be configured<br />by both field category or globally as the following example. Field configuration for &quot;boolean&quot;<br />will overwrite global configuration.<br />Token expand could be configured both by field category or golbally. Local field configuration will<br />overwrite global configuration.</p><p>configuration example:<br />{<br />  fields:{<br />    title: {boost: 2},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;bool&quot; field configuation overwrite global configuation example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>&quot;expand&quot; example:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;,<br />  expand: true<br />}</p><p>&quot;expand&quot; example for field category:<br />{<br />  fields:{<br />    title: {boost: 2, bool: &quot;AND&quot;, expand: true},<br />    body: {boost: 1}<br />  },<br />  bool: &quot;OR&quot;<br />}</p><p>setting the boost to 0 ignores the field (this will only search the title):<br />{<br />  fields:{<br />    title: {boost: 1},<br />    body: {boost: 0}<br />  }<br />}</p><p>then, user could search with configuration to do query-time boosting.<br />idx.search(&#39;oracle database&#39;, {fields: {title: {boost: 2}, body: {boost: 1}}});</p> </div>
           <pre><code class="language-javascript">elasticlunr.Configuration = function (config, fields) {
   var config = config || '';
 
@@ -241,7 +241,7 @@
         }
 
         this.config[field] = {
-          boost: field_config.boost || 1,
+          boost: (field_config.boost || field_config.boost === 0) ? field_config.boost : 1,
           bool: field_config.bool || global_bool,
           expand: field_expand
         };

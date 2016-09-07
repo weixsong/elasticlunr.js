@@ -1,6 +1,6 @@
 /**
  * elasticlunr - http://weixsong.github.io
- * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.9.0
+ * Lightweight full-text search engine in Javascript for browser search and offline search. - 0.9.2
  *
  * Copyright (C) 2016 Oliver Nightingale
  * Copyright (C) 2016 Wei Song
@@ -83,7 +83,7 @@ var elasticlunr = function (config) {
   return idx;
 };
 
-elasticlunr.version = "0.9.0";
+elasticlunr.version = "0.9.2";
 /*!
  * elasticlunr.utils
  * Copyright (C) 2016 Oliver Nightingale
@@ -929,8 +929,14 @@ elasticlunr.Index.prototype.search = function (query, userConfig) {
 elasticlunr.Index.prototype.fieldSearch = function (queryTokens, fieldName, config) {
   var booleanType = config[fieldName].bool;
   var expand = config[fieldName].expand;
+  var boost = config[fieldName].boost;
   var scores = null;
   var docTokens = {};
+
+  // Do nothing if the boost is 0
+  if (boost === 0) {
+    return;
+  }
 
   queryTokens.forEach(function (token) {
     var tokens = [token];
@@ -2069,6 +2075,14 @@ elasticlunr.InvertedIndex.prototype.toJSON = function () {
   *   bool: "OR"
   * }
   * 
+  * setting the boost to 0 ignores the field (this will only search the title):
+  * {
+  *   fields:{
+  *     title: {boost: 1},
+  *     body: {boost: 0}
+  *   }
+  * }
+  *
   * then, user could search with configuration to do query-time boosting.
   * idx.search('oracle database', {fields: {title: {boost: 2}, body: {boost: 1}}});
   * 
@@ -2143,7 +2157,7 @@ elasticlunr.Configuration.prototype.buildUserConfig = function (config, fields) 
         }
 
         this.config[field] = {
-          boost: field_config.boost || 1,
+          boost: (field_config.boost || field_config.boost === 0) ? field_config.boost : 1,
           bool: field_config.bool || global_bool,
           expand: field_expand
         };
