@@ -178,19 +178,7 @@ index.addField(&#39;body&#39;);
 index.setRef(&#39;id&#39;);
 index.saveDocument(false);
 </code></pre>
-<p>Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.<br />Assume you&#39;re using lunr-language in Node.js envrionment, you could import lunr-language as followings:</p><pre><code class="lang-javascript">var elasticlunr = require(&#39;elasticlunr&#39;);
-require(&#39;./lunr.stemmer.support.js&#39;)(elasticlunr);
-require(&#39;./lunr.de.js&#39;)(elasticlunr);
-
-var index = elasticlunr(function () {
-    // use the language (de)
-    this.use(lunr.de);
-    // then, the normal elasticlunr index initialization
-    this.addField(&#39;title&#39;)
-    this.addField(&#39;body&#39;)
-});
-</code></pre>
-<p>For more details, please go to <a href="https://github.com/weixsong/lunr-languages">lunr-languages</a>.</p><h2>2. Add document to index</h2>
+<h2>2. Add document to index</h2>
 <p>Add document to index is very simple, just prepare you document in JSON format, then add it to index.</p><pre><code class="lang-javascript">var doc1 = {
     &quot;id&quot;: 1,
     &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
@@ -324,7 +312,8 @@ index.addDoc(doc2);
 
 index.search(&quot;Oracle database profit&quot;);
 </code></pre>
-<h1>Contributing</h1>
+<h1>Other Languages?</h1>
+<p>Sorry for the original version documents that I think elasticlunr.js will support <a href="https://github.com/MihaiValentin/lunr-languages">lunr-languages</a> seamlessly, I was wrong. <a href="https://github.com/MihaiValentin/lunr-languages">lunr-languages</a> is developed based on <a href="https://github.com/olivernn/lunr.js">lunr.js</a> and not work in <strong>Elasticlunr.js</strong>.<br />I will refactor the code and support all the languages that available in <a href="https://github.com/MihaiValentin/lunr-languages">lunr-languages</a>.</p><h1>Contributing</h1>
 <p>See the <a href="CONTRIBUTING.mdown"><code>CONTRIBUTING.mdown</code> file</a>.</p></section>
         </div>
       </div>
