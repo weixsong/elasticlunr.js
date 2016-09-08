@@ -366,6 +366,67 @@ index.addDoc(doc2);
 index.search("Oracle database profit");
 ```
 
+## 8. Save & Load Index
+
+You just need to build index only one time offline, and then save the index to a JSON file, for future usage, you just need to load the index file.
+
+Save the index to JSON file as followings:
+```javascript
+var elasticlunr = require('./elasticlunr.js'),
+    fs = require('fs');
+
+var idx = elasticlunr(function () {
+  this.setRef('id');
+
+  this.addField('title');
+  this.addField('tags');
+  this.addField('body');
+});
+
+fs.readFile('./example/example_data.json', function (err, data) {
+  if (err) throw err;
+
+  var raw = JSON.parse(data);
+
+  var questions = raw.questions.map(function (q) {
+    return {
+      id: q.question_id,
+      title: q.title,
+      body: q.body,
+      tags: q.tags.join(' ')
+    };
+  });
+
+  questions.forEach(function (question) {
+    idx.addDoc(question);
+  });
+
+  fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {
+    if (err) throw err;
+    console.log('done');
+  });
+});
+```
+
+The above code is the example index builder usage in [elasticlunr online example](http://elasticlunr.com/example/index.html), you only need to pay attention to:
+```javascript
+  fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {
+    if (err) throw err;
+    console.log('done');
+  });
+```
+
+The function of <code>elasticlunr.Index.prototype.toJSON</code> is called in <code>JSON.stringify(idx)</code>.
+
+If you want load an alreay persisted index file, you could use:
+```javascript
+  var indexDump = JSON.parse(indexDump)
+  console.time('load')
+  window.idx = elasticlunr.Index.load(indexDump)
+```
+
+<code>indexDump</code> is a file content, other your could load archived JSON index as whatever way you like. I'm not familiar with Javascript, so you are welcome to update this document to provide detailed example.
+
 # Other Languages
 
 Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/weixsong/lunr-languages).
