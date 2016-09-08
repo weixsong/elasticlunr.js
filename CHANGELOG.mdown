@@ -1,5 +1,9 @@
 # 
 
+## 0.9.3
+
+* add sorted_set.js to make it compatible with lunr-languages.js
+
 ## 0.9.2
 
 * some update
