@@ -1,4 +1,8 @@
-# 
+#
+
+## 0.9.5
+
+* support lunr-languages.js, user could use elasticlunr.js for other languages.
 
 ## 0.9.4
 

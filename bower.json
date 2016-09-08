@@ -1,6 +1,6 @@
 {
   "name": "elasticlunr.js",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "main": "elasticlunr.js",
   "ignore": [
     "tests/",
