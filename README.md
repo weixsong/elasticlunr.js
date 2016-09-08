@@ -366,10 +366,56 @@ index.addDoc(doc2);
 index.search("Oracle database profit");
 ```
 
-# Other Languages?
-Sorry for the original version documents that I think elasticlunr.js will support [lunr-languages](https://github.com/MihaiValentin/lunr-languages) seamlessly, I was wrong. [lunr-languages](https://github.com/MihaiValentin/lunr-languages) is developed based on [lunr.js](https://github.com/olivernn/lunr.js) and not work in **Elasticlunr.js**.
-I will refactor the code and support all the languages that available in [lunr-languages](https://github.com/MihaiValentin/lunr-languages).
+# Other Languages
 
+Default supported language of elasticlunr.js is English, if you want to use elasticlunr.js to index other language documents, then you need to use elasticlunr.js combined with [lunr-languages](https://github.com/weixsong/lunr-languages).
+
+## Other languages example in Browser
+Suppose you are using **elasticlunr.js** in browser for other languages, you could download the corresponding language support from [lunr-languages](https://github.com/weixsong/lunr-languages), then include the scripts as:
+```html
+<script src="lunr.stemmer.support.js"></script>
+<script src="lunr.de.js"></script>
+```
+
+then, you could use elasticlunr.js as normal:
+```javascript
+var index = elasticlunr(function () {
+    // use the language (de)
+    this.use(elasticlunr.de);
+    // then, the normal elasticlunr index initialization
+    this.addField('title')
+    this.addField('body')
+});
+```
+
+Pay attention to the special code:
+```javascript
+    this.use(elasticlunr.de);
+```
+
+If you are using other language, such as **es**(Spanish), download the corresponding <code>lunr.es.js</code> file and <code>lunr.stemmer.support.js</code>, and change the above line to:
+```javascript
+    this.use(elasticlunr.es);
+```
+
+## Other languages example in Node.js
+Suppose you are using **elasticlunr.js** in **Node.js** for other languages, you could download the corresponding language support from [lunr-languages](https://github.com/weixsong/lunr-languages), put the files <code>lunr.es.js</code> file and <code>lunr.stemmer.support.js</code> in your project, then in your **Node.js** module, use **elasticlunr.js** as:
+
+```javascript
+var elasticlunr = require('elasticlunr');
+require('./lunr.stemmer.support.js')(elasticlunr);
+require('./lunr.de.js')(elasticlunr);
+
+var index = elasticlunr(function () {
+    // use the language (de)
+    this.use(elasticlunr.de);
+    // then, the normal elasticlunr index initialization
+    this.addField('title')
+    this.addField('body')
+});
+```
+
+For more details, please go to [lunr-languages](https://github.com/weixsong/lunr-languages).
 
 # Contributing
 
