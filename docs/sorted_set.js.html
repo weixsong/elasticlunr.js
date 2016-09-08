@@ -72,6 +72,7 @@
         <div class="span3 bs-docs-sidebar">
           <ul class="nav nav-list bs-docs-sidenav affix-top">
             <li><a href="index.html">Main</a></li>
+            <li><a href="configuration.js.html">configuration.js</a></li>
             <li><a href="document_store.js.html">document_store.js</a></li>
             <li><a href="elasticlunr.js.html">elasticlunr.js</a></li>
             <li><a href="event_emitter.js.html">event_emitter.js</a></li>
@@ -115,15 +116,16 @@
           </div>
         </div>
         <div class="span9">
+          <div class="description"><p>sorted_set.js is added only to make elasticlunr.js compatible with lunr-languages.<br />if elasticlunr.js support different languages by default, this will make elasticlunr.js<br />much bigger that not good for browser usage.</p> </div>
           <section id="SortedSet">
             <h1>SortedSet</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-success radius ctx-type">constructor</div><span>elasticlunr.SortedSet()</span>
+              <div class="label label-success radius ctx-type">constructor</div><span>lunr.SortedSet()</span>
             </p>
           </section>
-          <div class="description"><p>elasticlunr.SortedSets are used to maintain an array of uniq values in a sorted<br />order.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet = function () {
+          <div class="description"><p>lunr.SortedSets are used to maintain an array of uniq values in a sorted<br />order.</p> </div>
+          <pre><code class="language-javascript">lunr.SortedSet = function () {
   this.length = 0
   this.elements = []
 }</code></pre>
@@ -131,7 +133,7 @@
             <h1>load</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.load()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.load()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -148,15 +150,10 @@
                 <td>Array</td>
                 <td><p>The serialised set to load.</p></td>
               </tr>
-              <tr>
-                <td>return</td>
-                <td>elasticlunr.SortedSet</td>
-                <td></td>
-              </tr>
             </tbody>
           </table>
           <div class="description"><p>Loads a previously serialised sorted set.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.load = function (serialisedData) {
+          <pre><code class="language-javascript">lunr.SortedSet.load = function (serialisedData) {
   var set = new this
 
   set.elements = serialisedData
@@ -168,7 +165,7 @@
             <h1>add</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.add()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.add()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -188,7 +185,7 @@
             </tbody>
           </table>
           <div class="description"><p>Inserts new items into the set in the correct position to maintain the<br />order.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.add = function () {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.add = function () {
   var i, element
 
   for (i = 0; i &lt; arguments.length; i++) {
@@ -203,18 +200,18 @@
             <h1>toArray</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.toArray()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.toArray()</span>
             </p>
           </section>
           <div class="description"><p>Converts this sorted set into an array.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.toArray = function () {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.toArray = function () {
   return this.elements.slice()
 }</code></pre>
           <section id="map">
             <h1>map</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.map()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.map()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -236,22 +233,17 @@
                 <td>Object</td>
                 <td><p>An optional object that can be used as the context for the function fn.</p></td>
               </tr>
-              <tr>
-                <td>return</td>
-                <td>Array</td>
-                <td></td>
-              </tr>
             </tbody>
           </table>
           <div class="description"><p>Creates a new array with the results of calling a provided function on every<br />element in this sorted set.</p><p>Delegates to Array.prototype.map and has the same signature.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.map = function (fn, ctx) {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.map = function (fn, ctx) {
   return this.elements.map(fn, ctx)
 }</code></pre>
           <section id="forEach">
             <h1>forEach</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.forEach()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.forEach()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -276,14 +268,14 @@
             </tbody>
           </table>
           <div class="description"><p>Executes a provided function once per sorted set element.</p><p>Delegates to Array.prototype.forEach and has the same signature.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.forEach = function (fn, ctx) {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.forEach = function (fn, ctx) {
   return this.elements.forEach(fn, ctx)
 }</code></pre>
           <section id="indexOf">
             <h1>indexOf</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.indexOf()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.indexOf()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -300,34 +292,36 @@
                 <td>Object</td>
                 <td><p>The object to locate in the sorted set.</p></td>
               </tr>
-              <tr>
-                <td>return</td>
-                <td>Number</td>
-                <td></td>
-              </tr>
             </tbody>
           </table>
           <div class="description"><p>Returns the index at which a given element can be found in the<br />sorted set, or -1 if it is not present.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.indexOf = function (elem) {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.indexOf = function (elem) {
   var start = 0,
-      end = this.elements.length - 1;
+      end = this.elements.length,
+      sectionLength = end - start,
+      pivot = start + Math.floor(sectionLength / 2),
+      pivotElem = this.elements[pivot]
 
-  while (end &gt;= start) {
-    var pivot = start + Math.floor((end - start + 1) / 2);
-    var pivotElem = this.elements[pivot];
+  while (sectionLength &gt; 1) {
+    if (pivotElem === elem) return pivot
 
-    if (pivotElem === elem) return pivot;
-    if (pivotElem &lt; elem) start = pivot + 1;
-    else end = pivot - 1;
+    if (pivotElem &lt; elem) start = pivot
+    if (pivotElem &gt; elem) end = pivot
+
+    sectionLength = end - start
+    pivot = start + Math.floor(sectionLength / 2)
+    pivotElem = this.elements[pivot]
   }
 
-  return -1;
+  if (pivotElem === elem) return pivot
+
+  return -1
 }</code></pre>
           <section id="locationFor">
             <h1>locationFor</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.locationFor()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.locationFor()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -344,35 +338,33 @@
                 <td>Object</td>
                 <td><p>The elem to find the position for in the set</p></td>
               </tr>
-              <tr>
-                <td>return</td>
-                <td>Number</td>
-                <td></td>
-              </tr>
             </tbody>
           </table>
           <div class="description"><p>Returns the position within the sorted set that an element should be<br />inserted at to maintain the current order of the set.</p><p>This function assumes that the element to search for does not already exist<br />in the sorted set.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.locationFor = function (elem) {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.locationFor = function (elem) {
   var start = 0,
-      end = this.elements.length - 1;
+      end = this.elements.length,
+      sectionLength = end - start,
+      pivot = start + Math.floor(sectionLength / 2),
+      pivotElem = this.elements[pivot]
 
-  while (end &gt;= start) {
-    var pivot = start + Math.floor((end - start + 1) / 2);
-    var pivotElem = this.elements[pivot];
+  while (sectionLength &gt; 1) {
+    if (pivotElem &lt; elem) start = pivot
+    if (pivotElem &gt; elem) end = pivot
 
-    if (pivotElem === elem) return pivot;
-    if (pivotElem &lt; elem) start = pivot + 1;
-    else end = pivot - 1;
+    sectionLength = end - start
+    pivot = start + Math.floor(sectionLength / 2)
+    pivotElem = this.elements[pivot]
   }
 
-  if (pivotElem &gt; elem) return pivot;
-  if (pivotElem &lt; elem) return pivot + 1;
+  if (pivotElem &gt; elem) return pivot
+  if (pivotElem &lt; elem) return pivot + 1
 }</code></pre>
           <section id="intersect">
             <h1>intersect</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.intersect()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.intersect()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -386,19 +378,14 @@
             <tbody>
               <tr>
                 <td>otherSet</td>
-                <td>elasticlunr.SortedSet</td>
+                <td>lunr.SortedSet</td>
                 <td><p>The set to intersect with this set.</p></td>
-              </tr>
-              <tr>
-                <td>return</td>
-                <td>elasticlunr.SortedSet</td>
-                <td></td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Creates a new elasticlunr.SortedSet that contains the elements in the intersection<br />of this set and the passed set.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.intersect = function (otherSet) {
-  var intersectSet = new elasticlunr.SortedSet,
+          <div class="description"><p>Creates a new lunr.SortedSet that contains the elements in the intersection<br />of this set and the passed set.</p> </div>
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.intersect = function (otherSet) {
+  var intersectSet = new lunr.SortedSet,
       i = 0, j = 0,
       a_len = this.length, b_len = otherSet.length,
       a = this.elements, b = otherSet.elements
@@ -429,12 +416,12 @@
             <h1>clone</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.clone()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.clone()</span>
             </p>
           </section>
           <div class="description"><p>Makes a copy of this set</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.clone = function () {
-  var clone = new elasticlunr.SortedSet
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.clone = function () {
+  var clone = new lunr.SortedSet
 
   clone.elements = this.toArray()
   clone.length = clone.elements.length
@@ -445,7 +432,7 @@
             <h1>union</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.union()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.union()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -459,18 +446,13 @@
             <tbody>
               <tr>
                 <td>otherSet</td>
-                <td>elasticlunr.SortedSet</td>
+                <td>lunr.SortedSet</td>
                 <td><p>The set to union with this set.</p></td>
-              </tr>
-              <tr>
-                <td>return</td>
-                <td>elasticlunr.SortedSet</td>
-                <td></td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Creates a new elasticlunr.SortedSet that contains the elements in the union<br />of this set and the passed set.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.union = function (otherSet) {
+          <div class="description"><p>Creates a new lunr.SortedSet that contains the elements in the union<br />of this set and the passed set.</p> </div>
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.union = function (otherSet) {
   var longSet, shortSet, unionSet
 
   if (this.length &gt;= otherSet.length) {
@@ -481,7 +463,9 @@
 
   unionSet = longSet.clone()
 
-  unionSet.add.apply(unionSet, shortSet.toArray())
+  for(var i = 0, shortSetElements = shortSet.toArray(); i &lt; shortSetElements.length; i++){
+    unionSet.add(shortSetElements[i])
+  }
 
   return unionSet
 }</code></pre>
@@ -489,11 +473,11 @@
             <h1>toJSON</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>elasticlunr.SortedSet.prototype.toJSON()</span>
+              <div class="label label-info radius ctx-type">method</div><span>lunr.SortedSet.prototype.toJSON()</span>
             </p>
           </section>
           <div class="description"><p>Returns a representation of the sorted set ready for serialisation.</p> </div>
-          <pre><code class="language-javascript">elasticlunr.SortedSet.prototype.toJSON = function () {
+          <pre><code class="language-javascript">lunr.SortedSet.prototype.toJSON = function () {
   return this.toArray()
 }</code></pre>
         </div>
