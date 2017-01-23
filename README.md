@@ -189,7 +189,7 @@ index.removeDoc(doc);
 Remove a document will remove each token of that document's each field from field-specified inverted index.
 
 ## 4. Update a document in index
-Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.
+Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.updateDoc()</code> function.
 
 For example:
 ```javascript
@@ -199,7 +199,7 @@ var doc = {
     "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
 }
 
-index.update(doc);
+index.updateDoc(doc);
 ```
 
 ## 5. Query from Index
