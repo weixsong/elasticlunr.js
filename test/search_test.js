@@ -77,3 +77,11 @@ test('search skips on 0 boost fields', function () {
   equal(results.length, 1);
   equal(results[0].ref, 'b');
 });
+
+test('allows different searches for different fields', function () {
+  var results = this.idx.search({title: 'helps', body: 'nice'});
+
+  equal(results.length, 2);
+  equal(results[0].ref, 'c');
+  equal(results[1].ref, 'a');
+});
