@@ -3,6 +3,14 @@
 [![Build Status](https://travis-ci.org/weixsong/elasticlunr.js.svg?branch=master)](https://travis-ci.org/weixsong/elasticlunr.js)
 [![npm version](https://badge.fury.io/js/elasticlunr.svg)](https://badge.fury.io/js/elasticlunr)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/weixsong/elasticlunr.js/master/LICENSE)
+[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
+[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badge/)
+
+# Milestone
+
+Thanks that so many people use and love Elasticlunr.js, it has received more than 500 stars.
+
+# Elasticlunr.js
 
 Elasticlunr.js is a lightweight full-text search engine developed in JavaScript for browser search and offline search.
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting, field search, more rational scoring/ranking methodology, fast computation speed and so on.
@@ -19,7 +27,7 @@ Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also 
 # Key Features Comparing with Lunr.js
 
 1. **Query-Time Boosting**, you don't need to setup boosting weight in index building procedure, Query-Time Boosting make it more flexible that you could try different boosting scheme.
-2. **More Rational Scoring Mechanism**, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene. 
+2. **More Rational Scoring Mechanism**, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.
 3. **Field-Search**, you could choose which field to index and which field to search.
 4. **Boolean Model**, you could set which field to search and the boolean model for each query token, such as "OR", "AND".
 5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, make the results ranking more reliable.
@@ -44,7 +52,7 @@ Adding documents to the index is as simple as:
 var doc1 = {
     "id": 1,
     "title": "Oracle released its latest database Oracle 12g",
-    "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
+    "body": "Yesterday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
 }
 
 var doc2 = {
@@ -87,6 +95,15 @@ This returns a list of matching documents with a score of how closely they match
 }]
 ```
 
+You can also query on different terms for each field.
+
+```javascript
+index.search({
+  title: 'database',
+  body:  'profit',
+});
+```
+
 If user do not want to store the original JSON documents, they could use the following setting:
 ```javascript
 var index = elasticlunr(function () {
@@ -97,7 +114,7 @@ var index = elasticlunr(function () {
 });
 ```
 
-Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not udpate or delete a document from index. 
+Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not udpate or delete a document from index.
 
 [API documentation](http://elasticlunr.com/docs/index.html) is available, as well as a [full working example](http://elasticlunr.com/example/index.html).
 
@@ -189,7 +206,7 @@ index.removeDoc(doc);
 Remove a document will remove each token of that document's each field from field-specified inverted index.
 
 ## 4. Update a document in index
-Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.
+Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.updateDoc()</code> function.
 
 For example:
 ```javascript
@@ -199,7 +216,7 @@ var doc = {
     "body": "Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year."
 }
 
-index.update(doc);
+index.updateDoc(doc);
 ```
 
 ## 5. Query from Index
@@ -365,6 +382,67 @@ index.addDoc(doc2);
 
 index.search("Oracle database profit");
 ```
+
+## 8. Save & Load Index
+
+You just need to build index only one time offline, and then save the index to a JSON file, for future usage, you just need to load the index file.
+
+Save the index to JSON file as followings:
+```javascript
+var elasticlunr = require('./elasticlunr.js'),
+    fs = require('fs');
+
+var idx = elasticlunr(function () {
+  this.setRef('id');
+
+  this.addField('title');
+  this.addField('tags');
+  this.addField('body');
+});
+
+fs.readFile('./example/example_data.json', function (err, data) {
+  if (err) throw err;
+
+  var raw = JSON.parse(data);
+
+  var questions = raw.questions.map(function (q) {
+    return {
+      id: q.question_id,
+      title: q.title,
+      body: q.body,
+      tags: q.tags.join(' ')
+    };
+  });
+
+  questions.forEach(function (question) {
+    idx.addDoc(question);
+  });
+
+  fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {
+    if (err) throw err;
+    console.log('done');
+  });
+});
+```
+
+The above code is the example index builder usage in [elasticlunr online example](http://elasticlunr.com/example/index.html), you only need to pay attention to:
+```javascript
+  fs.writeFile('./example/example_index.json', JSON.stringify(idx), function (err) {
+    if (err) throw err;
+    console.log('done');
+  });
+```
+
+The function of <code>elasticlunr.Index.prototype.toJSON</code> is called in <code>JSON.stringify(idx)</code>.
+
+If you want load an alreay persisted index file, you could use:
+```javascript
+  var indexDump = JSON.parse(indexDump)
+  console.time('load')
+  window.idx = elasticlunr.Index.load(indexDump)
+```
+
+<code>indexDump</code> is a file content, other your could load archived JSON index as whatever way you like. I'm not familiar with Javascript, so you are welcome to update this document to provide detailed example.
 
 # Other Languages
 
