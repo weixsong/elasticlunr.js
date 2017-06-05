@@ -6,6 +6,12 @@
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
 [![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badge/)
 
+# Milestone
+
+Thanks that so many people use and love Elasticlunr.js, it has received more than 500 stars.
+
+# Elasticlunr.js
+
 Elasticlunr.js is a lightweight full-text search engine developed in JavaScript for browser search and offline search.
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting, field search, more rational scoring/ranking methodology, fast computation speed and so on.
 Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration, query-time boosting, field search and other features.

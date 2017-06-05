@@ -1,5 +1,10 @@
 #
 
+## 0.9.6
+
+* add badges
+* update README.md
+
 ## 0.9.5
 
 * support lunr-languages.js, user could use elasticlunr.js for other languages.
