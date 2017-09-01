@@ -17,21 +17,21 @@ Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also 
 
 # Why You Need Lightweight Offline Search?
 
-1. In some system, you don't want to deploy any **complex full-text search engine**(such as Lucence, Elasticsearch, Sphinx, etc.), you only want to provide some static web pages and provide search functionality , then you could build index in previous and load index in client side(such as Browser).
-2. Provide offline search functionality. For some documents, user usually download these documents, you could build index and put index in the documents package, then provide offline search functionality.
-3. For some limited or restricted network, such WAN or LAN, offline search is a better choice.
-4. For mobile device, Iphone or Android phone, network traffic maybe very expensive, then provide offline search is a good choice.
+1. In some systems, you don't want to deploy any **complex full-text search engine** (such as Lucene, Elasticsearch, Sphinx, etc.), you only want to provide some static web pages and provide search functionality, then you could build index in previous and load index in client side (such as Browser).
+2. Provide offline search functionality. For some documents, the user usually downloads these documents, you could build index and put index in the documents package, then provide offline search functionality.
+3. For limited or restricted networks, such WAN or LAN, offline search is a better choice.
+4. For mobile devices, Iphone or Android phones, network traffic may be very expensive, so offline search is a good choice.
 5. If you want to provide search functionality in your Node.js system, and you don't want to use a complex system, or you only need to support thousands of documents, then Elasticlunr.js is what you want to use.
 
 # Key Features Comparing with Lunr.js
 
-1. **Query-Time Boosting**, you don't need to setup boosting weight in index building procedure, Query-Time Boosting make it more flexible that you could try different boosting scheme.
-2. **More Rational Scoring Mechanism**, Elasticlunr.js use quite the same scoring mechanism as Elasticsearch, and also this scoring mechanism is used by lucene.
-3. **Field-Search**, you could choose which field to index and which field to search.
-4. **Boolean Model**, you could set which field to search and the boolean model for each query token, such as "OR", "AND".
-5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, make the results ranking more reliable.
-6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improve the search speed significantly.
-7. **Small Index Size**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is small, and also user could choose if they need to store the origianl JSON doc, if user care more about the index size, they could choose not store the original JSON doc, this could reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search. The index size is about half size of lunr.js index file.
+1. **Query-Time Boosting**, you don't need to set up boosting weight in index building procedure, Query-Time Boosting make it more flexible so you could try different boosting schemes.
+2. **More Rational Scoring Mechanism**, Elasticlunr.js uses a similar scoring mechanism as Elasticsearch, and also this scoring mechanism is used by Lucene.
+3. **Field-Search**, you can choose which field to index and which field to search.
+4. **Boolean Model**, you can set which field to search and the boolean model for each query token, such as "OR", "AND".
+5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, makes the results ranking more reliable.
+6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improves the search speed significantly.
+7. **Small Index Size**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is small, and also user can choose if they need to store the origianl JSON doc, if user cares more about the index size, they can choose not store the original JSON doc. This can reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search. The index size is about half size of lunr.js index file.
 
 ## Example
 
@@ -103,7 +103,7 @@ index.search({
 });
 ```
 
-If user do not want to store the original JSON documents, they could use the following setting:
+If user doesn't want to store the original JSON documents, they can use the following setting:
 ```javascript
 var index = elasticlunr(function () {
     this.addField('title');
@@ -476,7 +476,7 @@ If you are using other language, such as **es**(Spanish), download the correspon
 ```
 
 ## Other languages example in Node.js
-Suppose you are using **elasticlunr.js** in **Node.js** for other languages, you could download the corresponding language support from [lunr-languages](https://github.com/weixsong/lunr-languages), put the files <code>lunr.es.js</code> file and <code>lunr.stemmer.support.js</code> in your project, then in your **Node.js** module, use **elasticlunr.js** as:
+Suppose you are using **elasticlunr.js** in **Node.js** for other languages, you can download the corresponding language support from [lunr-languages](https://github.com/weixsong/lunr-languages), put the files <code>lunr.es.js</code> file and <code>lunr.stemmer.support.js</code> in your project, then in your **Node.js** module, use **elasticlunr.js** as:
 
 ```javascript
 var elasticlunr = require('elasticlunr');
