@@ -5,6 +5,10 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/weixsong/elasticlunr.js/master/LICENSE)
 [![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badge/)
 
+# Contributor Welcome!!!
+
+As I'm now focusing on new domain, hope that someone who interested on this project could help to maintain this repository.
+
 # Milestone
 
 Thanks that so many people use and love Elasticlunr.js, it has received more than 500 stars.
