@@ -6,7 +6,7 @@
   "keywords": ["search", "text retrieval", "offline search", "full text search"],
   "homepage": "http://weixsong.github.io",
   "bugs": "https://github.com/weixsong/elasticlunr.js/issues",
-  "main": "elasticlunr.js",
+  "main": "elasticlunr.npm.js",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -25,7 +25,7 @@ NPM ?= /usr/bin/npm
 PHANTOMJS ?= ./node_modules/.bin/phantomjs
 UGLIFYJS ?= ./node_modules/.bin/uglifyjs
 
-all: node_modules elasticlunr.js elasticlunr.min.js docs bower.json package.json component.json example
+all: node_modules elasticlunr.js elasticlunr.npm.js elasticlunr.min.js docs bower.json package.json component.json example
 
 elasticlunr.js: $(SRC)
 	cat build/wrapper_start $^ build/wrapper_end | \
@@ -41,6 +41,12 @@ elasticlunr.min.js: $(SRC)
 	${UGLIFYJS} --compress --mangle --comments > $@
 	cp $@ ./release/
 	cp $@ ./example/
+
+elasticlunr.npm.js: elasticlunr.js
+	sed -e 's/^\/\/ only used this to make elasticlunr.js.*/\/\/Removed global lunr definition for npm version/' \
+		-e '/^\/\/ this is a trick to define a global/d' \
+		-e 's/^lunr *= *elasticlunr;/var lunr = elasticlunr;/' elasticlunr.js > $@
+	cp $@ ./release
 
 %.json: build/%.json.template
 	cat $< | sed "s/@VERSION/${VERSION}/" > $@
