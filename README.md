@@ -9,6 +9,8 @@
 
 As I'm now focusing on new domain, hope that someone who interested on this project could help to maintain this repository.
 
+If anyone want to help to maintain this repo, please leave a message and I could add you to the admin account. Thanks very much~~~ :)
+
 # Milestone
 
 Thanks that so many people use and love Elasticlunr.js, it has received more than 500 stars.
