@@ -148,12 +148,16 @@
   this.config = {};
 
   var userConfig;
-  try {
-    userConfig = JSON.parse(config);
-    this.buildUserConfig(userConfig, fields);
-  } catch (error) {
-    elasticlunr.utils.warn('user configuration parse failed, will use default configuration');
+  if (config.length === 0) {
     this.buildDefaultConfig(fields);
+  } else {
+    try {
+      userConfig = JSON.parse(config);
+      this.buildUserConfig(userConfig, fields);
+    } catch (error) {
+      elasticlunr.utils.warn('user configuration parse failed, will use default configuration');
+      this.buildDefaultConfig(fields);
+    }
   }
 };</code></pre>
           <section id="buildDefaultConfig">
