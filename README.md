@@ -13,7 +13,7 @@ If anyone want to help to maintain this repo, please leave a message and I could
 
 # Milestone
 
-Thanks that so many people use and love Elasticlunr.js, it has received more than 500 stars.
+Thanks that so many people use and love Elasticlunr.js, it has received more than 1K stars.
 
 # Elasticlunr.js
 
