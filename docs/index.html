@@ -205,13 +205,13 @@ index.addDoc(doc2);
 index.removeDoc(doc);
 </code></pre>
 <p>Remove a document will remove each token of that document&#39;s each field from field-specified inverted index.</p><h2>4. Update a document in index</h2>
-<p>Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.update()</code> function.</p><p>For example:</p><pre><code class="lang-javascript">var doc = {
+<p>Elasticlunr.js support update a document in index, just provide JSON document to <code>elasticlunr.Index.prototype.updateDoc()</code> function.</p><p>For example:</p><pre><code class="lang-javascript">var doc = {
     &quot;id&quot;: 1,
     &quot;title&quot;: &quot;Oracle released its latest database Oracle 12g&quot;,
     &quot;body&quot;: &quot;Yestaday Oracle has released its new database Oracle 12g, this would make more money for this company and lead to a nice profit report of annual year.&quot;
 }
 
-index.update(doc);
+index.updateDoc(doc);
 </code></pre>
 <h2>5. Query from Index</h2>
 <p>Elasticlunr.js provides flexible query configuration, supports query-time boosting and Boolean logic setting.<br />You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.<br />Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.</p><h3>5.1 Simple Query</h3>
