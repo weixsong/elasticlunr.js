@@ -161,6 +161,14 @@ test("run should filter out any undefined values at each stage in the pipeline",
   equal(output.length, 5);
 });
 
+test("run should allow a pipeline step to split a token into multiple tokens", function() {
+  var pipeline = new elasticlunr.Pipeline,
+      splitter = function(t) { return t.split("-"); };
+  pipeline.add(splitter);
+
+  var output = pipeline.run(['t-h-i-s']);
+  deepEqual(output, ['t', 'h', 'i', 's']);
+});
 test('toJSON', function () {
   var pipeline = new elasticlunr.Pipeline,
       fn1 = function () {},
