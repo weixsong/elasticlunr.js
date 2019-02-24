@@ -18,13 +18,6 @@
     "url": "https://github.com/weixsong/elasticlunr.js"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "doxx": "1.4.0",
-    "mocha": "^5.2.0",
-    "nyc": "^13.3.0",
-    "phantomjs": "1.9.8",
-    "sinon": "^7.2.3",
-    "uglify-js": "2.6.0",
     "@babel/cli": "^7.0.0-beta.51",
     "@babel/core": "^7.0.0-beta.51",
     "@babel/preset-env": "^7.0.0-beta.51",
@@ -34,19 +27,27 @@
     "babel-plugin-istanbul": "^5.1.0",
     "babel-preset-env": "^7.0.0-beta.3",
     "babel-register": "^7.0.0-beta.3",
+    "chai": "^4.2.0",
     "cross-env": "^5.2.0",
+    "doxx": "1.4.0",
     "eslint": "^5.0.1",
     "eslint-loader": "^2.0.0",
     "jsdom": "11.11.0",
     "jsdom-global": "3.0.2",
+    "mocha": "^5.2.0",
+    "nyc": "^13.3.0",
+    "phantomjs": "1.9.8",
+    "sinon": "^7.2.3",
+    "uglify-js": "2.6.0",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.12.2",
+    "webpack-bundle-analyzer": "^3.0.4",
     "webpack-cli": "^3.0.8",
     "yargs": "^10.0.3"
   },
   "scripts": {
     "test": "nyc --reporter=html mocha",
-    "build": "webpack"
+    "build": "webpack --env build"
   },
   "dependencies": {}
 }

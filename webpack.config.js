@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const path = require('path');
 const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 let libraryName = pkg.name;
 
@@ -20,7 +21,7 @@ if (env === 'build') {
 const config = {
   mode: mode,
   entry: __dirname + '/lib/elasticlunr.js',
-  devtool: 'inline-source-map',
+  plugins: [new BundleAnalyzerPlugin()],
   output: {
     path: __dirname + '/build',
     filename: outputFile,
