@@ -1,5 +1,6 @@
-const elasticlunr = require("../lib/elasticlunr.js");
-var assert = require('assert');
+
+import elasticlunr from '../lib/elasticlunr.js';
+import assert from 'assert';
 
 describe('Configuration', function () {
   describe("constructor test", function() {

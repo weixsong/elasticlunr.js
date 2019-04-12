@@ -1,5 +1,5 @@
-const elasticlunr = require("../lib/elasticlunr.js");
-const assert = require("assert");
+import elasticlunr from '../lib/elasticlunr.js';
+import assert from 'assert';
 
 describe('elasticlunr.DocumentStore', function() {
   describe('store=false', function() {
@@ -51,9 +51,13 @@ describe('elasticlunr.DocumentStore', function() {
       store.addDoc('foo', {title: 'eggs bread'});
       store.addFieldLength('foo', 'title', 2);
       assert.deepEqual(store.toJSON(), { docs: { foo: {title: 'eggs bread'}}, docInfo: {foo: {title: 2}}, length: 1, save: true });
+
+      
+      store.updateFieldLength('foo', 'title', 3);
+      assert.deepEqual(store.toJSON(), { docs: { foo: {title: 'eggs bread'}}, docInfo: {foo: {title: 3}}, length: 1, save: true });
     
       store.addFieldLength('foo', 'body', 20);
-      assert.deepEqual(store.toJSON(), { docs: { foo: {title: 'eggs bread'}}, docInfo: {foo: {title: 2, body: 20}}, length: 1, save: true });
+      assert.deepEqual(store.toJSON(), { docs: { foo: {title: 'eggs bread'}}, docInfo: {foo: {title: 3, body: 20}}, length: 1, save: true });
     });
     
     it('should serialize in reduced form if storage is not enabled', function () {

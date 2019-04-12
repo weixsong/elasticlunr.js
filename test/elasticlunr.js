@@ -1,15 +1,15 @@
-const elasticlunr = require("../lib/elasticlunr.js");
-const assert = require("assert");
+import elasticlunr from '../lib/elasticlunr.js';
+import assert from 'assert';
 
 describe('General elasticlunr functions', function() {
   it('should return a new index', function() {
     var index = elasticlunr();
-    assert.equal(index.constructor, elasticlunr.Index);
+    assert.ok(typeof(index.addDoc) == 'function');
+//    assert.equal(index.constructor, elasticlunr.Index);
   });
   it('should set up a pipeline', function() {
     var index = elasticlunr(),
     queue = index.pipeline._queue;
-
     assert.equal(queue.length, 3);
     assert.equal(queue.indexOf(elasticlunr.trimmer), 0);
     assert.equal(queue.indexOf(elasticlunr.stopWordFilter), 1);
@@ -22,7 +22,7 @@ describe('General elasticlunr functions', function() {
       configCtx = this;
       configArg = idx;
   
-      this.setRef('cid');
+      this.setRef('id');
   
       this.addField('title');
       this.addField('body');
@@ -31,7 +31,7 @@ describe('General elasticlunr functions', function() {
     assert.equal(configCtx, index);
     assert.equal(configArg, index);
   
-    assert.equal(index._ref, 'cid');
-    assert.equal(index._fields.length, 2);
+    assert.equal(index.getRef(), 'id');
+    assert.equal(index.getFields().length, 3);
   });
 });

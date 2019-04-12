@@ -7,6 +7,7 @@
     },
   
     "globals": {
+      "__VERSION__": true,
       "document": false,
       "escape": false,
       "navigator": false,
@@ -28,7 +29,7 @@
     "rules": {
       "block-scoped-var": 2,
       "brace-style": [2, "1tbs", { "allowSingleLine": true }],
-      "camelcase": [2, { "properties": "always" }],
+      "camelcase": [1, { "properties": "always" }],
       "comma-dangle": [2, "never"],
       "comma-spacing": [2, { "before": false, "after": true }],
       "comma-style": [2, "last"],

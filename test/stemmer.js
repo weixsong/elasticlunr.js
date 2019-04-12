@@ -1,6 +1,8 @@
 const elasticlunr = require("../lib/elasticlunr.js"),
       assert = require("assert");
 
+import { Token } from '../lib/index/withPosition.js';
+
 var stemmingFixture = {
         "consign": "consign",
         "consigned": "consign",
@@ -87,7 +89,7 @@ var stemmingFixture = {
 describe('elasticlunr.stemmer', function() {
   it('should stem words correctly', function() {
     Object.keys(stemmingFixture).forEach(function(word) {
-      assert.equal(elasticlunr.stemmer(word), stemmingFixture[word]);
+      assert.equal(elasticlunr.stemmer(new Token(word)), stemmingFixture[word]);
     });
   });
   it('should be registered with elasticlunr.Pipeline as default', function() {

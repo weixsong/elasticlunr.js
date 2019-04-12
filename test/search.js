@@ -1,5 +1,6 @@
-var elasticlunr = require("../lib/elasticlunr.js"),
-    assert = require("assert");
+
+import elasticlunr from '../lib/elasticlunr.js';
+import assert from 'assert';
 
 describe('elasticlunr search', function() {
   var idx = null;
@@ -38,6 +39,9 @@ describe('elasticlunr search', function() {
 
   it('returns the correct results', function() {
 
+    var results = idx.search();
+    assert.deepEqual(results, []);
+
     var results = idx.search('green plant');
     assert.equal(results.length, 3);
     assert.equal(results[0].ref, 'b');
@@ -64,6 +68,21 @@ describe('elasticlunr search', function() {
     assert.equal(results.length, 1);
     assert.equal(results[0].ref, 'b');
 
+    var results = idx.search({title: 'green plant'}, {expand: true, bool: 'AND'});
+    assert.equal(results.length, 1);
+
+    var results = idx.search({title: 'gre plant'}, {expand: true, bool: 'AND'});
+    assert.equal(results.length, 1);
+
+    var results = idx.search({title: 'plant', body: 'Plumb'}, {bool: 'AND'});
+    assert.equal(results.length, 1);
+    
+    var results = idx.search({title: 'blue plant'}, {bool: 'AND'});
+    assert.equal(results.length, 0);
+
+    var results = idx.search({title: 'plant red'}, {bool: 'AND'});
+    assert.equal(results.length, 0);
+
     var results = idx.search({title: 'helps', body: 'nice'});
   
     assert.equal(results.length, 2);
@@ -71,14 +90,15 @@ describe('elasticlunr search', function() {
     assert.equal(results[1].ref, 'a');
   });
 });
-return;
-module('search', {
-  setup: function () {
-    var idx = new elasticlunr.Index;
+
+describe('elastic-like DSL', function() {
+  var idx = null;
+  beforeEach(() => {
+    idx = new elasticlunr.Index();
     idx.addField('body');
     idx.addField('title');
 
-    ;([{
+    ([{
       id: 'a',
       title: 'Mr. Green kills Colonel Mustard',
       body: 'Mr. Green killed Colonel Mustard in the study with the candlestick. Mr. Green is not a very nice fellow.',
@@ -104,58 +124,16 @@ module('search', {
     }]).forEach(function (doc) { idx.addDoc(doc); });
 
     this.idx = idx;
-  }
-});
-
-test('returning the correct results', function () {
-  var results = this.idx.search('green plant');
-  equal(results.length, 3);
-  equal(results[0].ref, 'b');
-});
-
-test('search term not in the index', function () {
-  var results = this.idx.search('foo');
-
-  equal(results.length, 0);
-});
-
-test('one search term not in the index', function () {
-  var results = this.idx.search('foo green')
-
-  equal(results.length, 3);
-})
-
-test('search contains one term not in the index', function () {
-  var results = this.idx.search('green foo');
-
-  equal(results.length, 3);
-});
-
-test('search takes into account boosts', function () {
-  var results = this.idx.search('professor');
-
-  equal(results.length, 2);
-  equal(results[0].ref, 'c');
-});
-
-test('search boosts exact matches', function () {
-  var results = this.idx.search('title');
-
-  equal(results.length, 2);
-  equal(results[0].ref, 'd');
-});
-
-test('search skips on 0 boost fields', function () {
-  var results = this.idx.search('plant', {fields: {title: {boost: 1}, body: {boost: 0}}});
-
-  equal(results.length, 1);
-  equal(results[0].ref, 'b');
-});
-
-test('allows different searches for different fields', function () {
-  var results = this.idx.search({title: 'helps', body: 'nice'});
-
-  equal(results.length, 2);
-  equal(results[0].ref, 'c');
-  equal(results[1].ref, 'a');
+  });
+  it('Allows fuzzing', () => {
+    var results = idx.search({
+      query: {
+        match: {
+          title: 'grene',
+          fuzziness: 2
+        }
+      }
+    });
+    assert.equal(results.length, 2);
+  })
 });

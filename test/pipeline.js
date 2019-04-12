@@ -42,8 +42,8 @@ describe('elasticlunr.Pipeline', function() {
     var pipeline = _pipeline();
     var fn = $.noop;
 
-    elasticlunr.Pipeline.registerFunction('test', fn);
-    elasticlunr.Pipeline.registerFunction('test', fn);
+    elasticlunr.Pipeline.registerFunction(fn, 'test');
+    elasticlunr.Pipeline.registerFunction(fn, 'test');
     assert.ok(spy.calledOnce);
     elasticlunr.utils.warn = oldwarn;
   })

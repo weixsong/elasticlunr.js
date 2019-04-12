@@ -21,7 +21,11 @@ if (env === 'build') {
 const config = {
   mode: mode,
   entry: __dirname + '/lib/elasticlunr.js',
-  plugins: [new BundleAnalyzerPlugin()],
+  plugins: [
+    new webpack.DefinePlugin({
+        __VERSION__: JSON.stringify(require('./package.json').version)
+     })
+  ],
   output: {
     path: __dirname + '/build',
     filename: outputFile,

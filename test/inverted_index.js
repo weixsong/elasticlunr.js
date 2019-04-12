@@ -9,8 +9,8 @@ describe('elasticlunr.InvertedIndex', function() {
     assert.deepEqual(invertedIndex.root, { docs: {}, df: 0 });
     assert.equal(invertedIndex.root.df, 0);
 
-    doc = { ref: 123, tf: 1},
-    token = 'foo';
+    var doc = { ref: 123, tf: 1},
+      token = 'foo';
 
     invertedIndex.addToken(token, doc);
 

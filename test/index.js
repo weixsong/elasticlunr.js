@@ -1,66 +1,94 @@
 const elasticlunr = require("../lib/elasticlunr.js");
 const assert = require("assert");
 const sinon = require("sinon");
+const iface = require("../lib/index/interface.js");
+const util = require("util");
 
+function getAllFuncs(obj) {
+  var props = [];
+
+  props = props.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj)));
+
+  return props.sort().filter(function(e, i, arr) { 
+     if (e!=arr[i+1] && obj && obj[e] && typeof obj[e] == 'function') return true;
+  });
+}
+
+describe('interface', () => {
+  it('should throw on every member', () => {
+    var i = new iface();
+    var fn = getAllFuncs(i);
+    fn.filter((prop) => ['constructor', 'all'].indexOf(prop) < 0).forEach((name) => {
+      if (i[name]) assert.throws(() => {
+        i[name]()
+      }, name)
+    });
+  })
+})
 describe('elasticlunr.Index', function() {
+  let addSpy = null;
+  let idx = null;
   it('should remember settings', function() {
     var idx = new elasticlunr.Index;
-    assert.deepEqual(idx._fields, []);
-    assert.equal(idx._ref, 'id');
+    assert.deepEqual(idx.getFields(), ['id']);
+    assert.equal(idx.getRef(), 'id');
 
     idx.addField('foo');
-    assert.deepEqual(idx._fields, ['foo']);
+    assert.deepEqual(idx.getFields(), ['id', 'foo']);
 
     idx.setRef('foo');
-    assert.deepEqual(idx._ref, 'foo');
+    assert.deepEqual(idx.getRef(), 'foo');
   });
-  it('should allow the addition of documents', function() {
-    
-    var idx = new elasticlunr.Index,
-    doc = {id: 1, body: 'this is a test'},    
-    doc2 = {id: 2, body: 'this is a test'};
-
-    let addSpy = sinon.spy();
+  it('should allow the addition of documents', () => {
+    var idx = new elasticlunr.Index();
+    var addSpy = sinon.spy();
     idx.on('add', addSpy);
+    
+    var doc = {id: 1, body: 'this is a test'},    
+    doc2 = {id: 2, body: 'this is a test'};
     idx.addField('body');
-    idx.addDoc(doc);
-    idx.addDoc(doc2, false);
-
-    assert.equal(idx.documentStore.length, 2);
-    assert.equal(addSpy.calledWith(doc, idx), true);
-    assert.equal(addSpy.calledOnce, true);
+    return Promise.all([idx.addDoc(doc), idx.addDoc(doc2, false)]).then(() => {
+      assert.equal(addSpy.calledOnce, true);
+    });
   });
   it('should allow the addition of documents with an empty field', function () {
     var idx = new elasticlunr.Index,
         doc = {id: 1, body: 'test', title: ''};
-  
+
     idx.addField('title');
     idx.addField('body');
   
     idx.addDoc(doc);
-    assert.equal(idx.index['body'].getDocFreq('test'), 1);
-    assert.equal(idx.index['body'].getDocs('test')[1].tf, 1);
+    assert.equal(Object.keys(idx.getField('body').termFrequency('test')).length, 1);
+    assert.equal(idx.getField('body').termFrequency('test')['1'], 1);
   });
 
   it('allows the removal of a document from the index', function () {
     var idx = new elasticlunr.Index,
-        doc = {id: 1, body: 'this is a test'};
+        doc = {id: 1, body: 'this is a test'},
+        doc2 = {id:2, body: 'this is another test'};
   
     idx.addField('body');
-    assert.equal(idx.documentStore.length, 0);
-  
+    // assert.equal(idx.documentStore.length, 0);
+    idx.addDoc(doc2);
     idx.addDoc(doc);
-    assert.equal(idx.documentStore.length, 1);
+    // assert.equal(idx.documentStore.length, 1);
   
     idx.removeDoc(doc);
-    assert.equal(idx.documentStore.length, 0);
+    // assert.equal(idx.documentStore.length, 0);
   
-    assert.equal(idx.index['body'].hasToken('this'), true);
-    assert.equal(idx.index['body'].hasToken('test'), true);
-    assert.equal(idx.index['body'].getNode('this').df, 0);
-    assert.deepEqual(idx.index['body'].getNode('test').docs, {});
+    assert.equal(idx.getField('body').hasToken('a'), false);
+    assert.equal(idx.getField('body').hasToken('another'), true);
+    assert.equal(idx.getField('body').getToken('a'), null);
+    assert.ok(idx.getField('body').getToken('another').idf> 0);
+    assert.deepEqual(idx.getField('body').getToken('another').documents, ['2']);
   })
   
+  it('should not allow the removal of a document from a non-stored index', function() {
+    var idx = new elasticlunr.Index;
+    idx.saveDocument(false);
+    assert.equal(idx.removeDocByRef("test"), null);
+  });
   it('allows the removal of a document from the index with more than one documents', function () {
     var idx = new elasticlunr.Index,
         doc1 = {id: 1, body: 'this is a test'},
@@ -78,17 +106,19 @@ describe('elasticlunr.Index', function() {
     idx.addDoc(doc2);
     assert.equal(idx.documentStore.length, 2);
   
-    assert.deepEqual(idx.index['body'].getNode('this').docs, docs);
+    assert.deepEqual(idx.getField('body').getToken('this').documents, ['1', '2']);
   
+    assert.equal(idx.removeDocByRef(), null);
+    assert.equal(idx.removeDocByRef("test"), null);
+    assert.equal(idx.removeDoc(), null);
     idx.removeDoc(doc1);
     assert.equal(idx.documentStore.length, 1);
-  
-    assert.equal(idx.index['body'].hasToken('this'), true);
-    assert.equal(idx.index['body'].hasToken('test'), true);
-    assert.equal(idx.index['body'].hasToken('apple'), true);
-    assert.equal(idx.index['body'].getNode('this').df, 1);
-    assert.deepEqual(idx.index['body'].getNode('apple').docs, {2: {tf: 1}});
-    assert.deepEqual(idx.index['body'].getNode('this').docs, {2: {tf: 1}});
+    assert.equal(idx.getField('body').hasToken('this'), true);
+    assert.equal(idx.getField('body').hasToken('test'), false);
+    assert.equal(idx.getField('body').hasToken('apple'), true);
+    assert.equal(idx.getField('body').getToken('this').idf> 0, true);
+    assert.deepEqual(idx.getField('body').getToken('apple').documents, ['2']);
+    assert.deepEqual(idx.getField('body').getToken('this').documents, ['2']);
   });
   
   it('should trigger remove events', function () {
@@ -106,8 +136,7 @@ describe('elasticlunr.Index', function() {
     
     idx.addDoc(doc);
     idx.removeDoc(doc, false);
-  
-    assert.equal(removalSpy.calledOnceWith(doc, idx), true);
+    assert.equal(removalSpy.calledOnce, true);
   });
   
   it('should no-op when removing a document not in the index', function () {
@@ -120,13 +149,13 @@ describe('elasticlunr.Index', function() {
     idx.on('remove', removalSpy);
   
     idx.addField('body')
-    assert.equal(idx.documentStore.length, 0)
+    assert.equal(idx.documentStore.size(), 0)
   
     idx.addDoc(doc)
-    assert.equal(idx.documentStore.length, 1)
+    assert.equal(idx.documentStore.size(), 1)
   
     idx.removeDoc(doc2)
-    assert.equal(idx.documentStore.length, 1)
+    assert.equal(idx.documentStore.size(), 1)
   
     assert.equal(removalSpy.notCalled, true);
   })
@@ -138,13 +167,13 @@ describe('elasticlunr.Index', function() {
     idx.addField('body')
     idx.addDoc(doc)
     assert.equal(idx.documentStore.length, 1)
-    assert.ok(idx.index['body'].hasToken('foo'))
+    assert.ok(idx.getField('body').hasToken('foo'))
   
     doc.body = 'bar'
     idx.updateDoc(doc)
   
     assert.equal(idx.documentStore.length, 1)
-    assert.ok(idx.index['body'].hasToken('bar'))
+    assert.ok(idx.getField('body').hasToken('bar'))
   })
   
   it('searches for a document', function () {
@@ -178,7 +207,7 @@ describe('elasticlunr.Index', function() {
     idx.addField('body')
     idx.addDoc(doc)
     assert.equal(idx.documentStore.length, 1)
-    assert.ok(idx.index['body'].hasToken('foo'))
+    assert.ok(idx.getField('body').hasToken('foo'))
   
     var addSpy = sinon.spy(),
         updateSpy = sinon.spy(),
@@ -190,7 +219,7 @@ describe('elasticlunr.Index', function() {
     doc.body = 'bar'
     idx.updateDoc(doc)
   
-    assert.ok(updateSpy.calledOnceWith(doc, idx));
+    assert.ok(updateSpy.calledOnce);
     assert.ok(addSpy.notCalled);
     assert.ok(deleteSpy.notCalled);
   })
@@ -203,7 +232,7 @@ describe('elasticlunr.Index', function() {
     idx.addField('body');
     idx.addDoc(doc);
     assert.equal(idx.documentStore.length, 1);
-    assert.ok(idx.index['body'].hasToken('foo'));
+    assert.ok(idx.getField('body').hasToken('foo'));
   
     var updateSpy = sinon.spy();
     idx.on('update', updateSpy);
@@ -214,71 +243,37 @@ describe('elasticlunr.Index', function() {
     assert.ok(updateSpy.notCalled);
   });
   
-  it('serializes', function () {
-    var idx = new elasticlunr.Index,
-        mockDocumentStore = { toJSON: function () { return 'documentStore' }},
-        mockIndex = {title: { toJSON: function () { return 'index' }},
-                     body: { toJSON: function () { return 'index' }}},
-  
-        mockPipeline = { toJSON: function () { return 'pipeline' }};
-  
-    idx.setRef('id');
-  
-    idx.addField('title');
-    idx.addField('body');
-  
-    idx.documentStore = mockDocumentStore;
-    idx.index = mockIndex;
-    idx.pipeline = mockPipeline;
-  
-    assert.deepEqual(idx.toJSON(), {
-      version: elasticlunr.version, // this is what the lunr version is set to before being built
-      fields: [ 'title', 'body' ],
-      ref: 'id',
-      documentStore: 'documentStore',
-      index: {title: 'index', body: 'index'},
-      pipeline: 'pipeline'
-    });
-  });
-  
   it('loads a serialised index', function () {
     var serialisedData = {
-      version: elasticlunr.version, // this is what the lunr version is set to before being built
+      version: '0.9.6', // this is what the lunr version is set to before being built
       fields: [
         { name: 'title', boost: 10 },
         { name: 'body', boost: 1 }
       ],
       ref: 'id',
       documentStore: { document_store: {}, length: 0 },
-      invertedIndex: { root: {}, length: 0 },
+      index: {
+        title: {
+          root: {
+          a: {
+            n: {
+              docs: {
+                'a': {
+                  tf: 1
+                }
+              }
+            }
+          }
+        }
+      }, length: 1 },
       corpusTokens: [],
       pipeline: ['stopWordFilter', 'stemmer']
     }
   
-    var idx = elasticlunr.Index.load(serialisedData)
-  
-    assert.deepEqual(idx._fields, serialisedData.fields)
-    assert.equal(idx._ref, 'id')
-  })
-  
-  it('sets idf cache with reserved words', function () {
-    var idx = new elasticlunr.Index;
-    idx.addField('body');
-  
-    var troublesomeTokens = [
-      'constructor',
-      '__proto__',
-      'hasOwnProperty',
-      'isPrototypeOf',
-      'propertyIsEnumerable',
-      'toLocaleString',
-      'toString',
-      'valueOf'
-    ]
-  
-    troublesomeTokens.forEach(function (token) {
-      assert.equal(typeof(idx.idf(token, 'body')), 'number', 'Using token: ' + token)
-    })
+    var idx = elasticlunr.Index.load(serialisedData);
+    assert.ok(idx.getField('title') !== null);
+    assert.ok(idx.getField('body') !== null);
+    assert.equal(idx.getRef(), 'id')
   })
   
   it('allows the use of plugins', function () {
@@ -295,5 +290,23 @@ describe('elasticlunr.Index', function() {
     assert.equal(ctx, idx)
     assert.deepEqual(args, [idx, 'foo', 'bar'])
     assert.ok(idx.pluginLoaded)
-  })
+  });
+  it('prevents the use of unknown index versions', function() {
+    assert.throws(function() {
+      var serialisedData = {
+        version: '0.3.2',
+        fields: [
+          { name: 'title', boost: 10 },
+          { name: 'body', boost: 1 }
+        ],
+        ref: 'id',
+        documentStore: { document_store: {}, length: 0 },
+        invertedIndex: { root: {}, length: 0 },
+        corpusTokens: [],
+        pipeline: ['stopWordFilter', 'stemmer']
+      }
+    
+      var idx = elasticlunr.Index.load(serialisedData)
+    });
+  });
 });
