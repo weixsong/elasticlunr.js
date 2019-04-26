@@ -1,7 +1,8 @@
 var elasticlunr = require("../lib/elasticlunr.js");
-var lunrStemmer = require("../node_modules/lunr-languages/lunr.stemmer.support.js")(elasticlunr);
-var lunrFR = require("../node_modules/lunr-languages/lunr.fr.js")(elasticlunr);
+require("../node_modules/lunr-languages/lunr.stemmer.support.js")(elasticlunr);
+require("../node_modules/lunr-languages/lunr.fr.js")(elasticlunr);
 var util = require("util");
+var assert = require("assert");
 
 describe('lunr-languages', () => {
     it('Allows the usage of the package', () => {
@@ -16,7 +17,9 @@ describe('lunr-languages', () => {
                 id: 2,
                 body: 'Some english to make sure it works'
             });
-        })
-        console.log(util.inspect(idx, false, null, true));
+        });
+        assert.deepEqual(idx.inner.pipeline._queue.map((r) => r.label), ['trimmer-fr', 'stopWordFilter-fr', 'stemmer-fr']);
+        var results = idx.search('document');
+        assert.deepEqual(results.map((r) => r.ref), [1]);
     })
 })
