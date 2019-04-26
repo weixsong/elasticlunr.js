@@ -189,10 +189,6 @@ describe('elastic-like DSL', function() {
           }
         }
       });
-      results.forEach((result) => {
-        console.log(result);
-        console.log(idx.highlight(result.ref, result.positions)('<i>', '</i>'));
-      })
       assert.equal(results.length, 2);
     })
     it('properly handles must_not', () => {

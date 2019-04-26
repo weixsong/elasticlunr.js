@@ -291,6 +291,49 @@ describe('elasticlunr.Index', function() {
     assert.deepEqual(args, [idx, 'foo', 'bar'])
     assert.ok(idx.pluginLoaded)
   });
+  it('allows the use of multiple, different pipelines for searching and indexing', () => {
+    var idx = new elasticlunr.Index;
+    idx.addField('test');
+    idx.inner.getField('test').setQueryPipeline({
+      run: (token) => {
+        var currentSet = [];
+        if (token.toString() === "foo") {
+          currentSet.push('bar');
+          currentSet.push('baz');
+          currentSet.push('barry');
+        }
+        currentSet.push(token.toString());
+        return currentSet;
+      }
+    });
+    idx.addDoc({
+      id: 'a',
+      test: 'Barry had a beer with Fred in the bar'
+    });
+    idx.addDoc({
+      id: 'b',
+      test: 'the bar is empty'
+    });
+    var results = idx.search({
+      query: {
+        match: {
+          test: 'foo'
+        }
+      }
+    });
+    assert.equal(results.length, 2);
+    // An unfortunate side-effect of variation matching is that scores
+    // get inflated due to more terms matching the `should` query.
+    assert.ok(results[1].score < results[0].score);
+    results = idx.search({
+      query: {
+        match: {
+          test: 'fred'
+        }
+      }
+    });
+    assert.equal(results.length, 1);
+  })
   it('prevents the use of unknown index versions', function() {
     assert.throws(function() {
       var serialisedData = {
