@@ -136,7 +136,7 @@ Browsers that do not support ES5 will require a JavaScript shim for Elasticlunr.
 
 # Documentation
 
-This part only contain important apects of elasticlunr.js, for the whole documentation, please go to [API documentation](http://elasticlunr.com/docs/index.html).
+This part only contain important aspects of elasticlunr.js, for the whole documentation, please go to [API documentation](http://elasticlunr.com/docs/index.html).
 
 ## 1. Build Index
 
@@ -228,7 +228,7 @@ index.updateDoc(doc);
 
 Elasticlunr.js provides flexible query configuration, supports query-time boosting and Boolean logic setting.
 You could setup a configuration tell elasticlunr.js how to do query-time boosting, which field to search in, how to do the boolean logic.
-Or you could just use it by simply provide a query string, this will aslo works perfectly because the scoring mechanism is very efficient.
+Or you could just use it by simply provide a query string, this will also works perfectly because the scoring mechanism is very efficient.
 
 ### 5.1 Simple Query
 
@@ -265,7 +265,7 @@ index.search("Oracle database profit", {
 
 #### 5.2.2 **Boolean Model**
 
-Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic defaulty. By "OR" default logic, elasticlunr.js could reach a high **Recall**.
+Elasticlunr.js also support boolean logic setting, if no boolean logic is setted, elasticlunr.js use "OR" logic default. By "OR" default logic, elasticlunr.js could reach a high **Recall**.
 
 ```javascript
 index.search("Oracle database profit", {
@@ -288,7 +288,7 @@ index.search("Oracle database profit", {
 });
 ```
 The above setting will search <code>title</code> field by **AND** model and other fields by "OR" model.
-Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
+Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future Elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
 
 #### 5.2.3 **Token Expandation**
 Sometimes user want to expand a query token to increase **RECALL**, then user could set expand model to **true** by configuration, default is **false**.
