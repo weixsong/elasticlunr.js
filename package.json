@@ -7,6 +7,7 @@
   "homepage": "http://weixsong.github.io",
   "bugs": "https://github.com/weixsong/elasticlunr.js/issues",
   "main": "elasticlunr.js",
+  "types": "elasticlunr.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
