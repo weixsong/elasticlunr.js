@@ -3,21 +3,86 @@
   "description": "Lightweight full-text search engine in Javascript for browser search and offline search.",
   "version": "0.9.6",
   "author": "Wei Song",
-  "keywords": ["search", "text retrieval", "offline search", "full text search"],
+  "keywords": [
+    "search",
+    "text retrieval",
+    "offline search",
+    "full text search"
+  ],
   "homepage": "http://weixsong.github.io",
   "bugs": "https://github.com/weixsong/elasticlunr.js/issues",
-  "main": "elasticlunr.js",
+  "main": "lib/elasticlunr.js",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/weixsong/elasticlunr.js"
   },
+  "nyc": {
+    "require": [
+      "@babel/register"
+    ],
+    "reporter": [
+      "html",
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "exclude": [
+      "lib/index/legacy.js"
+    ],
+    "include": [
+      "lib/*.js",
+      "lib/**/*.js"
+    ],
+    "exensions": [
+      ".js"
+    ],
+    "instrument": false,
+    "sourceMap": false,
+    "all": true,
+    "report-dir": "docs/reports/coverage/"
+  },
   "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^8.0.3",
+    "babel-loader": "^8.0.0-beta.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-istanbul": "^5.1.1",
+    "babel-preset-env": "^7.0.0-beta.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^7.0.0-beta.3",
+    "benchmark": "^2.1.4",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "doxx": "1.4.0",
-    "phantomjs": "1.9.8",
-    "uglify-js": "2.6.0"
+    "elasticlunr": "0.9.5",
+    "eslint": "^5.0.1",
+    "eslint-loader": "^2.0.0",
+    "jsdom": "11.11.0",
+    "jsdom-global": "3.0.2",
+    "lunr": "^2.3.6",
+    "lunr-languages": "^1.1.0",
+    "microtime": "^3.0.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.3.0",
+    "sinon": "^7.2.3",
+    "terser-webpack-plugin": "^1.2.3",
+    "uglify-js": "2.6.0",
+    "uglifyjs-webpack-plugin": "^1.2.7",
+    "webpack": "^4.12.2",
+    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-cli": "^3.0.8",
+    "yargs": "^10.0.3"
   },
   "scripts": {
-    "test": "make test"
+    "test": "cross-env NODE_ENV=test nyc mocha -R spec",
+    "build": "cross-env NODE_ENV=production webpack --mode production --env production -p"
+  },
+  "dependencies": {
+    "depromisify": "^1.0.0"
   }
 }
