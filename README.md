@@ -21,6 +21,11 @@ Elasticlunr.js is a lightweight full-text search engine developed in JavaScript 
 Elasticlunr.js is developed based on Lunr.js, but more flexible than lunr.js. Elasticlunr.js provides Query-Time boosting, field search, more rational scoring/ranking methodology, fast computation speed and so on.
 Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also provide flexible configuration, query-time boosting, field search and other features.
 
+# Elasticlunr.js Search Widget
+
+This library only provides the search-engine functionality but there is no actual "front-end" to display the results with. [Here](https://github.com/amihaiemil/elasticlunr-search-widget) is an implementation of a Search component that will help you
+display the results elegantly.
+
 # Why You Need Lightweight Offline Search?
 
 1. In some systems, you don't want to deploy any **complex full-text search engine** (such as Lucene, Elasticsearch, Sphinx, etc.), you only want to provide some static web pages and provide search functionality, then you could build index in previous and load index in client side (such as Browser).
