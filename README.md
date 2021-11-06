@@ -37,7 +37,7 @@ Elasticlunr.js is a bit like Solr, but much smaller and not as bright, but also 
 4. **Boolean Model**, you can set which field to search and the boolean model for each query token, such as "OR", "AND".
 5. **Combined Boolean Model, TF/IDF Model and the Vector Space Model**, makes the results ranking more reliable.
 6. **Fast**, Elasticlunr.js removed TokenCorpus and Vector from lunr.js, by using combined model there is **no** need to compute the vector of a document and query string to compute similarity of query and matched document, this improves the search speed significantly.
-7. **Small Index Size**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is small, and also user can choose if they need to store the origianl JSON doc, if user cares more about the index size, they can choose not store the original JSON doc. This can reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search. The index size is about half size of lunr.js index file.
+7. **Small Index Size**, Elasticlunr.js did not store TokenCorpus because there is no need to compute query vector and document vector, then the index file is small, and also user can choose if they need to store the original JSON doc, if user cares more about the index size, they can choose not store the original JSON doc. This can reduce the index size significantly. This is especially helpful when elasticlunr.js is used as offline search. The index size is about half size of lunr.js index file.
 
 ## Example
 
@@ -119,7 +119,7 @@ var index = elasticlunr(function () {
 });
 ```
 
-Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not udpate or delete a document from index.
+Then elasticlunr.js will not store the JSON documents, this will reduce the index size, but also bring some inconvenience such as update a document or delete a document by document id or reference. Actually most of the time user will not update or delete a document from index.
 
 [API documentation](http://elasticlunr.com/docs/index.html) is available, as well as a [full working example](http://elasticlunr.com/example/index.html).
 
@@ -288,7 +288,7 @@ index.search("Oracle database profit", {
 });
 ```
 The above setting will search <code>title</code> field by **AND** model and other fields by "OR" model.
-Currently if you search in multiply fields, resutls from each field will be merged together to give the query results. In the future Elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
+Currently if you search in multiply fields, results from each field will be merged together to give the query results. In the future Elasticlunr will support configuration that user could set how to combine the results from each field, such as "most_field" or "top_field".
 
 #### 5.2.3 **Token Expandation**
 Sometimes user want to expand a query token to increase **RECALL**, then user could set expand model to **true** by configuration, default is **false**.
