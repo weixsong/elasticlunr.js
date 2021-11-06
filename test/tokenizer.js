@@ -39,7 +39,7 @@ describe('elasticlunr.tokenizer', function() {
     assert.deepEqual(elasticlunr.tokenizer(obj).map((r) => r.toString()), ['custom', 'object']);
 
 // slicing here to avoid asserting on the timezone part of the date
-// that will be different whereever the test is run.
+// that will be different wherever the test is run.
     assert.deepEqual(elasticlunr.tokenizer(date).slice(0, 4).map((r) => r.toString()), ['tue', 'jan', '01', '2013']);
   });
 
