@@ -62,7 +62,7 @@
     "elasticlunr": "0.9.5",
     "eslint": "^5.0.1",
     "eslint-loader": "^2.0.0",
-    "jsdom": "11.11.0",
+    "jsdom": "16.5.0",
     "jsdom-global": "3.0.2",
     "lunr": "^2.3.6",
     "lunr-languages": "^1.1.0",
