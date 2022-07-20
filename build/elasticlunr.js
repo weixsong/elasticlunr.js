@@ -1118,12 +1118,13 @@ QueryRepository.register('match_all', function (repository, options) {
 /*!****************************!*\
   !*** ./lib/elasticlunr.js ***!
   \****************************/
-/*! exports provided: elasticlunr */
+/*! exports provided: elasticlunr, lunr */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "elasticlunr", function() { return elasticlunr; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lunr", function() { return lunr; });
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./lib/utils.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./lib/index.js");
 /* harmony import */ var _configuration_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./configuration.js */ "./lib/configuration.js");
@@ -1201,6 +1202,7 @@ var elasticlunr = function elasticlunr(config) {
   return idx;
 };
 
+var lunr = elasticlunr;
 
 
 
@@ -1214,8 +1216,8 @@ var elasticlunr = function elasticlunr(config) {
 
 [_utils_js__WEBPACK_IMPORTED_MODULE_0__["utils"], _index_js__WEBPACK_IMPORTED_MODULE_1__["index"], _configuration_js__WEBPACK_IMPORTED_MODULE_2__["configuration"], _event_emitter_js__WEBPACK_IMPORTED_MODULE_3__["eventEmitter"], _pipeline_js__WEBPACK_IMPORTED_MODULE_4__["pipeline"], _document_store_js__WEBPACK_IMPORTED_MODULE_5__["documentStore"], _sorted_set_js__WEBPACK_IMPORTED_MODULE_6__["sortedSet"], _tokenizer_js__WEBPACK_IMPORTED_MODULE_7__["tokenizer"], _stemmer_js__WEBPACK_IMPORTED_MODULE_8__["stemmer"], _stop_word_filter_js__WEBPACK_IMPORTED_MODULE_9__["stopWordFilter"], _trimmer_js__WEBPACK_IMPORTED_MODULE_10__["trimmer"]].forEach(function (module) {
   module(elasticlunr);
-}); // elasticlunr.version = __VERSION__;
-// only used this to make elasticlunr.js compatible with lunr-languages
+});
+elasticlunr.version = "0.9.6"; // only used this to make elasticlunr.js compatible with lunr-languages
 // this is a trick to define a global alias of elasticlunr
 
 
@@ -2456,8 +2458,8 @@ var DocumentStore = /*#__PURE__*/function () {
   return DocumentStore;
 }();
 
-var Index = /*#__PURE__*/function (_Index) {
-  _inherits(Index, _Index);
+var Index = /*#__PURE__*/function (_IdxInterface) {
+  _inherits(Index, _IdxInterface);
 
   var _super = _createSuper(Index);
 
