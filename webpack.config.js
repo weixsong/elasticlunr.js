@@ -8,7 +8,6 @@ const pkg = require('./package.json');
 let libraryName = pkg.name;
 
 const TerserPlugin = require('terser-webpack-plugin');
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 let outputFile, mode;
 
@@ -28,15 +27,11 @@ const config = {
     new webpack.DefinePlugin({
         __VERSION__: JSON.stringify(require('./package.json').version)
      }),
-//     new BundleAnalyzerPlugin()
   ],
   output: {
     path: __dirname + '/build',
     filename: outputFile,
-    library: libraryName,
     libraryTarget: 'umd',
-    umdNamedDefine: true,
-    globalObject: "typeof self !== 'undefined' ? self : this"
   },
   module: {
     rules: [
